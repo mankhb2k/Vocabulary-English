@@ -466,6 +466,30 @@ Dưới đây là cấu trúc khung cho bộ từ vựng, được chia làm 2 p
 - Follow / Unfollow someone (Theo dõi / Bỏ theo dõi ai đó)
 - Go viral (Lan truyền nhanh chóng trên mạng)
 
+## 19. Basic Commands & Instructions (Mệnh lệnh & Hướng dẫn cơ bản) - 15 cụm
+*Những câu ra lệnh, yêu cầu hoặc hướng dẫn ngắn gọn, dùng với tần suất cực cao mỗi ngày.*
+
+### Hướng dẫn & Hành động
+- Follow me. (Đi theo tôi.)
+- Come here. / Come in. (Lại đây. / Vào đi.)
+- Go ahead. (Cứ tự nhiên / Cứ làm đi.)
+- Let me see. (Để tôi xem.)
+- Look at this. (Nhìn cái này đi.)
+
+### Thời gian & Tốc độ
+- Wait a minute / Wait a second. (Đợi một chút.)
+- Hurry up! (Nhanh lên!)
+- Take your time. (Cứ từ từ / Không phải vội.)
+- Hold on. (Giữ máy / Chờ một chút.)
+
+### Cảnh báo & Trạng thái
+- Be careful! / Watch out! (Cẩn thận!)
+- Watch your step. (Chú ý bước chân.)
+- Mind your own business. (Lo việc của bạn đi / Đừng tò mò.)
+- Leave me alone. (Để tôi yên.)
+- Give me a hand. (Giúp tôi một tay với.)
+- Calm down. (Bình tĩnh nào.)
+
 ***
 
 
