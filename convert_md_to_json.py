@@ -17,6 +17,9 @@ import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
+JSON_DIR = os.path.join(BASE_DIR, "json")
+
+os.makedirs(JSON_DIR, exist_ok=True)
 
 
 # ============================================================
@@ -278,6 +281,45 @@ def _parse_chunk_line(text: str) -> dict:
     return {"english": text, "vietnamese": "", "notes": ""}
 
 
+def _normalize_chunk_key(text: str) -> str:
+    """Normalize text for duplicate detection."""
+    text = text.replace('’', "'").replace('“', '"').replace('”', '"')
+    text = re.sub(r'\s+', ' ', text.strip()).lower()
+    return text
+
+
+def validate_chunk_uniqueness(filepath: str) -> list[dict]:
+    """Check chunk entries in markdown source for duplicate English phrases."""
+    with open(filepath, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    seen = {}
+    duplicates = []
+
+    for idx, line in enumerate(lines, start=1):
+        stripped = line.strip()
+        m = re.match(r'^-\s+(.+)$', stripped)
+        if not m:
+            continue
+
+        raw = m.group(1).strip()
+        parsed = _parse_chunk_line(raw)
+        key = _normalize_chunk_key(parsed.get('english', ''))
+        if not key:
+            continue
+
+        if key in seen:
+            duplicates.append({
+                'line': idx,
+                'english': parsed.get('english', ''),
+                'first_line': seen[key],
+            })
+        else:
+            seen[key] = idx
+
+    return duplicates
+
+
 # ============================================================
 # 3. MAIN
 # ============================================================
@@ -287,7 +329,7 @@ def main():
 
     if "vocab" in targets or "all" in targets:
         inp = os.path.join(DOCS_DIR, "Vocabulary.md")
-        out = os.path.join(BASE_DIR, "Vocabulary.json")
+        out = os.path.join(JSON_DIR, "Vocabulary.json")
         if not os.path.exists(inp):
             print(f"❌ Not found: {inp}")
         else:
@@ -303,10 +345,18 @@ def main():
 
     if "chunk" in targets or "all" in targets:
         inp = os.path.join(DOCS_DIR, "chunk-english.md")
-        out = os.path.join(BASE_DIR, "chunk-english.json")
+        out = os.path.join(JSON_DIR, "chunk-english.json")
         if not os.path.exists(inp):
             print(f"❌ Not found: {inp}")
         else:
+            duplicates = validate_chunk_uniqueness(inp)
+            if duplicates:
+                print(f"\n⚠️ Found {len(duplicates)} duplicate chunk entries in {inp}:")
+                for item in duplicates[:10]:
+                    print(f"   - line {item['line']}: {item['english']} (first seen at line {item['first_line']})")
+            else:
+                print(f"\n✅ No duplicate chunk entries found in {inp}")
+
             print(f"\n📖 Parsing {inp} ...")
             data = parse_chunk_english_md(inp)
             with open(out, 'w', encoding='utf-8') as f:

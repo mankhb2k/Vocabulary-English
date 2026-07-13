@@ -495,7 +495,55 @@ _Những cụm động từ hành động mà người ta THỰC HIỆN mỗi ng
 - Reschedule a meeting (Đổi lịch họp)
 - Keep track of something (Theo dõi / Giữ ghi chép về điều gì đó)
 
-## 18. Modern Digital Life (Cuộc sống số hàng ngày) - 28 cụm
+## 18. Everyday Situations & Problems (Tình huống thường ngày) - 20 cụm
+
+_Các cụm dùng khi bạn đang bận, phải đi muộn, đổi lịch, hoặc cần nhờ ai đó giúp._
+
+### Đến muộn / Đi sớm / Rời đi
+
+- I'm running late. (Tôi đến muộn rồi.)
+- Sorry I'm late. (Xin lỗi vì tôi đến muộn.)
+- I'll be there in 10 minutes. (Tôi sẽ đến trong 10 phút.)
+- I'm on my way. (Tôi đang trên đường.)
+- I need to leave now. (Tôi cần đi ngay bây giờ.)
+- I need to head out. (Tôi phải đi đây.)
+- I’m in a hurry. (Tôi đang vội.)
+- I’m running out of time. (Tôi đang hết thời gian.)
+
+### Bận / Không rảnh / Phản hồi nhanh
+
+- I'm not available right now. (Bây giờ tôi không rảnh.)
+- I'm busy at the moment. (Hiện tại tôi đang bận.)
+- Can you wait a minute? (Bạn đợi mình một phút được không?)
+- Can you hold on for a second? (Bạn chờ mình một chút được không?)
+- I'll get back to you soon. (Tôi sẽ phản hồi lại sớm.)
+- I'll let you know. (Tôi sẽ cho bạn biết sau.)
+- I’ll reach out again later. (Tôi sẽ liên hệ lại sau.)
+
+### Nhờ giúp / Đổi lịch / Hủy bỏ
+
+- I need a favor. (Tôi cần một việc bạn giúp.)
+- Could you give me a hand? (Bạn có thể giúp tôi một tay không?)
+- Can we reschedule? (Chúng ta có thể đổi lịch không?)
+- I have to cancel. (Tôi phải hủy.)
+- It's not a big deal. (Không việc gì đâu.)
+- That's fine. (Được thôi.)
+- I'm not sure what to do. (Tôi không biết phải làm gì.)
+
+### Kế hoạch / Hẹn gặp / Chọn ý kiến
+
+- I’m free this evening. (Tôi rảnh tối nay.)
+- I’m available tomorrow. (Tôi có thể hôm mai.)
+- I’ve got plans tonight. (Tôi đã có kế hoạch tối nay.)
+- I’m thinking of going out. (Tôi đang nghĩ đến việc đi chơi.)
+- Let’s meet up sometime. (Chúng ta hẹn gặp nhau lúc nào đó.)
+- I can make it. (Tôi có thể đến được.)
+- I can’t make it. (Tôi không đến được.)
+- Sounds good to me. (Nghe ổn với tôi.)
+- I’m not sure yet. (Tôi vẫn chưa chắc.)
+- I’d rather not. (Tôi không muốn lắm.)
+
+## 19. Modern Digital Life (Cuộc sống số hàng ngày) - 28 cụm
 
 _Những cụm từ gắn liền với điện thoại, máy tính, mạng xã hội và làm việc từ xa — không có trong sách giáo khoa cũ._
 
@@ -541,7 +589,7 @@ _Những cụm từ gắn liền với điện thoại, máy tính, mạng xã h
 - Follow / Unfollow someone (Theo dõi / Bỏ theo dõi ai đó)
 - Go viral (Lan truyền nhanh chóng trên mạng)
 
-## 19. Basic Commands & Instructions (Mệnh lệnh & Hướng dẫn cơ bản) - 15 cụm
+## 20. Basic Commands & Instructions (Mệnh lệnh & Hướng dẫn cơ bản) - 15 cụm
 
 _Những câu ra lệnh, yêu cầu hoặc hướng dẫn ngắn gọn, dùng với tần suất cực cao mỗi ngày._
 

@@ -1801,6 +1801,200 @@
         {
           "id": 18,
           "code": "18",
+          "name_english": "Everyday Situations & Problems (Tình huống thường ngày)",
+          "name_vietnamese": "20 cụm",
+          "estimated_chunks": 20,
+          "description": "",
+          "sub_topics": [
+            {
+              "name": "Đến muộn / Đi sớm / Rời đi",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "I'm running late.",
+                  "vietnamese": "Tôi đến muộn rồi.",
+                  "notes": ""
+                },
+                {
+                  "english": "Sorry I'm late.",
+                  "vietnamese": "Xin lỗi vì tôi đến muộn.",
+                  "notes": ""
+                },
+                {
+                  "english": "I'll be there in 10 minutes.",
+                  "vietnamese": "Tôi sẽ đến trong 10 phút.",
+                  "notes": ""
+                },
+                {
+                  "english": "I'm on my way.",
+                  "vietnamese": "Tôi đang trên đường.",
+                  "notes": ""
+                },
+                {
+                  "english": "I need to leave now.",
+                  "vietnamese": "Tôi cần đi ngay bây giờ.",
+                  "notes": ""
+                },
+                {
+                  "english": "I need to head out.",
+                  "vietnamese": "Tôi phải đi đây.",
+                  "notes": ""
+                },
+                {
+                  "english": "I’m in a hurry.",
+                  "vietnamese": "Tôi đang vội.",
+                  "notes": ""
+                },
+                {
+                  "english": "I’m running out of time.",
+                  "vietnamese": "Tôi đang hết thời gian.",
+                  "notes": ""
+                }
+              ]
+            },
+            {
+              "name": "Bận / Không rảnh / Phản hồi nhanh",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "I'm not available right now.",
+                  "vietnamese": "Bây giờ tôi không rảnh.",
+                  "notes": ""
+                },
+                {
+                  "english": "I'm busy at the moment.",
+                  "vietnamese": "Hiện tại tôi đang bận.",
+                  "notes": ""
+                },
+                {
+                  "english": "Can you wait a minute?",
+                  "vietnamese": "Bạn đợi mình một phút được không?",
+                  "notes": ""
+                },
+                {
+                  "english": "Can you hold on for a second?",
+                  "vietnamese": "Bạn chờ mình một chút được không?",
+                  "notes": ""
+                },
+                {
+                  "english": "I'll get back to you soon.",
+                  "vietnamese": "Tôi sẽ phản hồi lại sớm.",
+                  "notes": ""
+                },
+                {
+                  "english": "I'll let you know.",
+                  "vietnamese": "Tôi sẽ cho bạn biết sau.",
+                  "notes": ""
+                },
+                {
+                  "english": "I’ll reach out again later.",
+                  "vietnamese": "Tôi sẽ liên hệ lại sau.",
+                  "notes": ""
+                }
+              ]
+            },
+            {
+              "name": "Nhờ giúp / Đổi lịch / Hủy bỏ",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "I need a favor.",
+                  "vietnamese": "Tôi cần một việc bạn giúp.",
+                  "notes": ""
+                },
+                {
+                  "english": "Could you give me a hand?",
+                  "vietnamese": "Bạn có thể giúp tôi một tay không?",
+                  "notes": ""
+                },
+                {
+                  "english": "Can we reschedule?",
+                  "vietnamese": "Chúng ta có thể đổi lịch không?",
+                  "notes": ""
+                },
+                {
+                  "english": "I have to cancel.",
+                  "vietnamese": "Tôi phải hủy.",
+                  "notes": ""
+                },
+                {
+                  "english": "It's not a big deal.",
+                  "vietnamese": "Không việc gì đâu.",
+                  "notes": ""
+                },
+                {
+                  "english": "That's fine.",
+                  "vietnamese": "Được thôi.",
+                  "notes": ""
+                },
+                {
+                  "english": "I'm not sure what to do.",
+                  "vietnamese": "Tôi không biết phải làm gì.",
+                  "notes": ""
+                }
+              ]
+            },
+            {
+              "name": "Kế hoạch / Hẹn gặp / Chọn ý kiến",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "I’m free this evening.",
+                  "vietnamese": "Tôi rảnh tối nay.",
+                  "notes": ""
+                },
+                {
+                  "english": "I’m available tomorrow.",
+                  "vietnamese": "Tôi có thể hôm mai.",
+                  "notes": ""
+                },
+                {
+                  "english": "I’ve got plans tonight.",
+                  "vietnamese": "Tôi đã có kế hoạch tối nay.",
+                  "notes": ""
+                },
+                {
+                  "english": "I’m thinking of going out.",
+                  "vietnamese": "Tôi đang nghĩ đến việc đi chơi.",
+                  "notes": ""
+                },
+                {
+                  "english": "Let’s meet up sometime.",
+                  "vietnamese": "Chúng ta hẹn gặp nhau lúc nào đó.",
+                  "notes": ""
+                },
+                {
+                  "english": "I can make it.",
+                  "vietnamese": "Tôi có thể đến được.",
+                  "notes": ""
+                },
+                {
+                  "english": "I can’t make it.",
+                  "vietnamese": "Tôi không đến được.",
+                  "notes": ""
+                },
+                {
+                  "english": "Sounds good to me.",
+                  "vietnamese": "Nghe ổn với tôi.",
+                  "notes": ""
+                },
+                {
+                  "english": "I’m not sure yet.",
+                  "vietnamese": "Tôi vẫn chưa chắc.",
+                  "notes": ""
+                },
+                {
+                  "english": "I’d rather not.",
+                  "vietnamese": "Tôi không muốn lắm.",
+                  "notes": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "code": "19",
           "name_english": "Modern Digital Life (Cuộc sống số hàng ngày)",
           "name_vietnamese": "28 cụm",
           "estimated_chunks": 28,
@@ -1974,8 +2168,8 @@
           ]
         },
         {
-          "id": 19,
-          "code": "19",
+          "id": 20,
+          "code": "20",
           "name_english": "Basic Commands & Instructions (Mệnh lệnh & Hướng dẫn cơ bản)",
           "name_vietnamese": "15 cụm",
           "estimated_chunks": 15,
@@ -2976,6 +3170,6 @@
       ]
     }
   },
-  "total_chunks": 437,
-  "total_sections": 27
+  "total_chunks": 469,
+  "total_sections": 28
 }
