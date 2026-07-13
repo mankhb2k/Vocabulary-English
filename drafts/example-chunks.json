@@ -1,0 +1,28 @@
+{
+  "topic": {
+    "code": "24",
+    "name_english": "Health & Body",
+    "name_vietnamese": "Sức khỏe & Cơ thể",
+    "estimated_chunks": 3
+  },
+  "sub_topics": [
+    {
+      "name": "Triệu chứng",
+      "chunks": [
+        {
+          "english": "Throw up",
+          "vietnamese": "Nôn / Ói"
+        },
+        {
+          "english": "Pass out",
+          "vietnamese": "Ngất / Bất tỉnh"
+        },
+        {
+          "english": "Come down with",
+          "vietnamese": "Mắc bệnh / Bị ốm",
+          "notes": "come down with a cold"
+        }
+      ]
+    }
+  ]
+}

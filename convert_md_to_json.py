@@ -1,13 +1,14 @@
 """
 Convert MD vocabulary files to JSON.
 Usage:
-    python convert_md_to_json.py              # Convert both files
-    python convert_md_to_json.py vocab        # Convert Vocabulary.md only
-    python convert_md_to_json.py chunk        # Convert chunk-english.md only
+    python convert_md_to_json.py              # Convert all files
+    python convert_md_to_json.py vocab        # Convert vocabulary MD files only
+    python convert_md_to_json.py chunk-en-vi  # Convert chunk-en-vi.md only
 
 Output:
-    Vocabulary.md   → Vocabulary.json
-    chunk-english.md → chunk-english.json
+    Vocabulary-topics.md  → json/Vocabulary-topics.json
+    Vocabulary-levels.md  → json/Vocabulary-levels.json
+    chunk-en-vi.md        → json/chunk-en-vi.json
 """
 
 import json
@@ -18,64 +19,53 @@ import sys
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 JSON_DIR = os.path.join(BASE_DIR, "json")
+CHUNK_MD = "chunk-en-vi.md"
+CHUNK_JSON = "chunk-en-vi.json"
 
 os.makedirs(JSON_DIR, exist_ok=True)
 
 
 # ============================================================
-# 1. PARSE Vocabulary.md → Vocabulary.json
+# 1. PARSE Vocabulary-topics.md → Vocabulary-topics.json
 # ============================================================
 
 def parse_vocabulary_md(filepath: str) -> dict:
     """
-    Convert Vocabulary.md to structured JSON.
+    Convert Vocabulary-topics.md to structured JSON.
 
     Expected MD structure:
-        ## A1 — Beginner
-        ### 1. Topic Name (A1)
+        ### 1. Topic Name
         word1, word2, word3, ...
 
-        ## A2 — Elementary
-        ### 14. Topic Name (A2)
+        ### 2. Another Topic
         word1, word2, ...
     """
     with open(filepath, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
     result = {
-        "title": "English Vocabulary — Practical Core",
-        "description": "Giao tiếp hàng ngày + văn phòng / IT (A1 → B1)",
-        "levels": {}
+        "title": "English Vocabulary — By Topic",
+        "description": "Giao tiếp hàng ngày + văn phòng / IT — sắp xếp theo chủ đề",
+        "topics": []
     }
 
-    current_level = None
     current_topic = None
 
     for line in lines:
         stripped = line.strip()
 
-        # Level header: ## A1 ... or ## A2 ... or ## B1 ...
-        m = re.match(r'^##\s+(A[12]|B1)\b', stripped)
-        if m:
-            current_level = m.group(1)
-            result["levels"].setdefault(current_level, {"level": current_level, "topics": []})
-            continue
-
-        # Topic header: ### N. Topic Name (Level)
-        m = re.match(r'^###\s+(\d+)\.\s+(.+?)\s*\(([A-Z][0-9])\)', stripped)
+        # Topic header: ### N. Topic Name
+        m = re.match(r'^###\s+(\d+)\.\s+(.+)$', stripped)
         if m:
             topic_num = int(m.group(1))
             topic_name = m.group(2).strip()
-            topic_level = m.group(3)
-            current_topic = {"id": topic_num, "name": topic_name, "level": topic_level, "words": []}
-
-            # Attach to current level, or fallback to level from header
-            lvl = current_level if current_level and current_level in result["levels"] else topic_level
-            result["levels"].setdefault(lvl, {"level": lvl, "topics": []})
-            result["levels"][lvl]["topics"].append(current_topic)
+            current_topic = {"id": topic_num, "name": topic_name, "words": []}
+            result["topics"].append(current_topic)
             continue
 
-        # Skip blank lines, comments (#, >), metadata (**...**), separators (---)
+        # Skip level headers (legacy), blank lines, metadata
+        if re.match(r'^##\s+(A[12]|B[12])\b', stripped):
+            continue
         if not stripped or stripped.startswith(('#', '>', '**', '---')):
             continue
 
@@ -85,28 +75,74 @@ def parse_vocabulary_md(filepath: str) -> dict:
             words = [w for w in words if not re.match(r'^\d+$', w)]
             current_topic["words"].extend(words)
 
-    # Deduplicate words & compute stats
     total_words = 0
-    total_topics = 0
-    for lvl_data in result["levels"].values():
-        for topic in lvl_data["topics"]:
-            topic["words"] = list(dict.fromkeys(topic["words"]))  # preserve order, remove dups
-            total_words += len(topic["words"])
-        total_topics += len(lvl_data["topics"])
+    for topic in result["topics"]:
+        topic["words"] = list(dict.fromkeys(topic["words"]))
+        total_words += len(topic["words"])
 
     result["total_words"] = total_words
-    result["total_topics"] = total_topics
+    result["total_topics"] = len(result["topics"])
+
+    return result
+
+
+def parse_vocabulary_levels_md(filepath: str) -> dict:
+    """
+    Convert Vocabulary-levels.md to structured JSON.
+
+    Expected MD structure:
+        ## A1 — Beginner
+        word1, word2, word3, ...
+
+        ## B2 — Upper Intermediate
+        word1, word2, ...
+    """
+    with open(filepath, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    result = {
+        "title": "English Vocabulary — By CEFR Level",
+        "description": "Từ vựng theo trình độ CEFR (A1 → B2)",
+        "levels": {}
+    }
+
+    current_level = None
+
+    for line in lines:
+        stripped = line.strip()
+
+        m = re.match(r'^##\s+(A[12]|B[12])\b', stripped)
+        if m:
+            current_level = m.group(1)
+            result["levels"].setdefault(current_level, {"level": current_level, "words": []})
+            continue
+
+        if not stripped or stripped.startswith(('#', '>', '**', '---')):
+            continue
+
+        if current_level and ',' in stripped:
+            words = [w.strip() for w in stripped.split(',') if w.strip()]
+            words = [w for w in words if not re.match(r'^\d+$', w)]
+            result["levels"][current_level]["words"].extend(words)
+
+    total_words = 0
+    for lvl_data in result["levels"].values():
+        lvl_data["words"] = list(dict.fromkeys(lvl_data["words"]))
+        total_words += len(lvl_data["words"])
+
+    result["total_words"] = total_words
+    result["total_levels"] = len(result["levels"])
 
     return result
 
 
 # ============================================================
-# 2. PARSE chunk-english.md → chunk-english.json
+# 2. PARSE chunk-en-vi.md → chunk-en-vi.json
 # ============================================================
 
 def parse_chunk_english_md(filepath: str) -> dict:
     """
-    Convert chunk-english.md to structured JSON.
+    Convert chunk-en-vi.md to structured JSON.
 
     Expected MD structure:
         # 🟢 PHẦN 1: ...
@@ -328,24 +364,36 @@ def main():
     targets = sys.argv[1:] if len(sys.argv) > 1 else ["all"]
 
     if "vocab" in targets or "all" in targets:
-        inp = os.path.join(DOCS_DIR, "Vocabulary.md")
-        out = os.path.join(JSON_DIR, "Vocabulary.json")
-        if not os.path.exists(inp):
-            print(f"❌ Not found: {inp}")
-        else:
-            print(f"📖 Parsing {inp} ...")
-            data = parse_vocabulary_md(inp)
-            with open(out, 'w', encoding='utf-8') as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-            print(f"   ✅ {out}")
-            for lvl, ld in data["levels"].items():
-                print(f"      {lvl}: {len(ld['topics'])} topics, "
-                      f"{sum(len(t['words']) for t in ld['topics'])} words")
-            print(f"      Total: {data['total_topics']} topics, {data['total_words']} words")
+        topics_inp = os.path.join(DOCS_DIR, "Vocabulary-topics.md")
+        topics_out = os.path.join(JSON_DIR, "Vocabulary-topics.json")
+        levels_inp = os.path.join(DOCS_DIR, "Vocabulary-levels.md")
+        levels_out = os.path.join(JSON_DIR, "Vocabulary-levels.json")
 
-    if "chunk" in targets or "all" in targets:
-        inp = os.path.join(DOCS_DIR, "chunk-english.md")
-        out = os.path.join(JSON_DIR, "chunk-english.json")
+        if not os.path.exists(topics_inp):
+            print(f"❌ Not found: {topics_inp}")
+        else:
+            print(f"📖 Parsing {topics_inp} ...")
+            data = parse_vocabulary_md(topics_inp)
+            with open(topics_out, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            print(f"   ✅ {topics_out}")
+            print(f"      {data['total_topics']} topics, {data['total_words']} words")
+
+        if not os.path.exists(levels_inp):
+            print(f"❌ Not found: {levels_inp}")
+        else:
+            print(f"\n📖 Parsing {levels_inp} ...")
+            data = parse_vocabulary_levels_md(levels_inp)
+            with open(levels_out, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            print(f"   ✅ {levels_out}")
+            for lvl, ld in data["levels"].items():
+                print(f"      {lvl}: {len(ld['words'])} words")
+            print(f"      Total: {data['total_levels']} levels, {data['total_words']} words")
+
+    if "chunk" in targets or "chunk-en-vi" in targets or "all" in targets:
+        inp = os.path.join(DOCS_DIR, CHUNK_MD)
+        out = os.path.join(JSON_DIR, CHUNK_JSON)
         if not os.path.exists(inp):
             print(f"❌ Not found: {inp}")
         else:

@@ -57,7 +57,7 @@ def check_unique_chunks(file_path: str) -> list[dict]:
 
 
 def main():
-    file_path = sys.argv[1] if len(sys.argv) > 1 else 'docs/chunk-english.md'
+    file_path = sys.argv[1] if len(sys.argv) > 1 else 'docs/chunk-en-vi.md'
     duplicates = check_unique_chunks(file_path)
     if duplicates:
         print(f"Found {len(duplicates)} duplicate chunk entries in {file_path}:")

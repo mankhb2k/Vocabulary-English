@@ -649,8 +649,8 @@
           "id": 5,
           "code": "5",
           "name_english": "Feelings & Emotions (Cảm xúc & Tâm trạng)",
-          "name_vietnamese": "11 cụm",
-          "estimated_chunks": 11,
+          "name_vietnamese": "25 cụm",
+          "estimated_chunks": 25,
           "description": "",
           "sub_topics": [
             {
@@ -680,6 +680,21 @@
                 {
                   "english": "That sounds wonderful.",
                   "vietnamese": "Nghe tuyệt quá.",
+                  "notes": ""
+                },
+                {
+                  "english": "Cheer up!",
+                  "vietnamese": "Vui lên nào! / Cố lên!",
+                  "notes": ""
+                },
+                {
+                  "english": "Chill out.",
+                  "vietnamese": "Thư giãn đi / Bình tĩnh lại.",
+                  "notes": ""
+                },
+                {
+                  "english": "Lighten up.",
+                  "vietnamese": "Đừng căng thẳng quá / Vui vẻ lên đi.",
                   "notes": ""
                 }
               ]
@@ -716,6 +731,67 @@
                 {
                   "english": "I'm worried about...",
                   "vietnamese": "Tôi đang lo lắng về...",
+                  "notes": ""
+                },
+                {
+                  "english": "Freak out",
+                  "vietnamese": "Hoảng loạn / Phát điên vì căng thẳng",
+                  "notes": ""
+                },
+                {
+                  "english": "Burn out",
+                  "vietnamese": "Kiệt sức / Cháy hết năng lượng",
+                  "notes": ""
+                },
+                {
+                  "english": "Bottle up",
+                  "vietnamese": "Nén kìm cảm xúc / Không bộc lộ",
+                  "notes": ""
+                },
+                {
+                  "english": "Lash out",
+                  "vietnamese": "Nổi giận đột ngột / Trút giận lên ai đó",
+                  "notes": ""
+                }
+              ]
+            },
+            {
+              "name": "Phrasal verbs cảm xúc thường gặp",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "Open up",
+                  "vietnamese": "Mở lòng / Bắt đầu chia sẻ",
+                  "notes": ""
+                },
+                {
+                  "english": "Wind down",
+                  "vietnamese": "Thư giãn sau một ngày dài",
+                  "notes": ""
+                },
+                {
+                  "english": "Loosen up",
+                  "vietnamese": "Thả lỏng / Bớt căng thẳng",
+                  "notes": ""
+                },
+                {
+                  "english": "Get over",
+                  "vietnamese": "Vượt qua / Hồi phục sau chuyện buồn",
+                  "notes": ""
+                },
+                {
+                  "english": "Let down",
+                  "vietnamese": "Làm ai đó thất vọng",
+                  "notes": ""
+                },
+                {
+                  "english": "Hold back",
+                  "vietnamese": "Kìm nén / Không bộc lộ cảm xúc",
+                  "notes": ""
+                },
+                {
+                  "english": "Give in",
+                  "vietnamese": "Nhượng bộ / Chịu thua",
                   "notes": ""
                 }
               ]
@@ -798,8 +874,8 @@
           "id": 7,
           "code": "7",
           "name_english": "Daily Life & Routines (Cuộc sống hàng ngày & Sinh hoạt)",
-          "name_vietnamese": "14 cụm",
-          "estimated_chunks": 14,
+          "name_vietnamese": "28 cụm",
+          "estimated_chunks": 28,
           "description": "",
           "sub_topics": [
             {
@@ -830,6 +906,26 @@
                   "english": "Get dressed",
                   "vietnamese": "Mặc quần áo",
                   "notes": ""
+                },
+                {
+                  "english": "Put on",
+                  "vietnamese": "Mặc vào",
+                  "notes": ""
+                },
+                {
+                  "english": "Take off",
+                  "vietnamese": "Cởi ra",
+                  "notes": ""
+                },
+                {
+                  "english": "Sit down / Stand up",
+                  "vietnamese": "Ngồi xuống / Đứng dậy",
+                  "notes": ""
+                },
+                {
+                  "english": "Lie down",
+                  "vietnamese": "Nằm xuống",
+                  "notes": ""
                 }
               ]
             },
@@ -855,6 +951,16 @@
                 {
                   "english": "Take a break",
                   "vietnamese": "Nghỉ ngơi một lát",
+                  "notes": ""
+                },
+                {
+                  "english": "Get ready",
+                  "vietnamese": "Chuẩn bị sẵn sàng",
+                  "notes": ""
+                },
+                {
+                  "english": "Head out",
+                  "vietnamese": "Lên đường / Ra ngoài",
                   "notes": ""
                 }
               ]
@@ -887,6 +993,46 @@
                   "english": "Go to bed / Hit the sack",
                   "vietnamese": "Đi ngủ",
                   "notes": ""
+                },
+                {
+                  "english": "Stay up",
+                  "vietnamese": "Thức khuya",
+                  "notes": ""
+                },
+                {
+                  "english": "Sleep in",
+                  "vietnamese": "Ngủ nướng / Ngủ đến trưa",
+                  "notes": ""
+                },
+                {
+                  "english": "Turn in",
+                  "vietnamese": "Đi ngủ",
+                  "notes": "trang trọng hơn \"go to bed\""
+                },
+                {
+                  "english": "Clean up",
+                  "vietnamese": "Dọn dẹp / Lau chùi",
+                  "notes": ""
+                },
+                {
+                  "english": "Tidy up",
+                  "vietnamese": "Sắp xếp gọn gàng",
+                  "notes": ""
+                },
+                {
+                  "english": "Put away",
+                  "vietnamese": "Cất đi đúng chỗ",
+                  "notes": ""
+                },
+                {
+                  "english": "Wash up",
+                  "vietnamese": "Rửa bát / Rửa mặt tay",
+                  "notes": ""
+                },
+                {
+                  "english": "Warm up",
+                  "vietnamese": "Làm ấm đồ ăn / Khởi động",
+                  "notes": ""
                 }
               ]
             }
@@ -896,8 +1042,8 @@
           "id": 8,
           "code": "8",
           "name_english": "Work & School (Công việc & Trường học)",
-          "name_vietnamese": "11 cụm",
-          "estimated_chunks": 11,
+          "name_vietnamese": "31 cụm",
+          "estimated_chunks": 31,
           "description": "",
           "sub_topics": [
             {
@@ -933,6 +1079,56 @@
                   "english": "Get a promotion",
                   "vietnamese": "Được thăng chức",
                   "notes": ""
+                },
+                {
+                  "english": "Carry on",
+                  "vietnamese": "Tiếp tục làm việc",
+                  "notes": ""
+                },
+                {
+                  "english": "Keep on",
+                  "vietnamese": "Tiếp tục không ngừng",
+                  "notes": ""
+                },
+                {
+                  "english": "Carry out",
+                  "vietnamese": "Thực hiện / Hoàn thành nhiệm vụ",
+                  "notes": ""
+                },
+                {
+                  "english": "Take on",
+                  "vietnamese": "Nhận thêm việc / Thuê thêm người",
+                  "notes": ""
+                },
+                {
+                  "english": "Step down",
+                  "vietnamese": "Từ chức / Nhường vị trí",
+                  "notes": ""
+                },
+                {
+                  "english": "Step up",
+                  "vietnamese": "Gia tăng / Nỗ lực hơn",
+                  "notes": ""
+                },
+                {
+                  "english": "Sign off",
+                  "vietnamese": "Kết thúc / Phê duyệt xong",
+                  "notes": ""
+                },
+                {
+                  "english": "Wrap up",
+                  "vietnamese": "Kết thúc / Tổng kết",
+                  "notes": ""
+                },
+                {
+                  "english": "Draw up",
+                  "vietnamese": "Soạn thảo hợp đồng / kế hoạch",
+                  "notes": ""
+                },
+                {
+                  "english": "Lay out",
+                  "vietnamese": "Trình bày / Bố trí kế hoạch",
+                  "notes": ""
                 }
               ]
             },
@@ -964,6 +1160,56 @@
                   "english": "Skip class",
                   "vietnamese": "Cúp học",
                   "notes": ""
+                },
+                {
+                  "english": "Hand out",
+                  "vietnamese": "Phát tài liệu cho cả lớp",
+                  "notes": ""
+                },
+                {
+                  "english": "Fill in",
+                  "vietnamese": "Điền vào biểu mẫu",
+                  "notes": ""
+                },
+                {
+                  "english": "Fill out",
+                  "vietnamese": "Điền đầy đủ thông tin vào form",
+                  "notes": ""
+                },
+                {
+                  "english": "Write down",
+                  "vietnamese": "Ghi chép xuống giấy",
+                  "notes": ""
+                },
+                {
+                  "english": "Note down / Jot down",
+                  "vietnamese": "Ghi nhanh / Viết lại số điện thoại",
+                  "notes": ""
+                },
+                {
+                  "english": "Look over",
+                  "vietnamese": "Xem lại / Kiểm tra nhanh",
+                  "notes": ""
+                },
+                {
+                  "english": "Go over",
+                  "vietnamese": "Ôn lại / Xem xét kỹ",
+                  "notes": ""
+                },
+                {
+                  "english": "Read up on",
+                  "vietnamese": "Đọc tìm hiểu về chủ đề",
+                  "notes": ""
+                },
+                {
+                  "english": "Catch up on",
+                  "vietnamese": "Bù lại việc đã trễ",
+                  "notes": ""
+                },
+                {
+                  "english": "Brush up on",
+                  "vietnamese": "Ôn lại kiến thức cũ",
+                  "notes": ""
                 }
               ]
             }
@@ -973,8 +1219,8 @@
           "id": 9,
           "code": "9",
           "name_english": "Travel & Directions (Du lịch & Chỉ đường)",
-          "name_vietnamese": "9 cụm",
-          "estimated_chunks": 9,
+          "name_vietnamese": "21 cụm",
+          "estimated_chunks": 21,
           "description": "",
           "sub_topics": [
             {
@@ -1031,6 +1277,66 @@
                   "english": "Turn left / Turn right.",
                   "vietnamese": "Rẽ trái / Rẽ phải.",
                   "notes": ""
+                },
+                {
+                  "english": "Get on / Get off",
+                  "vietnamese": "Lên xe / Xuống xe",
+                  "notes": ""
+                },
+                {
+                  "english": "Set off",
+                  "vietnamese": "Khởi hành / Bắt đầu hành trình",
+                  "notes": ""
+                },
+                {
+                  "english": "Pull over",
+                  "vietnamese": "Tấp vào lề đường",
+                  "notes": ""
+                },
+                {
+                  "english": "Pull up",
+                  "vietnamese": "Dừng xe lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Speed up",
+                  "vietnamese": "Tăng tốc",
+                  "notes": ""
+                },
+                {
+                  "english": "Slow down",
+                  "vietnamese": "Giảm tốc / Làm chậm lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Touch down",
+                  "vietnamese": "Hạ cánh",
+                  "notes": ""
+                },
+                {
+                  "english": "Stop over",
+                  "vietnamese": "Dừng chân tạm thời",
+                  "notes": ""
+                },
+                {
+                  "english": "See off",
+                  "vietnamese": "Tiễn ai đó đi",
+                  "notes": ""
+                },
+                {
+                  "english": "See out",
+                  "vietnamese": "Tiễn khách ra cửa",
+                  "notes": ""
+                },
+                {
+                  "english": "Fill up",
+                  "vietnamese": "Đổ đầy bình xăng",
+                  "notes": ""
+                },
+                {
+                  "english": "Pass by",
+                  "vietnamese": "Đi ngang qua không dừng",
+                  "notes": ""
                 }
               ]
             }
@@ -1040,8 +1346,8 @@
           "id": 10,
           "code": "10",
           "name_english": "Shopping & Money (Mua sắm & Tiền bạc)",
-          "name_vietnamese": "9 cụm",
-          "estimated_chunks": 9,
+          "name_vietnamese": "22 cụm",
+          "estimated_chunks": 22,
           "description": "",
           "sub_topics": [
             {
@@ -1067,6 +1373,26 @@
                   "english": "Keep the change.",
                   "vietnamese": "Cứ giữ lại tiền thừa nhé.",
                   "notes": ""
+                },
+                {
+                  "english": "Pay back",
+                  "vietnamese": "Trả lại tiền đã vay",
+                  "notes": ""
+                },
+                {
+                  "english": "Pay off",
+                  "vietnamese": "Trả hết nợ / Đáng công sức bỏ ra",
+                  "notes": ""
+                },
+                {
+                  "english": "Save up",
+                  "vietnamese": "Tiết kiệm dần",
+                  "notes": ""
+                },
+                {
+                  "english": "Cash in",
+                  "vietnamese": "Đổi thành tiền mặt",
+                  "notes": ""
                 }
               ]
             },
@@ -1085,8 +1411,13 @@
                   "notes": ""
                 },
                 {
-                  "english": "Can I try it on?",
-                  "vietnamese": "Tôi có thể mặc thử được không?",
+                  "english": "Can I try it on? / Try on",
+                  "vietnamese": "Mặc thử",
+                  "notes": ""
+                },
+                {
+                  "english": "Try out",
+                  "vietnamese": "Dùng thử / Thử nghiệm",
                   "notes": ""
                 },
                 {
@@ -1097,6 +1428,46 @@
                 {
                   "english": "Is this on sale?",
                   "vietnamese": "Cái này có đang giảm giá không?",
+                  "notes": ""
+                },
+                {
+                  "english": "Shop around",
+                  "vietnamese": "So sánh giá nhiều nơi",
+                  "notes": ""
+                },
+                {
+                  "english": "Take back",
+                  "vietnamese": "Mang đồ trả lại cửa hàng",
+                  "notes": ""
+                },
+                {
+                  "english": "Bring back",
+                  "vietnamese": "Mang trả lại đồ đã mượn",
+                  "notes": ""
+                },
+                {
+                  "english": "Give back",
+                  "vietnamese": "Trả lại cho chủ",
+                  "notes": ""
+                },
+                {
+                  "english": "Sell out",
+                  "vietnamese": "Bán hết sạch",
+                  "notes": ""
+                },
+                {
+                  "english": "Cut back on",
+                  "vietnamese": "Cắt giảm chi tiêu",
+                  "notes": ""
+                },
+                {
+                  "english": "Cut down on",
+                  "vietnamese": "Giảm bớt lượng tiêu dùng",
+                  "notes": ""
+                },
+                {
+                  "english": "Splash out on",
+                  "vietnamese": "Chi tiêu thoải mái cho thứ gì đó",
                   "notes": ""
                 }
               ]
@@ -1169,8 +1540,8 @@
           "id": 12,
           "code": "12",
           "name_english": "Phone & Internet (Điện thoại & Mạng)",
-          "name_vietnamese": "9 cụm",
-          "estimated_chunks": 9,
+          "name_vietnamese": "21 cụm",
+          "estimated_chunks": 21,
           "description": "",
           "sub_topics": [
             {
@@ -1190,6 +1561,41 @@
                 {
                   "english": "I'll call you back later.",
                   "vietnamese": "Tôi sẽ gọi lại cho bạn sau.",
+                  "notes": ""
+                },
+                {
+                  "english": "Call back",
+                  "vietnamese": "Gọi lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Call off",
+                  "vietnamese": "Hủy bỏ kế hoạch / cuộc gặp",
+                  "notes": ""
+                },
+                {
+                  "english": "Call up",
+                  "vietnamese": "Gọi điện cho ai đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Hang up",
+                  "vietnamese": "Cúp máy",
+                  "notes": ""
+                },
+                {
+                  "english": "Speak up",
+                  "vietnamese": "Nói to hơn",
+                  "notes": ""
+                },
+                {
+                  "english": "Hold on",
+                  "vietnamese": "Giữ máy / Chờ một chút",
+                  "notes": ""
+                },
+                {
+                  "english": "Get through",
+                  "vietnamese": "Liên lạc được / Hoàn thành việc",
                   "notes": ""
                 },
                 {
@@ -1226,6 +1632,31 @@
                 {
                   "english": "Let me check my email.",
                   "vietnamese": "Để tôi kiểm tra email.",
+                  "notes": ""
+                },
+                {
+                  "english": "Log in / Log on",
+                  "vietnamese": "Đăng nhập",
+                  "notes": ""
+                },
+                {
+                  "english": "Log out / Log off",
+                  "vietnamese": "Đăng xuất",
+                  "notes": ""
+                },
+                {
+                  "english": "Sign up",
+                  "vietnamese": "Đăng ký tài khoản",
+                  "notes": ""
+                },
+                {
+                  "english": "Reach out",
+                  "vietnamese": "Liên hệ / Chủ động gọi hoặc nhắn tin",
+                  "notes": ""
+                },
+                {
+                  "english": "Follow up",
+                  "vietnamese": "Theo dõi lại / Nhắc lại vấn đề",
                   "notes": ""
                 }
               ]
@@ -1298,8 +1729,8 @@
           "id": 14,
           "code": "14",
           "name_english": "Common Phrasal Verbs & Idioms (Cụm động từ & Thành ngữ phổ biến)",
-          "name_vietnamese": "12 cụm",
-          "estimated_chunks": 12,
+          "name_vietnamese": "91 cụm",
+          "estimated_chunks": 91,
           "description": "",
           "sub_topics": [
             {
@@ -1334,6 +1765,66 @@
                 {
                   "english": "Go on",
                   "vietnamese": "Tiếp tục",
+                  "notes": ""
+                },
+                {
+                  "english": "Work out",
+                  "vietnamese": "Giải quyết / Tập thể dục / Tính toán ra",
+                  "notes": ""
+                },
+                {
+                  "english": "Sort out",
+                  "vietnamese": "Sắp xếp / Giải quyết vấn đề",
+                  "notes": ""
+                },
+                {
+                  "english": "Find out",
+                  "vietnamese": "Tìm ra / Phát hiện",
+                  "notes": ""
+                },
+                {
+                  "english": "Point out",
+                  "vietnamese": "Chỉ ra / Nhắc nhở",
+                  "notes": ""
+                },
+                {
+                  "english": "Look up",
+                  "vietnamese": "Tra cứu / Tìm kiếm thông tin",
+                  "notes": ""
+                },
+                {
+                  "english": "Look into",
+                  "vietnamese": "Điều tra / Tìm hiểu sâu",
+                  "notes": ""
+                },
+                {
+                  "english": "Look out",
+                  "vietnamese": "Cẩn thận / Coi chừng",
+                  "notes": ""
+                },
+                {
+                  "english": "Look around",
+                  "vietnamese": "Nhìn xung quanh / Tham quan",
+                  "notes": ""
+                },
+                {
+                  "english": "Show up",
+                  "vietnamese": "Xuất hiện / Đến đúng giờ",
+                  "notes": ""
+                },
+                {
+                  "english": "Show off",
+                  "vietnamese": "Khoe khoang",
+                  "notes": ""
+                },
+                {
+                  "english": "End up",
+                  "vietnamese": "Cuối cùng lại...",
+                  "notes": ""
+                },
+                {
+                  "english": "Wind up",
+                  "vietnamese": "Kết thúc / Lên dây cót",
                   "notes": ""
                 }
               ]
@@ -1370,6 +1861,359 @@
                 {
                   "english": "Make up your mind",
                   "vietnamese": "Đưa ra quyết định đi",
+                  "notes": ""
+                }
+              ]
+            },
+            {
+              "name": "Phrasal verbs thông dụng — Hành động & Tương tác",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "Act up",
+                  "vietnamese": "Bị hỏng / hoạt động không bình thường",
+                  "notes": ""
+                },
+                {
+                  "english": "Add up",
+                  "vietnamese": "Cộng lại / có vẻ hợp lý",
+                  "notes": ""
+                },
+                {
+                  "english": "Add up to",
+                  "vietnamese": "Cộng lại bằng / Dẫn đến",
+                  "notes": ""
+                },
+                {
+                  "english": "Ask around",
+                  "vietnamese": "Hỏi khắp nơi / hỏi nhiều người",
+                  "notes": ""
+                },
+                {
+                  "english": "Back out",
+                  "vietnamese": "Rút lui / hủy bỏ lời hứa",
+                  "notes": ""
+                },
+                {
+                  "english": "Back up",
+                  "vietnamese": "Ủng hộ / sao lưu dữ liệu",
+                  "notes": ""
+                },
+                {
+                  "english": "Be fed up",
+                  "vietnamese": "Chán ngấy với điều gì",
+                  "notes": ""
+                },
+                {
+                  "english": "Bear with me",
+                  "vietnamese": "Kiên nhẫn với tôi một chút",
+                  "notes": ""
+                },
+                {
+                  "english": "Break down",
+                  "vietnamese": "Hỏng / đổ vỡ / Suy sụp tinh thần",
+                  "notes": ""
+                },
+                {
+                  "english": "Catch up",
+                  "vietnamese": "Đuổi kịp / trao đổi lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Deal with",
+                  "vietnamese": "Giải quyết / xử lý",
+                  "notes": ""
+                },
+                {
+                  "english": "Get along with",
+                  "vietnamese": "Hòa hợp với ai đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Keep up with",
+                  "vietnamese": "Theo kịp",
+                  "notes": ""
+                },
+                {
+                  "english": "Look after",
+                  "vietnamese": "Chăm sóc",
+                  "notes": ""
+                },
+                {
+                  "english": "Put up with",
+                  "vietnamese": "Chịu đựng",
+                  "notes": ""
+                },
+                {
+                  "english": "Run into",
+                  "vietnamese": "Tình cờ gặp",
+                  "notes": ""
+                },
+                {
+                  "english": "Take over",
+                  "vietnamese": "Tiếp quản / thay thế",
+                  "notes": ""
+                },
+                {
+                  "english": "Turn up",
+                  "vietnamese": "Xuất hiện / đến; tăng lên",
+                  "notes": ""
+                },
+                {
+                  "english": "Turn off",
+                  "vietnamese": "Tắt máy / Làm ai đó mất hứng",
+                  "notes": ""
+                },
+                {
+                  "english": "Turn around",
+                  "vietnamese": "Quay lại / Xoay chiều",
+                  "notes": ""
+                },
+                {
+                  "english": "Turn out",
+                  "vietnamese": "Hóa ra / Có mặt tại sự kiện",
+                  "notes": ""
+                },
+                {
+                  "english": "Make out",
+                  "vietnamese": "Xử lý được / Hôn nhau",
+                  "notes": "ngữ cảnh quyết định nghĩa"
+                },
+                {
+                  "english": "Make off",
+                  "vietnamese": "Bỏ chạy / Trốn",
+                  "notes": ""
+                },
+                {
+                  "english": "Make do",
+                  "vietnamese": "Xoay sở với những gì có",
+                  "notes": ""
+                },
+                {
+                  "english": "Pick up",
+                  "vietnamese": "Đón / nhặt / học nhanh",
+                  "notes": ""
+                },
+                {
+                  "english": "Give away",
+                  "vietnamese": "Cho tặng / Tiết lộ bí mật",
+                  "notes": ""
+                },
+                {
+                  "english": "Give out",
+                  "vietnamese": "Phát ra / Hết pin / Ngừng hoạt động",
+                  "notes": ""
+                },
+                {
+                  "english": "Run away",
+                  "vietnamese": "Bỏ chạy / Trốn thoát",
+                  "notes": ""
+                },
+                {
+                  "english": "Run out of",
+                  "vietnamese": "Hết / Cạn kiệt",
+                  "notes": ""
+                }
+              ]
+            },
+            {
+              "name": "Phrasal verbs — Nhà cửa & Đồ vật",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "Throw away",
+                  "vietnamese": "Vứt bỏ",
+                  "notes": ""
+                },
+                {
+                  "english": "Throw out",
+                  "vietnamese": "Đổ rác / Đuổi ai đó đi",
+                  "notes": ""
+                },
+                {
+                  "english": "Take out",
+                  "vietnamese": "Mang ra / Rút ra / Mời ai đi chơi",
+                  "notes": ""
+                },
+                {
+                  "english": "Take down",
+                  "vietnamese": "Tháo xuống / Ghi chép lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Put back",
+                  "vietnamese": "Đặt lại đúng chỗ / Hoãn lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Put down",
+                  "vietnamese": "Đặt xuống / Chê bai ai đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Put in",
+                  "vietnamese": "Lắp đặt / Bỏ công sức vào",
+                  "notes": ""
+                },
+                {
+                  "english": "Put out",
+                  "vietnamese": "Dập tắt lửa / Tắt đèn",
+                  "notes": ""
+                },
+                {
+                  "english": "Set up",
+                  "vietnamese": "Lắp đặt / Bày bẫy / Tổ chức",
+                  "notes": ""
+                },
+                {
+                  "english": "Set out",
+                  "vietnamese": "Bắt đầu hành trình / Trình bày",
+                  "notes": ""
+                },
+                {
+                  "english": "Use up",
+                  "vietnamese": "Dùng hết",
+                  "notes": ""
+                },
+                {
+                  "english": "Stock up on",
+                  "vietnamese": "Tích trữ / Mua dự trữ",
+                  "notes": ""
+                },
+                {
+                  "english": "Wipe off",
+                  "vietnamese": "Lau sạch bề mặt",
+                  "notes": ""
+                },
+                {
+                  "english": "Dry off",
+                  "vietnamese": "Lau khô nhanh",
+                  "notes": ""
+                },
+                {
+                  "english": "Plug in",
+                  "vietnamese": "Cắm điện",
+                  "notes": ""
+                },
+                {
+                  "english": "Plug into",
+                  "vietnamese": "Kết nối thiết bị",
+                  "notes": ""
+                },
+                {
+                  "english": "Switch on / Switch off",
+                  "vietnamese": "Bật / Tắt",
+                  "notes": ""
+                },
+                {
+                  "english": "Cool down",
+                  "vietnamese": "Nguội đi / Bình tĩnh lại",
+                  "notes": ""
+                }
+              ]
+            },
+            {
+              "name": "Phrasal verbs — Giải quyết vấn đề & Suy nghĩ",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "Clear up",
+                  "vietnamese": "Làm rõ / Dọn sạch hiểu lầm",
+                  "notes": ""
+                },
+                {
+                  "english": "Iron out",
+                  "vietnamese": "Gỡ rối các vấn đề nhỏ",
+                  "notes": ""
+                },
+                {
+                  "english": "Get rid of",
+                  "vietnamese": "Loại bỏ / Vứt bỏ",
+                  "notes": ""
+                },
+                {
+                  "english": "Do away with",
+                  "vietnamese": "Bãi bỏ / Loại bỏ hoàn toàn",
+                  "notes": ""
+                },
+                {
+                  "english": "Come up with",
+                  "vietnamese": "Nghĩ ra ý tưởng mới",
+                  "notes": ""
+                },
+                {
+                  "english": "Think up",
+                  "vietnamese": "Nghĩ ra / Bịa ra",
+                  "notes": ""
+                },
+                {
+                  "english": "Think through",
+                  "vietnamese": "Suy nghĩ kỹ mọi khả năng",
+                  "notes": ""
+                },
+                {
+                  "english": "Think over",
+                  "vietnamese": "Cân nhắc kỹ",
+                  "notes": ""
+                },
+                {
+                  "english": "Rule out",
+                  "vietnamese": "Loại trừ khả năng",
+                  "notes": ""
+                },
+                {
+                  "english": "Narrow down",
+                  "vietnamese": "Thu hẹp lựa chọn",
+                  "notes": ""
+                },
+                {
+                  "english": "Zero in on",
+                  "vietnamese": "Tập trung vào điểm chính",
+                  "notes": ""
+                },
+                {
+                  "english": "Pin down",
+                  "vietnamese": "Xác định chính xác",
+                  "notes": ""
+                },
+                {
+                  "english": "Track down",
+                  "vietnamese": "Lần ra / Tìm kiếm mãi mới thấy",
+                  "notes": ""
+                },
+                {
+                  "english": "Dig into",
+                  "vietnamese": "Đào sâu vào / Bắt đầu ăn",
+                  "notes": ""
+                },
+                {
+                  "english": "See through",
+                  "vietnamese": "Nhìn thấu / Kiên trì đến cùng",
+                  "notes": ""
+                },
+                {
+                  "english": "Abide by",
+                  "vietnamese": "Tuân thủ quy tắc / Quyết định",
+                  "notes": ""
+                },
+                {
+                  "english": "Account for",
+                  "vietnamese": "Giải thích / Chiếm tỷ lệ",
+                  "notes": ""
+                },
+                {
+                  "english": "Act on",
+                  "vietnamese": "Hành động theo thông tin nhận được",
+                  "notes": ""
+                },
+                {
+                  "english": "Add on",
+                  "vietnamese": "Cộng thêm vào",
+                  "notes": ""
+                },
+                {
+                  "english": "Bring about",
+                  "vietnamese": "Gây ra / Tạo nên điều gì",
                   "notes": ""
                 }
               ]
@@ -1632,8 +2476,8 @@
           "id": 17,
           "code": "17",
           "name_english": "Everyday Actions (Hành động hàng ngày)",
-          "name_vietnamese": "30 cụm",
-          "estimated_chunks": 30,
+          "name_vietnamese": "55 cụm",
+          "estimated_chunks": 55,
           "description": "",
           "sub_topics": [
             {
@@ -1668,6 +2512,151 @@
                 {
                   "english": "Head out / Head home",
                   "vietnamese": "Lên đường / Về nhà",
+                  "notes": ""
+                },
+                {
+                  "english": "Pick up groceries / Pick up something",
+                  "vietnamese": "Nhặt / lấy đồ khi đi ngang",
+                  "notes": ""
+                },
+                {
+                  "english": "Run into someone",
+                  "vietnamese": "Tình cờ gặp ai đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Look after the kids",
+                  "vietnamese": "Chăm sóc con cái",
+                  "notes": ""
+                },
+                {
+                  "english": "Catch up with friends",
+                  "vietnamese": "Cập nhật tin tức với bạn bè",
+                  "notes": ""
+                },
+                {
+                  "english": "Get in / Get out",
+                  "vietnamese": "Vào / Ra khỏi nơi nào đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Go out",
+                  "vietnamese": "Ra ngoài chơi / Hẹn hò",
+                  "notes": ""
+                },
+                {
+                  "english": "Go back",
+                  "vietnamese": "Quay lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Go away",
+                  "vietnamese": "Đi xa / Biến đi",
+                  "notes": ""
+                },
+                {
+                  "english": "Go in",
+                  "vietnamese": "Đi vào trong",
+                  "notes": ""
+                },
+                {
+                  "english": "Go off",
+                  "vietnamese": "Nổ / Rời đi / Hỏng",
+                  "notes": "thường dùng cho đồ ăn"
+                },
+                {
+                  "english": "Go through",
+                  "vietnamese": "Xem xét kỹ / Trải qua",
+                  "notes": ""
+                },
+                {
+                  "english": "Come back",
+                  "vietnamese": "Quay trở lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Come in",
+                  "vietnamese": "Vào đi",
+                  "notes": ""
+                },
+                {
+                  "english": "Come out",
+                  "vietnamese": "Ra ngoài / Xuất hiện / Công khai",
+                  "notes": ""
+                },
+                {
+                  "english": "Come up",
+                  "vietnamese": "Được nhắc đến / Đến gần",
+                  "notes": ""
+                },
+                {
+                  "english": "Come over",
+                  "vietnamese": "Ghé qua nhà ai đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Come across",
+                  "vietnamese": "Tình cờ tìm thấy / Gặp",
+                  "notes": ""
+                },
+                {
+                  "english": "Come along",
+                  "vietnamese": "Đi cùng / Tiến triển",
+                  "notes": ""
+                },
+                {
+                  "english": "Come down",
+                  "vietnamese": "Đi xuống / Giảm giá",
+                  "notes": ""
+                },
+                {
+                  "english": "Come off",
+                  "vietnamese": "Thành công / Bong ra",
+                  "notes": ""
+                },
+                {
+                  "english": "Go along",
+                  "vietnamese": "Tiếp tục / Đi cùng",
+                  "notes": ""
+                },
+                {
+                  "english": "Go by",
+                  "vietnamese": "Trôi qua / Đi ngang qua",
+                  "notes": ""
+                },
+                {
+                  "english": "Move in / Move out",
+                  "vietnamese": "Chuyển vào / Chuyển ra",
+                  "notes": ""
+                },
+                {
+                  "english": "Move on",
+                  "vietnamese": "Chuyển sang việc khác / Quên chuyện cũ",
+                  "notes": ""
+                },
+                {
+                  "english": "Head back",
+                  "vietnamese": "Quay trở lại",
+                  "notes": ""
+                },
+                {
+                  "english": "Drop off",
+                  "vietnamese": "Đưa ai đó đến rồi về",
+                  "notes": ""
+                },
+                {
+                  "english": "Walk away",
+                  "vietnamese": "Bỏ đi / Rời bỏ tình huống",
+                  "notes": ""
+                },
+                {
+                  "english": "Get around",
+                  "vietnamese": "Đi lại được / Lan truyền",
+                  "notes": ""
+                },
+                {
+                  "english": "Go under",
+                  "vietnamese": "Chìm / Phá sản",
                   "notes": ""
                 }
               ]
@@ -1918,6 +2907,16 @@
                   "notes": ""
                 },
                 {
+                  "english": "I need to back out of this plan.",
+                  "vietnamese": "Tôi cần rút khỏi kế hoạch này.",
+                  "notes": ""
+                },
+                {
+                  "english": "I can deal with it.",
+                  "vietnamese": "Tôi có thể xử lý được chuyện này.",
+                  "notes": ""
+                },
+                {
                   "english": "It's not a big deal.",
                   "vietnamese": "Không việc gì đâu.",
                   "notes": ""
@@ -2087,6 +3086,11 @@
                   "notes": ""
                 },
                 {
+                  "english": "Back up your files",
+                  "vietnamese": "Sao lưu file của bạn",
+                  "notes": ""
+                },
+                {
                   "english": "Download / Upload / Install",
                   "vietnamese": "Tải về / Tải lên / Cài đặt",
                   "notes": ""
@@ -2099,6 +3103,16 @@
                 {
                   "english": "Search / Google something",
                   "vietnamese": "Tìm kiếm / Google cái gì đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Turn up the volume",
+                  "vietnamese": "Tăng âm lượng",
+                  "notes": ""
+                },
+                {
+                  "english": "Find out the settings",
+                  "vietnamese": "Tìm hiểu cài đặt",
                   "notes": ""
                 }
               ]
@@ -2264,6 +3278,265 @@
                 {
                   "english": "Calm down.",
                   "vietnamese": "Bình tĩnh nào.",
+                  "notes": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "code": "21",
+          "name_english": "Social & Relationships (Quan hệ xã hội & Tình cảm)",
+          "name_vietnamese": "21 cụm",
+          "estimated_chunks": 21,
+          "description": "",
+          "sub_topics": [
+            {
+              "name": "Gặp gỡ & Kết bạn",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "Get together",
+                  "vietnamese": "Tụ tập / Gặp nhau",
+                  "notes": ""
+                },
+                {
+                  "english": "Meet up",
+                  "vietnamese": "Hẹn gặp",
+                  "notes": ""
+                },
+                {
+                  "english": "Hang out",
+                  "vietnamese": "Đi chơi / Tụ tập",
+                  "notes": ""
+                },
+                {
+                  "english": "Hit it off",
+                  "vietnamese": "Hợp nhau ngay từ đầu",
+                  "notes": ""
+                },
+                {
+                  "english": "Ask out",
+                  "vietnamese": "Mời hẹn hò",
+                  "notes": ""
+                },
+                {
+                  "english": "Go out with",
+                  "vietnamese": "Hẹn hò với ai đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Warm up to",
+                  "vietnamese": "Dần thích ai đó / điều gì đó hơn",
+                  "notes": ""
+                }
+              ]
+            },
+            {
+              "name": "Quan hệ & Xung đột",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "Break up",
+                  "vietnamese": "Chia tay / Tan vỡ",
+                  "notes": ""
+                },
+                {
+                  "english": "Split up",
+                  "vietnamese": "Chia tay / Chia nhóm",
+                  "notes": ""
+                },
+                {
+                  "english": "Make up",
+                  "vietnamese": "Làm lành sau cãi vã",
+                  "notes": ""
+                },
+                {
+                  "english": "Make up for",
+                  "vietnamese": "Bù đắp cho lỗi lầm",
+                  "notes": ""
+                },
+                {
+                  "english": "Fall out",
+                  "vietnamese": "Cãi nhau / Mất liên lạc",
+                  "notes": ""
+                },
+                {
+                  "english": "Fall for",
+                  "vietnamese": "Yêu / Bị lừa bởi ai đó",
+                  "notes": ""
+                },
+                {
+                  "english": "Grow up",
+                  "vietnamese": "Trưởng thành",
+                  "notes": ""
+                },
+                {
+                  "english": "Settle down",
+                  "vietnamese": "Ổn định cuộc sống / Lập gia đình",
+                  "notes": ""
+                },
+                {
+                  "english": "Stand by",
+                  "vietnamese": "Ở bên cạnh / Sẵn sàng hỗ trợ",
+                  "notes": ""
+                },
+                {
+                  "english": "Stick with",
+                  "vietnamese": "Kiên trì với / Tiếp tục dùng",
+                  "notes": ""
+                },
+                {
+                  "english": "Stick to",
+                  "vietnamese": "Tuân thủ / Không đổi ý",
+                  "notes": ""
+                },
+                {
+                  "english": "Check on",
+                  "vietnamese": "Kiểm tra xem ai đó ổn không",
+                  "notes": ""
+                },
+                {
+                  "english": "Check up on",
+                  "vietnamese": "Theo dõi / Kiểm tra tình hình",
+                  "notes": ""
+                },
+                {
+                  "english": "Take care of",
+                  "vietnamese": "Chăm sóc / Lo liệu",
+                  "notes": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "code": "22",
+          "name_english": "Getting Away & Free Time (Nghỉ ngơi & Thoát khỏi công việc)",
+          "name_vietnamese": "10 cụm",
+          "estimated_chunks": 10,
+          "description": "",
+          "sub_topics": [
+            {
+              "name": "Nghỉ ngơi & Thoát khỏi công việc",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "Get away",
+                  "vietnamese": "Trốn đi / Đi nghỉ",
+                  "notes": ""
+                },
+                {
+                  "english": "Check in with",
+                  "vietnamese": "Báo tin / Liên lạc để cập nhật",
+                  "notes": ""
+                },
+                {
+                  "english": "Chill out",
+                  "vietnamese": "Thư giãn / Bình tĩnh",
+                  "notes": ""
+                },
+                {
+                  "english": "Kick back",
+                  "vietnamese": "Nghỉ ngơi thoải mái",
+                  "notes": ""
+                },
+                {
+                  "english": "Unwind",
+                  "vietnamese": "Xả hơi / Thư giãn",
+                  "notes": ""
+                },
+                {
+                  "english": "Lie in",
+                  "vietnamese": "Ngủ nướng buổi sáng",
+                  "notes": ""
+                },
+                {
+                  "english": "Sit back",
+                  "vietnamese": "Ngồi thư giãn / Để mọi việc diễn ra",
+                  "notes": ""
+                },
+                {
+                  "english": "Opt out",
+                  "vietnamese": "Chọn không tham gia",
+                  "notes": ""
+                },
+                {
+                  "english": "Drop out",
+                  "vietnamese": "Bỏ cuộc / Bỏ học giữa chừng",
+                  "notes": ""
+                },
+                {
+                  "english": "Lay over",
+                  "vietnamese": "Quá cảnh tại sân bay",
+                  "notes": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "code": "23",
+          "name_english": "Cause & Effect Phrasal Verbs (Nguyên nhân & Hệ quả)",
+          "name_vietnamese": "10 cụm",
+          "estimated_chunks": 10,
+          "description": "",
+          "sub_topics": [
+            {
+              "name": "Nguyên nhân & Hệ quả",
+              "description": "",
+              "chunks": [
+                {
+                  "english": "Lead to",
+                  "vietnamese": "Dẫn đến",
+                  "notes": ""
+                },
+                {
+                  "english": "Result in",
+                  "vietnamese": "Dẫn đến kết quả",
+                  "notes": ""
+                },
+                {
+                  "english": "Come down to",
+                  "vietnamese": "Quy về / Phụ thuộc vào",
+                  "notes": ""
+                },
+                {
+                  "english": "Stem from",
+                  "vietnamese": "Bắt nguồn từ",
+                  "notes": ""
+                },
+                {
+                  "english": "Give rise to",
+                  "vietnamese": "Gây ra / Tạo nên",
+                  "notes": ""
+                },
+                {
+                  "english": "Pan out",
+                  "vietnamese": "Diễn ra / Kết quả như mong đợi",
+                  "notes": ""
+                },
+                {
+                  "english": "Turn into",
+                  "vietnamese": "Biến thành",
+                  "notes": ""
+                },
+                {
+                  "english": "Grow into",
+                  "vietnamese": "Lớn lên thành / Phát triển thành",
+                  "notes": ""
+                },
+                {
+                  "english": "Spring from",
+                  "vietnamese": "Phát sinh từ",
+                  "notes": ""
+                },
+                {
+                  "english": "Snowball into",
+                  "vietnamese": "Leo thang thành vấn đề lớn hơn",
                   "notes": ""
                 }
               ]
@@ -2513,8 +3786,8 @@
           "id": 3,
           "code": "C",
           "name_english": "Office & Professional English",
-          "name_vietnamese": "22 cụm",
-          "estimated_chunks": 22,
+          "name_vietnamese": "32 cụm",
+          "estimated_chunks": 32,
           "description": "",
           "sub_topics": [
             {
@@ -2550,6 +3823,21 @@
                   "english": "We're getting sidetracked.",
                   "vietnamese": "Chúng ta đang đi lạc chủ đề rồi.",
                   "notes": ""
+                },
+                {
+                  "english": "Kick off",
+                  "vietnamese": "Bắt đầu cuộc họp / dự án",
+                  "notes": ""
+                },
+                {
+                  "english": "Drill down",
+                  "vietnamese": "Đi sâu vào chi tiết",
+                  "notes": ""
+                },
+                {
+                  "english": "Flag up",
+                  "vietnamese": "Nêu lên / Đánh dấu vấn đề quan trọng",
+                  "notes": ""
                 }
               ]
             },
@@ -2580,6 +3868,46 @@
                 {
                   "english": "Can you get back to me by end of day?",
                   "vietnamese": "Bạn có thể phản hồi trước cuối ngày không?",
+                  "notes": ""
+                },
+                {
+                  "english": "Follow through",
+                  "vietnamese": "Theo sát đến khi hoàn thành",
+                  "notes": ""
+                },
+                {
+                  "english": "Sign off on",
+                  "vietnamese": "Phê duyệt chính thức",
+                  "notes": ""
+                },
+                {
+                  "english": "Push back",
+                  "vietnamese": "Hoãn deadline / Phản đối nhẹ",
+                  "notes": ""
+                },
+                {
+                  "english": "Roll out",
+                  "vietnamese": "Triển khai sản phẩm / chính sách mới",
+                  "notes": ""
+                },
+                {
+                  "english": "Scale up / Scale down",
+                  "vietnamese": "Mở rộng / Thu hẹp quy mô",
+                  "notes": ""
+                },
+                {
+                  "english": "Phase in / Phase out",
+                  "vietnamese": "Đưa vào / Loại bỏ dần",
+                  "notes": ""
+                },
+                {
+                  "english": "Carry forward",
+                  "vietnamese": "Chuyển sang kỳ / giai đoạn tiếp theo",
+                  "notes": ""
+                },
+                {
+                  "english": "Close out",
+                  "vietnamese": "Kết thúc / Chốt sổ",
                   "notes": ""
                 }
               ]
@@ -3170,6 +4498,6 @@
       ]
     }
   },
-  "total_chunks": 469,
-  "total_sections": 28
+  "total_chunks": 719,
+  "total_sections": 31
 }
