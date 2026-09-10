@@ -147,7 +147,7 @@ function renderVocabularyDetail(card) {
   $('#detail-word').textContent = card.english;
   $('#detail-pronunciation').textContent = card.pronunciation || 'Press the speaker to listen';
   const editButton = $('#detail-edit');
-  editButton.hidden = !card.isCustom || !card.id;
+  editButton.hidden = !card.english;
   $('#detail-definition').textContent = card.definition || 'An English word used in everyday communication.';
   $('#detail-examples').innerHTML = cardExamples(card).map((example) => `<li>${escapeHtml(example)}</li>`).join('') || '<li>Practise this word in a natural sentence.</li>';
   $('#detail-notes').textContent = card.notes || '';
@@ -337,9 +337,9 @@ function prepareNewVocabulary() {
 }
 
 function startEditingVocabulary(card) {
-  if (!card?.id) return toast('Only personal vocabulary can be edited.');
+  if (!card?.english) return;
   showView('add');
-  state.editingVocabulary = card;
+  state.editingVocabulary = { ...card, isStaticEdit: !card.id };
   $('#vocab-word').value = card.english || '';
   $('#vocab-definition').value = card.definition || '';
   $('#vocab-pronunciation').value = card.pronunciation || '';
@@ -349,7 +349,7 @@ function startEditingVocabulary(card) {
   resetImagePreview();
   setVocabularyFormMode(true);
   renderAiDraft(null);
-  setFormStatus(`Editing ${card.english}. Choose a replacement image only if needed.`, 'success');
+  setFormStatus(`Editing ${card.english}. Save to create your personal version of this card.`, 'success');
   $('#vocab-word').focus();
 }
 
@@ -387,15 +387,20 @@ async function submitVocabulary(event) {
   const form = event.currentTarget;
   const button = $('#save-vocabulary');
   const file = $('#vocab-image').files[0];
-  const isEditing = Boolean(state.editingVocabulary?.id);
+  const isEditing = Boolean(state.editingVocabulary);
+  const isPersistedEdit = Boolean(state.editingVocabulary?.id);
   if (!isEditing && !file) return setFormStatus('Please choose an image.', 'error');
   if (file && file.size > 5 * 1024 * 1024) return setFormStatus('The image must be smaller than 5MB.', 'error');
   button.disabled = true;
   setFormStatus(isEditing ? 'Updating the vocabulary...' : 'Uploading the image and saving the vocabulary...');
   try {
     const formData = new FormData(form);
-    if (isEditing) formData.append('id', state.editingVocabulary.id);
-    const response = await fetch('/api/vocabulary', { method: isEditing ? 'PUT' : 'POST', body: formData });
+    if (isPersistedEdit) formData.append('id', state.editingVocabulary.id);
+    if (isEditing) {
+      formData.append('replaceExisting', 'true');
+      formData.append('existingWord', state.editingVocabulary.english || '');
+    }
+    const response = await fetch('/api/vocabulary', { method: isPersistedEdit ? 'PUT' : 'POST', body: formData });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || (isEditing ? 'Unable to update the vocabulary.' : 'Unable to save the vocabulary.'));
     form.reset();

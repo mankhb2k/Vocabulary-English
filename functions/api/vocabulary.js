@@ -80,20 +80,28 @@ export async function onRequestPost({ request, env }) {
   const familyRoot = textField(form, 'familyRoot', 120);
   const topic = ['greetings', 'work', 'travel', 'other'].includes(form.get('topic')) ? form.get('topic') : 'other';
   const file = form.get('image');
+  const replaceExisting = form.get('replaceExisting') === 'true';
+  const existingWord = textField(form, 'existingWord', 120);
+  const hasFile = file instanceof File && file.size > 0;
 
   if (!word || !definition) return json({ error: 'Word and English definition are required.' }, 400);
   if (example.length < 3) return json({ error: 'Add at least three example sentences, one per line.' }, 400);
   const duplicate = await env.DB.prepare(`
-    SELECT word
+    SELECT id, word, source
     FROM vocabulary_entries
     WHERE lower(trim(word)) = lower(trim(?1))
     LIMIT 1
   `).bind(word).first();
-  if (duplicate) return json({ error: `"${duplicate.word}" is already in your vocabulary.` }, 409);
+  const canCreatePersonalVersion = replaceExisting
+    && existingWord
+    && duplicate
+    && duplicate.source === 'system'
+    && duplicate.word.toLowerCase() === existingWord.toLowerCase();
+  if (duplicate && !canCreatePersonalVersion) return json({ error: `"${duplicate.word}" is already in your vocabulary.` }, 409);
   if (familyRoot && familyRoot.toLowerCase() === word.toLowerCase()) return json({ error: 'The family root must be a different vocabulary item.' }, 400);
-  if (!(file instanceof File) || !file.size) return json({ error: 'Please choose an image.' }, 400);
-  if (!ALLOWED_IMAGE_TYPES.has(file.type)) return json({ error: 'Only JPG, PNG, or WEBP images are accepted.' }, 415);
-  if (file.size > MAX_IMAGE_BYTES) return json({ error: 'The image must be smaller than 5MB.' }, 413);
+  if (!hasFile && !replaceExisting) return json({ error: 'Please choose an image.' }, 400);
+  if (hasFile && !ALLOWED_IMAGE_TYPES.has(file.type)) return json({ error: 'Only JPG, PNG, or WEBP images are accepted.' }, 415);
+  if (hasFile && file.size > MAX_IMAGE_BYTES) return json({ error: 'The image must be smaller than 5MB.' }, 413);
 
   let familyRootRow;
   if (familyRoot) {
@@ -107,10 +115,12 @@ export async function onRequestPost({ request, env }) {
   }
 
   const id = crypto.randomUUID();
-  const key = `vocabulary/${id}.${ALLOWED_IMAGE_TYPES.get(file.type)}`;
-  await env.VOCABULARY_IMAGES.put(key, file.stream(), {
-    httpMetadata: { contentType: file.type, cacheControl: 'public, max-age=31536000, immutable' },
-  });
+  const key = hasFile ? `vocabulary/${id}.${ALLOWED_IMAGE_TYPES.get(file.type)}` : 'placeholder-1.png';
+  if (hasFile) {
+    await env.VOCABULARY_IMAGES.put(key, file.stream(), {
+      httpMetadata: { contentType: file.type, cacheControl: 'public, max-age=31536000, immutable' },
+    });
+  }
 
   let inserted = false;
   try {
@@ -129,7 +139,7 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: true, item: toClientItem(row) }, 201);
   } catch (error) {
     if (inserted) await env.DB.prepare('DELETE FROM vocabulary_entries WHERE id = ?1').bind(id).run();
-    await env.VOCABULARY_IMAGES.delete(key);
+    if (hasFile) await env.VOCABULARY_IMAGES.delete(key);
     return json({ error: 'Unable to save the vocabulary. Please try again.' }, 500);
   }
 }
