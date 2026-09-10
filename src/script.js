@@ -104,11 +104,6 @@ function libraryCardMarkup(card) {
   return `<article class="library-card c-surface" data-card-index="${cardIndex}" tabindex="0" role="button" aria-label="View details for ${escapeHtml(card.english)}"><img class="library-card-image c-media" src="${escapeHtml(cardImageUrl(card))}" alt="Illustration for ${escapeHtml(card.english)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" /><div class="library-card-body"><div><div class="library-card-top"><span class="category-pill c-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div><div class="library-card-footer"><span>${topicLabel}</span><span class="library-card-link">View details →</span></div></div></article>`;
 }
 
-function cardExamples(card) {
-  const examples = Array.isArray(card.examples) ? card.examples : [card.example];
-  return examples.filter(Boolean);
-}
-
 function detailCardFromRelation(item) {
   return { english: item.word, definition: item.definition || 'A related English word.', notes: 'A related word from your vocabulary.', topic: item.topic || 'other', category: 'WORD FAMILY', pronunciation: item.pronunciation || '', examples: item.example ? [item.example] : [], imageUrl: item.imageUrl, relationType: item.relationType, affix: item.affix, familyId: item.sourceWord };
 }
@@ -448,4 +443,66 @@ function init() {
   loadCustomVocabulary();
 }
 
+function exampleList(value) {
+  const values = Array.isArray(value) ? value : String(value || '').split(/\r?\n/);
+  return values
+    .flatMap((item) => String(item || '').split(/\r?\n/))
+    .map((item) => item.replace(/^\s*(?:[-*]|\d+[.)])\s*/, '').trim())
+    .filter(Boolean);
+}
+
+function cardExamples(card) {
+  return exampleList(card.examples?.length ? card.examples : card.example);
+}
+
+function setAiChatStatus(message = '', type = '') {
+  const element = document.querySelector('#ai-chat-status');
+  if (!element) return;
+  element.textContent = message;
+  element.className = `ai-chat-status${type ? ` is-${type}` : ''}`;
+}
+
+function renderAiChat() {
+  const messages = document.querySelector('#ai-chat-messages');
+  if (!messages) return;
+  const history = Array.isArray(state.aiChatMessages) ? state.aiChatMessages : [];
+  messages.innerHTML = history.length
+    ? history.map((message) => `<div class="ai-chat-message ai-chat-message-${message.role}">${escapeHtml(message.content)}</div>`).join('')
+    : '<div class="ai-chat-message ai-chat-message-assistant">Hi! Ask me anything about the word you want to learn.</div>';
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function submitAiChat(event) {
+  event.preventDefault();
+  const input = document.querySelector('#ai-chat-input');
+  const button = document.querySelector('#ai-chat-submit');
+  const content = input.value.trim();
+  if (!content || button.disabled) return;
+  if (!Array.isArray(state.aiChatMessages)) state.aiChatMessages = [];
+  state.aiChatMessages.push({ role: 'user', content });
+  renderAiChat();
+  input.value = '';
+  button.disabled = true;
+  setAiChatStatus('Thinking...');
+  try {
+    const response = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ messages: state.aiChatMessages }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to contact the AI assistant.');
+    state.aiChatMessages.push({ role: 'assistant', content: payload.answer || 'The AI returned an empty answer.' });
+    renderAiChat();
+    setAiChatStatus('');
+  } catch (error) {
+    setAiChatStatus(error.message || 'Something went wrong while contacting the AI.', 'error');
+  } finally {
+    button.disabled = false;
+    input.focus();
+  }
+}
+
 init();
+const aiChatForm = document.querySelector('#ai-chat-form');
+if (aiChatForm) aiChatForm.addEventListener('submit', submitAiChat);

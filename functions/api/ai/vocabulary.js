@@ -12,6 +12,15 @@ function normalizeWord(value) {
   return text(value, 120).replace(/\s+/g, ' ');
 }
 
+function normalizeExamples(value) {
+  const values = Array.isArray(value) ? value : [value];
+  return values
+    .flatMap((item) => String(item || '').split(/\r?\n/))
+    .map((item) => item.replace(/^\s*(?:[-*]|\d+[.)])\s*/, '').trim())
+    .filter(Boolean)
+    .slice(0, 8);
+}
+
 function parseJsonContent(content) {
   if (content && typeof content === 'object') return content;
   const raw = Array.isArray(content)
@@ -34,10 +43,11 @@ function topic(value) {
 
 const SYSTEM_PROMPT = `You create English vocabulary cards for a learner.
 Follow the English Vocabulary Skill contract exactly.
-Return one JSON object only, with these keys: word, definition, pronunciation, example, topic, familyRoot.
+Return one JSON object only, with these keys: word, definition, pronunciation, examples, topic, familyRoot.
 Use English only. A word may be a single word, phrasal verb, collocation, or useful vocabulary phrase, but never a full sentence as the card title.
-The definition must be a clear English learner-friendly definition. The example must be a natural English sentence.
+The definition must be a clear English learner-friendly definition. Each example must be a natural English sentence.
 If the item has more than one common part of speech, explain each form separately in the single definition string with clear labels such as "Verb:", "Noun:", "Adjective:", or "Adverb:". Do not merge different forms into one vague definition, and include only forms that are genuinely common for the requested item.
+Always provide at least three non-empty, natural example sentences in the examples array. Each sentence must demonstrate the requested word or phrase in context. Never return an empty examples array and never use one sentence repeated three times.
 Choose topic from greetings, work, travel, or other.
 Use familyRoot only when it exactly matches one of the existing vocabulary items supplied by the application; otherwise use an empty string.
 Do not include markdown, translations, extra keys, or commentary.`;
@@ -111,8 +121,8 @@ export async function onRequestPost({ request, env }) {
 
   const word = normalizeWord(generated.word || prompt);
   const definition = text(generated.definition, 500);
-  const example = text(generated.example, 500);
-  if (!word || !definition || !example) return json({ error: 'The AI response is missing a word, definition, or example.' }, 502);
+  const examples = normalizeExamples(generated.examples ?? generated.example);
+  if (!word || !definition || examples.length < 3) return json({ error: 'The AI response must include a word, definition, and at least three example sentences.' }, 502);
 
   const generatedDuplicate = await env.DB.prepare(`
     SELECT word
@@ -129,7 +139,8 @@ export async function onRequestPost({ request, env }) {
       word,
       definition,
       pronunciation: text(generated.pronunciation, 120),
-      example,
+      examples,
+      example: examples.join('\n'),
       topic: topic(generated.topic),
       familyRoot: familyRoot === word ? '' : familyRoot,
     },

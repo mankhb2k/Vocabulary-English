@@ -16,13 +16,17 @@ Each vocabulary item is one card. Return or save this shape:
   "word": "resilient",
   "definition": "Able to recover quickly from difficulties.",
   "pronunciation": "/rɪˈzɪliənt/",
-  "example": "She is resilient and never gives up.",
+  "examples": [
+    "She is resilient and never gives up.",
+    "The team stayed resilient after the first plan failed.",
+    "Regular practice can help learners become more resilient."
+  ],
   "topic": "work",
   "familyRoot": ""
 }
 ```
 
-Required fields are `word` and `definition`. `pronunciation`, `example`, `topic`, and `familyRoot` are optional but should be generated when they are useful.
+Required fields are `word`, `definition`, and at least three non-empty `examples`. `pronunciation`, `topic`, and `familyRoot` are optional but should be generated when they are useful.
 
 ## Content rules
 
@@ -30,7 +34,7 @@ Required fields are `word` and `definition`. `pronunciation`, `example`, `topic`
 - `word` can be a single word, phrasal verb, collocation, or useful vocabulary phrase. Do not create a full sentence as the card title.
 - Write a clear English learner-friendly definition, not a translation.
 - If the item has more than one common part of speech, explain each form separately in the definition with clear labels such as `Verb:`, `Noun:`, `Adjective:`, or `Adverb:`. Do not merge different forms into one vague definition.
-- Write a natural English example sentence that demonstrates the item.
+- Write at least three natural English example sentences that demonstrate the item. Keep each sentence separate in the `examples` array; never leave it empty.
 - Use one of these topic values: `greetings`, `work`, `travel`, or `other`.
 - Use IPA when pronunciation is known; otherwise leave it empty rather than inventing a pronunciation.
 - Examples belong inside the vocabulary card. Never create a separate Library card for an example sentence.

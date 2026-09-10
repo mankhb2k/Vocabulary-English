@@ -14,6 +14,14 @@ function textField(form, name, maxLength = 500) {
   return String(form.get(name) || '').trim().slice(0, maxLength);
 }
 
+function normalizeExamples(value) {
+  return String(value || '')
+    .split(/\r?\n/)
+    .map((item) => item.replace(/^\s*(?:[-*]|\d+[.)])\s*/, '').trim())
+    .filter(Boolean)
+    .slice(0, 8);
+}
+
 function topicName(topic) {
   return ({ greetings: 'Conversation', work: 'Work', travel: 'Travel', other: 'Other' })[topic] || 'Other';
 }
@@ -24,7 +32,8 @@ function toClientItem(row) {
     word: row.word,
     definition: row.definition,
     pronunciation: row.pronunciation,
-    example: row.example,
+    example: normalizeExamples(row.example).join('\n'),
+    examples: normalizeExamples(row.example),
     topic: row.topic,
     topicName: topicName(row.topic),
     imageUrl: `/api/vocabulary-image?key=${encodeURIComponent(row.image_key || 'placeholder-1.png')}`,
@@ -58,12 +67,13 @@ export async function onRequestPost({ request, env }) {
   const word = textField(form, 'word', 120).replace(/\s+/g, ' ');
   const definition = textField(form, 'definition', 500);
   const pronunciation = textField(form, 'pronunciation', 120);
-  const example = textField(form, 'example', 500);
+  const example = normalizeExamples(textField(form, 'example', 1500));
   const familyRoot = textField(form, 'familyRoot', 120);
   const topic = ['greetings', 'work', 'travel', 'other'].includes(form.get('topic')) ? form.get('topic') : 'other';
   const file = form.get('image');
 
   if (!word || !definition) return json({ error: 'Word and English definition are required.' }, 400);
+  if (example.length < 3) return json({ error: 'Add at least three example sentences, one per line.' }, 400);
   const duplicate = await env.DB.prepare(`
     SELECT word
     FROM vocabulary_entries
@@ -99,7 +109,7 @@ export async function onRequestPost({ request, env }) {
       INSERT INTO vocabulary_entries (id, word, definition, pronunciation, example, topic, image_key)
       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
       RETURNING id, word, definition, pronunciation, example, topic, image_key, created_at
-    `).bind(id, word, definition, pronunciation, example, topic, key).first();
+    `).bind(id, word, definition, pronunciation, example.join('\n'), topic, key).first();
     inserted = true;
     if (familyRootRow) {
       await env.DB.prepare(`
