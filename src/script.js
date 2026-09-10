@@ -247,10 +247,20 @@ function renderCustomVocabulary() {
   }).join('');
 }
 
+function renderFamilyRootOptions() {
+  const datalist = $('#family-root-options');
+  if (!datalist) return;
+  const roots = uniqueCards(state.allCards)
+    .map((card) => card.english)
+    .sort((left, right) => left.localeCompare(right));
+  datalist.innerHTML = roots.map((word) => `<option value="${escapeHtml(word)}"></option>`).join('');
+}
+
 function renderAll() {
   renderLibrary();
   renderChart();
   renderCustomVocabulary();
+  renderFamilyRootOptions();
 }
 
 function setFormStatus(message = '', type = '') {

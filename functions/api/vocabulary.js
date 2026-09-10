@@ -59,13 +59,26 @@ export async function onRequestPost({ request, env }) {
   const definition = textField(form, 'definition', 240);
   const pronunciation = textField(form, 'pronunciation', 120);
   const example = textField(form, 'example', 500);
+  const familyRoot = textField(form, 'familyRoot', 120);
   const topic = ['greetings', 'work', 'travel', 'other'].includes(form.get('topic')) ? form.get('topic') : 'other';
   const file = form.get('image');
 
   if (!word || !definition) return json({ error: 'Word and English definition are required.' }, 400);
+  if (familyRoot && familyRoot.toLowerCase() === word.toLowerCase()) return json({ error: 'The family root must be a different vocabulary item.' }, 400);
   if (!(file instanceof File) || !file.size) return json({ error: 'Please choose an image.' }, 400);
   if (!ALLOWED_IMAGE_TYPES.has(file.type)) return json({ error: 'Only JPG, PNG, or WEBP images are accepted.' }, 415);
   if (file.size > MAX_IMAGE_BYTES) return json({ error: 'The image must be smaller than 5MB.' }, 413);
+
+  let familyRootRow;
+  if (familyRoot) {
+    familyRootRow = await env.DB.prepare(`
+      SELECT id, word
+      FROM vocabulary_entries
+      WHERE lower(word) = lower(?1)
+      LIMIT 1
+    `).bind(familyRoot).first();
+    if (!familyRootRow) return json({ error: 'The family root must match an existing vocabulary item.' }, 400);
+  }
 
   const id = crypto.randomUUID();
   const key = `vocabulary/${id}.${ALLOWED_IMAGE_TYPES.get(file.type)}`;
@@ -73,14 +86,23 @@ export async function onRequestPost({ request, env }) {
     httpMetadata: { contentType: file.type, cacheControl: 'public, max-age=31536000, immutable' },
   });
 
+  let inserted = false;
   try {
     const row = await env.DB.prepare(`
       INSERT INTO vocabulary_entries (id, word, definition, pronunciation, example, topic, image_key)
       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
       RETURNING id, word, definition, pronunciation, example, topic, image_key, created_at
     `).bind(id, word, definition, pronunciation, example, topic, key).first();
+    inserted = true;
+    if (familyRootRow) {
+      await env.DB.prepare(`
+        INSERT INTO word_relations (id, source_word_id, target_word_id, relation_type, affix)
+        VALUES (?1, ?2, ?3, 'family', '')
+      `).bind(crypto.randomUUID(), familyRootRow.id, row.id).run();
+    }
     return json({ ok: true, item: toClientItem(row) }, 201);
   } catch (error) {
+    if (inserted) await env.DB.prepare('DELETE FROM vocabulary_entries WHERE id = ?1').bind(id).run();
     await env.VOCABULARY_IMAGES.delete(key);
     return json({ error: 'Unable to save the vocabulary. Please try again.' }, 500);
   }
