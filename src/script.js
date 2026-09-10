@@ -28,6 +28,7 @@ const state = {
   libraryTopic: 'all',
   searchQuery: '',
   selectedCard: null,
+  aiDraft: null,
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -256,6 +257,64 @@ function renderFamilyRootOptions() {
   datalist.innerHTML = roots.map((word) => `<option value="${escapeHtml(word)}"></option>`).join('');
 }
 
+function setAiStatus(message = '', type = '') {
+  const element = $('#ai-status');
+  element.textContent = message;
+  element.className = `ai-status${type ? ` is-${type}` : ''}`;
+}
+
+function renderAiDraft(item = state.aiDraft) {
+  const preview = $('#ai-draft-preview');
+  if (!preview) return;
+  state.aiDraft = item;
+  preview.hidden = !item;
+  if (!item) return;
+  $('#ai-draft-word').textContent = item.word;
+  $('#ai-draft-definition').textContent = item.definition;
+  $('#ai-draft-pronunciation').textContent = item.pronunciation || 'Pronunciation not provided';
+  $('#ai-draft-topic').textContent = item.topic || 'other';
+  $('#ai-draft-family').textContent = item.familyRoot ? `Family root: ${item.familyRoot}` : 'No family link suggested';
+  $('#ai-draft-example').textContent = `“${item.example}”`;
+}
+
+async function generateAiDraft(event) {
+  event.preventDefault();
+  const button = $('#generate-ai-vocabulary');
+  const prompt = $('#ai-word-prompt').value.trim();
+  if (!prompt) return;
+  button.disabled = true;
+  setAiStatus('Generating a vocabulary draft…');
+  try {
+    const response = await fetch('/api/ai/vocabulary', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to generate the vocabulary draft.');
+    renderAiDraft(payload.item);
+    setAiStatus('Draft ready. Review it, then use it in the vocabulary form.', 'success');
+  } catch (error) {
+    renderAiDraft(null);
+    setAiStatus(error.message || 'Something went wrong while contacting the AI.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function applyAiDraft() {
+  if (!state.aiDraft) return;
+  const draft = state.aiDraft;
+  $('#vocab-word').value = draft.word || '';
+  $('#vocab-definition').value = draft.definition || '';
+  $('#vocab-pronunciation').value = draft.pronunciation || '';
+  $('#vocab-topic').value = draft.topic || 'other';
+  $('#vocab-family-root').value = draft.familyRoot || '';
+  $('#vocab-example').value = draft.example || '';
+  setFormStatus('AI draft copied into the form. Add an image and save the card.', 'success');
+  $('#vocab-word').focus();
+}
+
 function renderAll() {
   renderLibrary();
   renderChart();
@@ -300,6 +359,7 @@ async function submitVocabulary(event) {
     if (!response.ok) throw new Error(payload.error || 'Unable to save the vocabulary.');
     form.reset();
     resetImagePreview();
+    renderAiDraft(null);
     setFormStatus('New vocabulary saved successfully.', 'success');
     await loadCustomVocabulary();
   } catch (error) {
@@ -353,6 +413,8 @@ function toggleCardFavorite(card) {
 
 function initEvents() {
   $$('.nav-item').forEach((button) => button.addEventListener('click', () => showView(button.dataset.view)));
+  $('#ai-vocabulary-form').addEventListener('submit', generateAiDraft);
+  $('#ai-apply-draft').addEventListener('click', applyAiDraft);
   $$('.filter-chip').forEach((button) => button.addEventListener('click', () => {
     state.libraryTopic = button.dataset.libraryTopic;
     state.searchQuery = '';
