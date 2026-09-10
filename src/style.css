@@ -211,7 +211,7 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .library-card-top { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
 .library-card .category-pill { font-size: 7px; }
 .library-card h3 { margin: 15px 0 7px; color: var(--navy); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 17px; letter-spacing: -.5px; }
-.library-card p { margin: 0; color: var(--muted); font-size: 11px; }
+.library-card p { display: -webkit-box; max-height: 4.8em; margin: 0; overflow: hidden; color: var(--muted); font-size: 11px; line-height: 1.6; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; }
 .library-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; color: var(--muted); font-size: 9px; }
 .library-card-link { color: var(--navy); font-size: 11px; font-weight: 700; }
 .vocabulary-detail { max-width: 940px; margin: 12px auto 0; }
