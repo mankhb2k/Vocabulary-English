@@ -120,7 +120,7 @@ function renderDetailFamily(card, relatedCards) {
   const uniqueCards = [...new Map(relatedCards.filter((item) => item.english !== card.english).map((item) => [item.english, item])).values()];
   section.hidden = !uniqueCards.length;
   root.textContent = card.familyId ? `Root: ${card.familyId}` : '';
-  list.innerHTML = uniqueCards.map((item) => `<button class="detail-family-word c-button" type="button"><strong>${escapeHtml(item.english)}</strong><small>${escapeHtml(item.affix ? `${item.relationType} ${item.affix}` : 'related word')}</small></button>`).join('');
+  list.innerHTML = uniqueCards.map((item) => `<button class="detail-family-word c-button" type="button" aria-label="Open ${escapeHtml(item.english)}"><strong>${escapeHtml(item.english)}</strong></button>`).join('');
   $$('.detail-family-word', list).forEach((button, index) => button.addEventListener('click', () => openCardDetails(uniqueCards[index])));
 }
 
