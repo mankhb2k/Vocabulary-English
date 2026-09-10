@@ -139,7 +139,7 @@ h1 { margin-bottom: 10px; font-family: 'Plus Jakarta Sans', sans-serif; font-siz
 .word-family { width: min(100%, 490px); margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--line); text-align: left; }
 .word-family-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .word-family-heading .card-overline { margin: 0; }
-.word-family-heading > span:last-child { color: var(--muted); font-size: 9px; }
+.word-family-root { color: var(--muted); font-size: 9px; }
 .word-family-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
 .related-word { display: inline-flex; align-items: center; gap: 7px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--paper); text-align: left; }
 .related-word:hover { border-color: var(--mint-strong); background: var(--mint); }
@@ -251,9 +251,9 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .image-preview button { width: 23px; height: 23px; margin-left: auto; border: 0; border-radius: 50%; color: var(--muted); background: transparent; font-size: 18px; line-height: 1; }
 .image-preview button:hover { color: var(--ink); background: var(--paper-deep); }
 .form-actions { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 22px; }
-#form-status { min-height: 16px; color: var(--muted); font-size: 10px; }
-#form-status.is-error { color: #a25e54; }
-#form-status.is-success { color: #4b947e; }
+.form-status { min-height: 16px; color: var(--muted); font-size: 10px; }
+.form-status.is-error { color: #a25e54; }
+.form-status.is-success { color: #4b947e; }
 .primary-button { display: inline-flex; align-items: center; gap: 12px; border: 0; border-radius: 8px; padding: 11px 15px; color: var(--white); background: var(--navy); font-size: 11px; font-weight: 800; }
 .primary-button:hover { background: var(--navy-dark); transform: translateY(-1px); }
 .primary-button:disabled { cursor: wait; opacity: .6; }

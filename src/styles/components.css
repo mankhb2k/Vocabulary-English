@@ -1,5 +1,55 @@
 /* Shared contracts for the vanilla JS components rendered by app.js. */
 
+/* Reusable primitives. Component-specific styles stay in style.css so the
+   visual language remains easy to find while these contracts can be shared by
+   new cards, buttons, forms, and panels. */
+.c-surface {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--white);
+}
+
+.c-surface--elevated {
+  box-shadow: var(--shadow);
+}
+
+.c-button {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.c-icon-button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+}
+
+.c-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 5px;
+}
+
+.c-media {
+  display: block;
+  width: 100%;
+  object-fit: contain;
+  background: var(--paper-deep);
+}
+
+.c-status {
+  min-height: 16px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.c-control {
+  font: inherit;
+}
+
 #app {
   min-height: 100vh;
 }

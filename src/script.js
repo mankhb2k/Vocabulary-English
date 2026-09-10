@@ -144,9 +144,9 @@ function cardImageUrl(card) {
 
 function libraryCardMarkup(card) {
   const topicLabel = card.topic === 'work' ? 'Work' : card.topic === 'travel' ? 'Travel' : card.topic === 'greetings' ? 'Conversation' : 'Other';
-  return `<article class="library-card">
-    <img class="library-card-image" src="${escapeHtml(cardImageUrl(card))}" alt="Illustration for ${escapeHtml(card.english)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" />
-    <div class="library-card-body"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div>
+  return `<article class="library-card c-surface">
+    <img class="library-card-image c-media" src="${escapeHtml(cardImageUrl(card))}" alt="Illustration for ${escapeHtml(card.english)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" />
+    <div class="library-card-body"><div><div class="library-card-top"><span class="category-pill c-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div>
     <h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div>
     <div class="library-card-footer"><span>${topicLabel}</span><button type="button" data-study-index="${state.allCards.indexOf(card)}">Study this card →</button></div></div>
   </article>`;
@@ -365,9 +365,9 @@ function renderCustomVocabulary() {
   }
   grid.innerHTML = state.customVocabulary.map((item) => {
     const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US') : 'Just added';
-    return `<article class="custom-vocab-card">
-      <img class="custom-vocab-image" src="${escapeHtml(item.imageUrl || PLACEHOLDER_IMAGE)}" alt="Illustration for ${escapeHtml(item.word)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" />
-      <div class="custom-vocab-content"><span class="category-pill">${escapeHtml(item.topicName || 'OTHER')}</span><h3>${escapeHtml(item.word)}</h3><p>${escapeHtml(item.definition || '')}</p>${item.example ? `<small>${escapeHtml(item.example)}</small>` : ''}<small>Added ${escapeHtml(date)}</small></div>
+    return `<article class="custom-vocab-card c-surface">
+      <img class="custom-vocab-image c-media" src="${escapeHtml(item.imageUrl || PLACEHOLDER_IMAGE)}" alt="Illustration for ${escapeHtml(item.word)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" />
+      <div class="custom-vocab-content"><span class="category-pill c-pill">${escapeHtml(item.topicName || 'OTHER')}</span><h3>${escapeHtml(item.word)}</h3><p>${escapeHtml(item.definition || '')}</p>${item.example ? `<small>${escapeHtml(item.example)}</small>` : ''}<small>Added ${escapeHtml(date)}</small></div>
     </article>`;
   }).join('');
 }
