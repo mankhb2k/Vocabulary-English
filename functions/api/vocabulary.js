@@ -27,7 +27,7 @@ function toClientItem(row) {
     example: row.example,
     topic: row.topic,
     topicName: topicName(row.topic),
-    imageUrl: `/api/vocabulary-image?key=${encodeURIComponent(row.image_key)}`,
+    imageUrl: `/api/vocabulary-image?key=${encodeURIComponent(row.image_key || 'placeholder-1.png')}`,
     createdAt: row.created_at,
   };
 }

@@ -2,7 +2,7 @@ export async function onRequestGet({ request, env }) {
   if (!env.VOCABULARY_IMAGES) return new Response('The R2 binding is not configured.', { status: 503 });
 
   const key = new URL(request.url).searchParams.get('key') || '';
-  if (!key.startsWith('vocabulary/') || key.length > 180 || key.includes('..')) {
+  if ((key !== 'placeholder-1.png' && !key.startsWith('vocabulary/')) || key.length > 180 || key.includes('..')) {
     return new Response('Invalid image key.', { status: 400 });
   }
 

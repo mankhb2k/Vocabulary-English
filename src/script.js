@@ -126,6 +126,22 @@ function setDeck() {
 function currentCard() { return state.deck[state.index] || fallbackCards[0]; }
 function cardKey(card) { return card.english; }
 
+const PLACEHOLDER_IMAGE = '/api/vocabulary-image?key=placeholder-1.png';
+
+function cardImageUrl(card) {
+  return card.imageUrl || PLACEHOLDER_IMAGE;
+}
+
+function libraryCardMarkup(card) {
+  const topicLabel = card.topic === 'work' ? 'Work' : card.topic === 'travel' ? 'Travel' : card.topic === 'greetings' ? 'Conversation' : 'Other';
+  return `<article class="library-card">
+    <img class="library-card-image" src="${escapeHtml(cardImageUrl(card))}" alt="Illustration for ${escapeHtml(card.english)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" />
+    <div class="library-card-body"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div>
+    <h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div>
+    <div class="library-card-footer"><span>${topicLabel}</span><button type="button" data-study-index="${state.allCards.indexOf(card)}">Study this card →</button></div></div>
+  </article>`;
+}
+
 function renderCard() {
   const card = currentCard();
   $('#card-english').textContent = card.english;
@@ -248,12 +264,7 @@ function renderLibrary() {
   const filtered = state.libraryTopic === 'all' ? state.allCards : state.allCards.filter((card) => card.topic === state.libraryTopic);
   $('#library-total').textContent = `${filtered.length.toLocaleString('en-US')} cards`;
   const cards = filtered.slice(0, 60);
-  $('#library-grid').innerHTML = cards.length ? cards.map((card, index) => `
-    <article class="library-card">
-      <div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div>
-      <h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div>
-      <div class="library-card-footer"><span>${escapeHtml(card.topic === 'work' ? 'Work' : card.topic === 'travel' ? 'Travel' : 'Conversation')}</span><button type="button" data-study-index="${state.allCards.indexOf(card)}">Study this card →</button></div>
-    </article>`).join('') : '<div class="empty-state">No matching cards found.</div>';
+  $('#library-grid').innerHTML = cards.length ? cards.map(libraryCardMarkup).join('') : '<div class="empty-state">No matching cards found.</div>';
   $$('.library-card button').forEach((button) => button.addEventListener('click', () => {
     const target = Number(button.dataset.studyIndex);
     state.activeTopic = 'all';
@@ -281,7 +292,7 @@ function renderCustomVocabulary() {
   grid.innerHTML = state.customVocabulary.map((item) => {
     const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US') : 'Just added';
     return `<article class="custom-vocab-card">
-      <img class="custom-vocab-image" src="${escapeHtml(item.imageUrl)}" alt="Illustration for ${escapeHtml(item.word)}" loading="lazy" />
+      <img class="custom-vocab-image" src="${escapeHtml(item.imageUrl || PLACEHOLDER_IMAGE)}" alt="Illustration for ${escapeHtml(item.word)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" />
       <div class="custom-vocab-content"><span class="category-pill">${escapeHtml(item.topicName || 'OTHER')}</span><h3>${escapeHtml(item.word)}</h3><p>${escapeHtml(item.definition || '')}</p>${item.example ? `<small>${escapeHtml(item.example)}</small>` : ''}<small>Added ${escapeHtml(date)}</small></div>
     </article>`;
   }).join('');
@@ -387,7 +398,7 @@ function initEvents() {
     if (!state.favorites.length) return toast('Tap ☆ to save cards you like.');
     state.libraryTopic = 'all';
     showView('library');
-    $('#library-grid').innerHTML = state.allCards.filter((card) => state.favorites.includes(cardKey(card))).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>★</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div></article>`).join('');
+    $('#library-grid').innerHTML = state.allCards.filter((card) => state.favorites.includes(cardKey(card))).map(libraryCardMarkup).join('');
   });
   $('#search-input').addEventListener('input', (event) => {
     const query = event.target.value.trim().toLowerCase();
@@ -396,7 +407,7 @@ function initEvents() {
     state.libraryTopic = 'all';
     showView('library');
     $('#library-total').textContent = `${matches.length.toLocaleString('en-US')} results`;
-    $('#library-grid').innerHTML = matches.slice(0, 60).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div></article>`).join('') || '<div class="empty-state">No matching expressions found.</div>';
+    $('#library-grid').innerHTML = matches.slice(0, 60).map(libraryCardMarkup).join('') || '<div class="empty-state">No matching expressions found.</div>';
   });
   $('#theme-toggle').addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
