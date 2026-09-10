@@ -156,9 +156,22 @@ function renderVocabularyDetail(card) {
   loadDetailFamily(card);
 }
 
-function openCardDetails(card) {
+function appRouteUrl(viewName = 'library', card = null) {
+  const hash = card ? `#library/${encodeURIComponent(card.english)}` : viewName === 'library' ? '' : `#${viewName}`;
+  return `${window.location.pathname}${window.location.search}${hash}`;
+}
+
+function setAppRoute(viewName = 'library', card = null, replace = false) {
+  const route = { app: 'english-cards', view: viewName };
+  if (card) route.card = card;
+  const method = replace ? 'replaceState' : 'pushState';
+  window.history[method](route, '', appRouteUrl(viewName, card));
+}
+
+function openCardDetails(card, { pushHistory = true } = {}) {
   state.selectedCard = typeof card === 'string' ? state.allCards.find((item) => item.english === card) : card;
   if (!state.selectedCard) return;
+  if (pushHistory) setAppRoute('library', state.selectedCard);
   $$('.view').forEach((view) => view.classList.toggle('is-visible', view.id === 'view-library'));
   $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === 'library'));
   $('#library-index').hidden = true;
@@ -171,6 +184,32 @@ function closeVocabularyDetail() {
   state.selectedCard = null;
   $('#vocabulary-detail').hidden = true;
   $('#library-index').hidden = false;
+}
+
+function handleHistoryChange(event) {
+  const route = event.state;
+  if (route?.app === 'english-cards' && route.card) {
+    openCardDetails(route.card, { pushHistory: false });
+    return;
+  }
+  showView(route?.app === 'english-cards' ? route.view : 'library', { syncHistory: false });
+}
+
+function initHistory() {
+  const hashCard = window.location.hash.startsWith('#library/')
+    ? decodeURIComponent(window.location.hash.slice('#library/'.length))
+    : '';
+  const existingCard = window.history.state?.app === 'english-cards' ? window.history.state.card : null;
+  const card = existingCard || state.allCards.find((item) => item.english.toLowerCase() === hashCard.toLowerCase());
+  window.addEventListener('popstate', handleHistoryChange);
+  if (card) {
+    setAppRoute('library', null, true);
+    setAppRoute('library', card);
+    openCardDetails(card, { pushHistory: false });
+    return;
+  }
+  const view = window.history.state?.app === 'english-cards' ? window.history.state.view : 'library';
+  setAppRoute(view, null, true);
 }
 
 function renderLibrary() {
@@ -259,8 +298,9 @@ async function submitVocabulary(event) {
   }
 }
 
-function showView(viewName) {
+function showView(viewName, { syncHistory = true } = {}) {
   if (state.selectedCard) closeVocabularyDetail();
+  if (syncHistory) setAppRoute(viewName, null, true);
   $$('.view').forEach((view) => view.classList.toggle('is-visible', view.id === `view-${viewName}`));
   $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === viewName));
   if (viewName === 'library') renderLibrary();
@@ -309,7 +349,10 @@ function initEvents() {
     $$('.filter-chip').forEach((chip) => chip.classList.toggle('is-active', chip === button));
     renderLibrary();
   }));
-  $('#detail-back').addEventListener('click', () => { closeVocabularyDetail(); showView('library'); });
+  $('#detail-back').addEventListener('click', () => {
+    if (window.history.state?.app === 'english-cards' && window.history.state.card) window.history.back();
+    else showView('library');
+  });
   $('#detail-speak').addEventListener('click', () => { if (state.selectedCard) speakWord(state.selectedCard.english); });
   $('#detail-favorite').addEventListener('click', () => { if (state.selectedCard) toggleCardFavorite(state.selectedCard); });
   $('#search-input').addEventListener('input', (event) => {
@@ -333,6 +376,7 @@ function init() {
   renderApp(document.querySelector('#app'));
   initEvents();
   renderAll();
+  initHistory();
   loadCustomVocabulary();
 }
 
