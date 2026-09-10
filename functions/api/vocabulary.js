@@ -37,6 +37,7 @@ export async function onRequestGet({ env }) {
   const result = await env.DB.prepare(`
     SELECT id, word, definition, pronunciation, example, topic, image_key, created_at
     FROM vocabulary_entries
+    WHERE source = 'user'
     ORDER BY created_at DESC
     LIMIT 100
   `).all();

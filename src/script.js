@@ -13,8 +13,17 @@ const fallbackCards = [
   { english: 'It slipped my mind.', definition: 'Used to say that you forgot something.', notes: 'A natural phrase for explaining that you forgot to do or remember something.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪt slɪpt maɪ maɪnd/', example: 'Sorry, it slipped my mind. I’ll do it now.' },
 ];
 
+const wordFamilyExamples = [
+  { english: 'help', definition: 'To make it easier for someone to do something.', notes: 'The base word in this family.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/help/', example: 'Can you help me with this task?', familyId: 'help' },
+  { english: 'helpful', definition: 'Useful or able to provide help.', notes: 'The suffix -ful means “full of” or “providing”.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ˈhelpfəl/', example: 'The instructions were very helpful.', familyId: 'help', relationType: 'suffix', affix: '-ful' },
+  { english: 'helpless', definition: 'Unable to help yourself or control a situation.', notes: 'The suffix -less means “without”.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ˈhelpləs/', example: 'He felt helpless during the emergency.', familyId: 'help', relationType: 'suffix', affix: '-less' },
+  { english: 'helper', definition: 'A person who helps someone.', notes: 'The suffix -er can describe a person who does an action.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ˈhelpər/', example: 'She works as a classroom helper.', familyId: 'help', relationType: 'suffix', affix: '-er' },
+  { english: 'helpfully', definition: 'In a way that provides useful help.', notes: 'The suffix -ly forms an adverb.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ˈhelpfəli/', example: 'He helpfully explained the next steps.', familyId: 'help', relationType: 'suffix', affix: '-fully' },
+  { english: 'unhelpful', definition: 'Not useful or not providing the help that is needed.', notes: 'The prefix un- often gives a word the opposite meaning.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ʌnˈhelpfəl/', example: 'The reply was vague and unhelpful.', familyId: 'help', relationType: 'prefix', affix: 'un-' },
+];
+
 const state = {
-  allCards: [...fallbackCards],
+  allCards: [...fallbackCards, ...wordFamilyExamples],
   activeTopic: 'all',
   deck: [...fallbackCards],
   index: 0,
@@ -25,6 +34,7 @@ const state = {
   flipped: false,
   libraryTopic: 'all',
   userId: localStorage.getItem('englishCardsUserId') || createUserId(),
+  relatedCards: new Map(),
 };
 
 function createUserId() {
@@ -92,7 +102,7 @@ async function loadDataset() {
       if (!response.ok) continue;
       const cards = flattenDataset(await response.json());
       if (cards.length) {
-        state.allCards = [...cards, ...state.customVocabulary.map(customVocabularyCard)];
+        state.allCards = [...cards, ...wordFamilyExamples, ...state.customVocabulary.map(customVocabularyCard)];
         setDeck();
         renderAll();
         toast(`Loaded ${cards.length.toLocaleString('en-US')} English expressions into your library.`);
@@ -142,6 +152,69 @@ function libraryCardMarkup(card) {
   </article>`;
 }
 
+function renderWordFamily(card, relatedCards) {
+  const section = $('#word-family');
+  const list = $('#word-family-list');
+  const root = $('#word-family-root');
+  if (!section || !list || !root) return;
+
+  state.relatedCards.clear();
+  const uniqueCards = [...new Map(relatedCards.filter((item) => item.english !== card.english).map((item) => [item.english, item])).values()];
+  section.hidden = !uniqueCards.length;
+  root.textContent = card.familyId ? `Root: ${card.familyId}` : '';
+  list.innerHTML = uniqueCards.map((item) => {
+    state.relatedCards.set(item.english, item);
+    return `<button class="related-word" type="button" data-related-word="${escapeHtml(item.english)}"><strong>${escapeHtml(item.english)}</strong><small>${escapeHtml(item.affix ? `${item.relationType} ${item.affix}` : item.partOfSpeech || 'related word')}</small></button>`;
+  }).join('');
+  $$('.related-word', list).forEach((button) => button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openRelatedCard(button.dataset.relatedWord);
+  }));
+}
+
+async function loadWordFamily(card) {
+  const localRelated = wordFamilyExamples.filter((item) => item.familyId && item.familyId === card.familyId);
+  renderWordFamily(card, localRelated);
+  try {
+    const response = await fetch(`/api/word-relations?word=${encodeURIComponent(card.english)}`);
+    if (!response.ok) return;
+    const payload = await response.json();
+    if (currentCard().english !== card.english) return;
+    const apiRelated = (payload.items || []).map((item) => ({
+      english: item.word,
+      definition: item.definition,
+      notes: 'A related word from your vocabulary.',
+      topic: item.topic || 'other',
+      category: 'WORD FAMILY',
+      pronunciation: item.pronunciation || '',
+      example: item.example || `Use “${item.word}” in a natural sentence.`,
+      imageUrl: item.imageUrl,
+      entryId: item.id,
+      relationType: item.relationType,
+      affix: item.affix,
+    }));
+    renderWordFamily(card, [...localRelated, ...apiRelated]);
+  } catch {
+    // The local examples keep the word family available on static hosting.
+  }
+}
+
+function openRelatedCard(word) {
+  const relatedCard = state.relatedCards.get(word);
+  let targetIndex = state.allCards.findIndex((item) => item.english === word);
+  if (targetIndex < 0 && relatedCard) {
+    state.allCards.push(relatedCard);
+    targetIndex = state.allCards.length - 1;
+  }
+  if (targetIndex < 0) return;
+  state.activeTopic = 'all';
+  state.deck = [...state.allCards];
+  state.index = targetIndex;
+  state.flipped = false;
+  showView('study');
+  renderAll();
+}
+
 function renderCard() {
   const card = currentCard();
   $('#card-english').textContent = card.english;
@@ -157,6 +230,7 @@ function renderCard() {
   $('#favorite-button').classList.toggle('is-favorite', state.favorites.includes(cardKey(card)));
   $('#favorite-button').setAttribute('aria-pressed', String(state.favorites.includes(cardKey(card))));
   updatePronunciation(card.english);
+  loadWordFamily(card);
 }
 
 function updateProgress() {

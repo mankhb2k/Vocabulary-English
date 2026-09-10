@@ -136,6 +136,15 @@ h1 { margin-bottom: 10px; font-family: 'Plus Jakarta Sans', sans-serif; font-siz
 .example-box span { color: var(--muted); font-size: 8px; font-weight: 800; letter-spacing: .12em; }
 .example-box p { margin: 6px 0 0; color: var(--navy); font-size: 12px; line-height: 1.45; }
 .card-note { max-width: 490px; margin: 17px 0 0; color: var(--muted); font-size: 11px; }
+.word-family { width: min(100%, 490px); margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--line); text-align: left; }
+.word-family-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.word-family-heading .card-overline { margin: 0; }
+.word-family-heading > span:last-child { color: var(--muted); font-size: 9px; }
+.word-family-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.related-word { display: inline-flex; align-items: center; gap: 7px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--paper); text-align: left; }
+.related-word:hover { border-color: var(--mint-strong); background: var(--mint); }
+.related-word strong { font-size: 11px; }
+.related-word small { color: var(--muted); font-size: 8px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .flip-label { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--muted); font-size: 9px; }
 .flip-dots { display: flex; gap: 4px; }
 .flip-dots i { width: 5px; height: 5px; display: block; border-radius: 50%; background: var(--line); }
