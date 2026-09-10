@@ -494,6 +494,14 @@ async function submitAiChat(event) {
     if (!response.ok) throw new Error(payload.error || 'Unable to contact the AI assistant.');
     state.aiChatMessages.push({ role: 'assistant', content: payload.answer || 'The AI returned an empty answer.' });
     renderAiChat();
+    const context = payload.context;
+    if (context) {
+      const comparison = context.duplicateMessages || context.trimmedMessages
+        ? ` · compared ${context.duplicateMessages || 0} duplicate, trimmed ${context.trimmedMessages || 0}`
+        : ' · compared';
+      const contextElement = document.querySelector('#ai-chat-context');
+      if (contextElement) contextElement.textContent = `Context: ${context.estimatedTokens.toLocaleString('en-US')} / ${context.maxTokens.toLocaleString('en-US')} tokens${comparison}`;
+    }
     setAiChatStatus('');
   } catch (error) {
     setAiChatStatus(error.message || 'Something went wrong while contacting the AI.', 'error');

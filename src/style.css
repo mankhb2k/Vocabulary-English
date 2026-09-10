@@ -325,6 +325,7 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .ai-chat-form .primary-button:disabled { cursor: wait; opacity: .6; }
 .ai-chat-status { min-height: 14px; margin: 8px 0 0; color: var(--muted); font-size: 10px; }
 .ai-chat-status.is-error { color: #a25e54; }
+.ai-chat-context { margin: 5px 0 0; color: var(--muted); font-size: 9px; line-height: 1.4; }
 .add-tip { align-self: start; padding: 22px 20px; border-radius: 13px; color: #e8f1ed; background: var(--navy-dark); }
 .tip-icon { display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: 20px; border-radius: 10px; color: #8d5d40; background: var(--coral); }
 .add-tip .section-label { color: #8db5aa; font-size: 8px; }

@@ -1,4 +1,6 @@
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' };
+const MAX_CONTEXT_TOKENS = 200000;
+const MAX_MESSAGE_CHARACTERS = 20000;
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
@@ -6,6 +8,46 @@ function json(data, status = 200) {
 
 function cleanText(value, maxLength = 1200) {
   return String(value || '').trim().slice(0, maxLength);
+}
+
+function estimateTokens(value) {
+  return Math.ceil(String(value || '').length / 3.5) + 4;
+}
+
+function messageSignature(message) {
+  return `${message.role}:${message.content.toLowerCase().replace(/\s+/g, ' ')}`;
+}
+
+function compareContext(messages) {
+  const retained = [];
+  const signatures = new Set();
+  let estimatedTokens = estimateTokens(SYSTEM_PROMPT);
+  let duplicateMessages = 0;
+  let trimmedMessages = 0;
+
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const message = messages[index];
+    const signature = messageSignature(message);
+    if (signatures.has(signature)) {
+      duplicateMessages += 1;
+      continue;
+    }
+    const messageTokens = estimateTokens(message.content) + 4;
+    if (estimatedTokens + messageTokens > MAX_CONTEXT_TOKENS) {
+      trimmedMessages += 1;
+      continue;
+    }
+    signatures.add(signature);
+    retained.unshift(message);
+    estimatedTokens += messageTokens;
+  }
+
+  return {
+    messages: retained,
+    estimatedTokens,
+    duplicateMessages,
+    trimmedMessages,
+  };
 }
 
 function responseText(content) {
@@ -32,11 +74,11 @@ export async function onRequestPost({ request, env }) {
   const messages = Array.isArray(body?.messages)
     ? body.messages
       .filter((message) => ['user', 'assistant'].includes(message?.role))
-      .map((message) => ({ role: message.role, content: cleanText(message.content) }))
+      .map((message) => ({ role: message.role, content: cleanText(message.content, MAX_MESSAGE_CHARACTERS) }))
       .filter((message) => message.content)
-      .slice(-12)
     : [];
-  if (!messages.length || messages[messages.length - 1].role !== 'user') return json({ error: 'Enter a question for the AI assistant.' }, 400);
+  const context = compareContext(messages);
+  if (!context.messages.length || context.messages[context.messages.length - 1].role !== 'user') return json({ error: 'Enter a question for the AI assistant.' }, 400);
 
   let upstream;
   try {
@@ -50,7 +92,7 @@ export async function onRequestPost({ request, env }) {
         model: env.AI_MODEL,
         temperature: 0.4,
         max_tokens: 600,
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...context.messages],
       }),
     });
   } catch {
@@ -68,5 +110,13 @@ export async function onRequestPost({ request, env }) {
 
   const answer = responseText(payload?.choices?.[0]?.message?.content ?? payload?.output_text ?? payload?.content);
   if (!answer) return json({ error: 'The AI returned an empty answer.' }, 502);
-  return json({ answer: answer.slice(0, 4000) });
+  return json({
+    answer: answer.slice(0, 4000),
+    context: {
+      estimatedTokens: context.estimatedTokens,
+      maxTokens: MAX_CONTEXT_TOKENS,
+      duplicateMessages: context.duplicateMessages,
+      trimmedMessages: context.trimmedMessages,
+    },
+  });
 }

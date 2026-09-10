@@ -118,6 +118,7 @@ export function AddView() {
             <button class="primary-button c-button" id="ai-chat-submit" type="submit">Send <span>&rarr;</span></button>
           </form>
           <p class="ai-chat-status" id="ai-chat-status" role="status"></p>
+          <p class="ai-chat-context" id="ai-chat-context">Context limit: 200,000 tokens · automatic comparison enabled</p>
         </aside>
       </section>
 
