@@ -381,11 +381,6 @@ function initEvents() {
     showView('library');
     $('#library-grid').innerHTML = state.allCards.filter((card) => state.favorites.includes(cardKey(card))).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>★</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.vietnamese)}</p></div></article>`).join('');
   });
-  $('#search-toggle').addEventListener('click', () => {
-    const panel = $('#search-panel');
-    panel.hidden = !panel.hidden;
-    if (!panel.hidden) $('#search-input').focus();
-  });
   $('#search-input').addEventListener('input', (event) => {
     const query = event.target.value.trim().toLowerCase();
     if (!query) return renderLibrary();
