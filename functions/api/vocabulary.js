@@ -103,7 +103,6 @@ export async function onRequestPost({ request, env }) {
     && duplicate.word.toLowerCase() === existingWord.toLowerCase();
   if (duplicate && !canCreatePersonalVersion) return json({ error: `"${duplicate.word}" is already in your vocabulary.` }, 409);
   if (familyRoot && familyRoot.toLowerCase() === word.toLowerCase()) return json({ error: 'The family root must be a different vocabulary item.' }, 400);
-  if (!hasFile && !replaceExisting) return json({ error: 'Please choose an image.' }, 400);
   if (hasFile && !ALLOWED_IMAGE_TYPES.has(file.type)) return json({ error: 'Only JPG, PNG, or WEBP images are accepted.' }, 415);
   if (hasFile && file.size > MAX_IMAGE_BYTES) return json({ error: 'The image must be smaller than 5MB.' }, 413);
 

@@ -341,8 +341,8 @@ function setVocabularyFormMode(editing = false) {
   const image = $('#vocab-image');
   const imageRequired = $('#vocab-image-required');
   if (button) button.innerHTML = editing ? 'Update vocabulary <span>&rarr;</span>' : 'Save vocabulary <span>&rarr;</span>';
-  if (image) image.required = !editing;
-  if (imageRequired) imageRequired.textContent = editing ? '' : '*';
+  if (image) image.required = false;
+  if (imageRequired) imageRequired.textContent = '(optional)';
 }
 
 function prepareNewVocabulary() {
@@ -408,10 +408,9 @@ async function submitVocabulary(event) {
   const file = $('#vocab-image').files[0];
   const isEditing = Boolean(state.editingVocabulary);
   const isPersistedEdit = Boolean(state.editingVocabulary?.id);
-  if (!isEditing && !file) return setFormStatus('Please choose an image.', 'error');
   if (file && file.size > 5 * 1024 * 1024) return setFormStatus('The image must be smaller than 5MB.', 'error');
   button.disabled = true;
-  setFormStatus(isEditing ? 'Updating the vocabulary...' : 'Uploading the image and saving the vocabulary...');
+  setFormStatus(isEditing ? 'Updating the vocabulary...' : (file ? 'Uploading the image and saving the vocabulary...' : 'Saving the vocabulary with the fallback image...'));
   try {
     const formData = new FormData(form);
     if (isPersistedEdit) formData.append('id', state.editingVocabulary.id);
