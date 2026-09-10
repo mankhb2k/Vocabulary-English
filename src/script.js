@@ -331,8 +331,8 @@ function applyAiDraft() {
   $('#vocab-pronunciation').value = draft.pronunciation || '';
   $('#vocab-topic').value = draft.topic || 'other';
   $('#vocab-family-root').value = draft.familyRoot || '';
-  $('#vocab-example').value = draft.example || '';
-  setFormStatus('AI draft copied into the form. Add an image and save the card.', 'success');
+  $('#vocab-example').value = formatExampleSentences(draft.examples?.length ? draft.examples : draft.example);
+  setFormStatus('AI draft copied into the form. Review it and save the card.', 'success');
   $('#vocab-word').focus();
 }
 
@@ -364,7 +364,7 @@ function startEditingVocabulary(card) {
   $('#vocab-pronunciation').value = card.pronunciation || '';
   $('#vocab-topic').value = card.topic || 'other';
   $('#vocab-family-root').value = card.familyId || '';
-  $('#vocab-example').value = cardExamples(card).join('\n');
+  $('#vocab-example').value = formatExampleSentences(cardExamples(card));
   resetImagePreview();
   setVocabularyFormMode(true);
   renderAiDraft(null);
@@ -530,6 +530,10 @@ function exampleList(value) {
 
 function cardExamples(card) {
   return exampleList(card.examples?.length ? card.examples : card.example);
+}
+
+function formatExampleSentences(value) {
+  return exampleList(value).map((sentence, index) => `${index + 1}. ${sentence}`).join('\n');
 }
 
 function setAiChatStatus(message = '', type = '') {
