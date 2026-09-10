@@ -75,7 +75,7 @@ function mergeCustomVocabulary() {
 }
 
 async function loadDataset() {
-  const paths = ['./json/chunk-en-vi.json', '../json/chunk-en-vi.json'];
+  const paths = ['./chunk-en-vi.json', './json/chunk-en-vi.json', '../json/chunk-en-vi.json'];
   for (const path of paths) {
     try {
       const response = await fetch(path);
