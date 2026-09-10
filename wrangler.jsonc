@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "name": "english-cards",
+  "compatibility_date": "2026-09-10",
+  "pages_build_output_dir": "src",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "english-cards-db",
+      "database_id": "b3a4a466-8dc4-4259-9278-2dbb61f21e12",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

@@ -1,0 +1,316 @@
+const fallbackCards = [
+  { english: 'How is it going?', vietnamese: 'Dạo này bạn thế nào?', notes: 'Cách hỏi thăm thân mật, dùng trong hội thoại hằng ngày.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/haʊ ɪz ɪt ˈɡoʊɪŋ/', example: 'Hey, long time no see! How is it going?' },
+  { english: 'I really appreciate it.', vietnamese: 'Tôi thực sự cảm kích điều đó.', notes: 'Cách cảm ơn chân thành và tự nhiên.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/əˈpriːʃieɪt/', example: 'Thanks for your help. I really appreciate it.' },
+  { english: 'Could you give me a hand?', vietnamese: 'Bạn có thể giúp tôi một tay không?', notes: 'Lời nhờ giúp đỡ lịch sự trong tình huống hằng ngày.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/kəd juː ɡɪv mi ə hænd/', example: 'Could you give me a hand with this report?' },
+  { english: 'Let me get back to you.', vietnamese: 'Để tôi phản hồi bạn sau nhé.', notes: 'Dùng khi cần thêm thời gian để kiểm tra hoặc suy nghĩ.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/let mi ɡet bæk tə juː/', example: 'I need to check the details. Let me get back to you.' },
+  { english: 'I’m looking forward to it.', vietnamese: 'Tôi rất mong chờ điều đó.', notes: 'Thể hiện sự hào hứng về một kế hoạch sắp tới.', topic: 'travel', category: 'TRAVEL', pronunciation: '/aɪm ˈlʊkɪŋ ˈfɔːrwərd tə ɪt/', example: 'Our trip is next week. I’m looking forward to it!' },
+  { english: 'Is there anything I should know?', vietnamese: 'Có điều gì tôi nên biết không?', notes: 'Một câu hỏi hữu ích khi muốn nắm thêm thông tin.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪz ðer ˈeniθɪŋ aɪ ʃəd noʊ/', example: 'Before we start, is there anything I should know?' },
+  { english: 'That sounds like a plan.', vietnamese: 'Nghe có vẻ là một kế hoạch hay đấy.', notes: 'Cách đồng ý thân thiện với một đề xuất.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/ðæt saʊndz laɪk ə plæn/', example: 'Let’s meet at six. That sounds like a plan.' },
+  { english: 'Could I have the bill, please?', vietnamese: 'Cho tôi xin hóa đơn nhé?', notes: 'Câu nói lịch sự khi thanh toán tại nhà hàng.', topic: 'travel', category: 'TRAVEL', pronunciation: '/kəd aɪ hæv ðə bɪl pliːz/', example: 'Everything was delicious. Could I have the bill, please?' },
+  { english: 'I’m just browsing.', vietnamese: 'Tôi chỉ xem qua thôi.', notes: 'Dùng khi nhân viên bán hàng hỏi bạn có cần giúp gì không.', topic: 'travel', category: 'TRAVEL', pronunciation: '/aɪm dʒʌst ˈbraʊzɪŋ/', example: 'Thanks, I’m just browsing for now.' },
+  { english: 'It slipped my mind.', vietnamese: 'Tôi quên mất.', notes: 'Cách nói tự nhiên khi quên làm một việc.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪt slɪpt maɪ maɪnd/', example: 'Sorry, it slipped my mind. I’ll do it now.' },
+];
+
+const state = {
+  allCards: [...fallbackCards],
+  activeTopic: 'all',
+  deck: [...fallbackCards],
+  index: 0,
+  reviewed: Number(localStorage.getItem('englishCardsReviewed') || 3),
+  correct: Number(localStorage.getItem('englishCardsCorrect') || 0),
+  favorites: JSON.parse(localStorage.getItem('englishCardsFavorites') || '[]'),
+  flipped: false,
+  libraryTopic: 'all',
+  userId: localStorage.getItem('englishCardsUserId') || createUserId(),
+};
+
+function createUserId() {
+  const id = `user_${crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2)}`}`;
+  localStorage.setItem('englishCardsUserId', id);
+  return id;
+}
+
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+function normalizeCard(chunk, topic, category) {
+  const english = chunk.english || chunk.word || '';
+  const vietnamese = chunk.vietnamese || chunk.meaning || '';
+  const topicName = `${topic} ${category}`.toLowerCase();
+  const inferredTopic = topicName.includes('work') || topicName.includes('office') || topicName.includes('meeting') || topicName.includes('công việc') ? 'work' : topicName.includes('travel') || topicName.includes('du lịch') || topicName.includes('transport') ? 'travel' : 'greetings';
+  return { english, vietnamese, notes: chunk.notes || 'Một cụm từ hữu ích trong giao tiếp hằng ngày.', topic: inferredTopic, category: category || 'EVERYDAY ENGLISH', pronunciation: chunk.pronunciation || '', example: chunk.example || `${english} — ${vietnamese}` };
+}
+
+function flattenDataset(data) {
+  const cards = [];
+  const parts = data?.parts ? Object.values(data.parts) : [];
+  parts.forEach((part) => (part.topics || []).forEach((topic) => {
+    (topic.sub_topics || []).forEach((subTopic) => {
+      (subTopic.chunks || []).forEach((chunk) => cards.push(normalizeCard(chunk, topic.name_english, subTopic.name)));
+    });
+  }));
+  return cards.filter((card) => card.english && card.vietnamese);
+}
+
+async function loadDataset() {
+  const paths = ['./json/chunk-en-vi.json', '../json/chunk-en-vi.json'];
+  for (const path of paths) {
+    try {
+      const response = await fetch(path);
+      if (!response.ok) continue;
+      const cards = flattenDataset(await response.json());
+      if (cards.length) {
+        state.allCards = cards;
+        setDeck();
+        renderAll();
+        toast(`Đã tải ${cards.length.toLocaleString('vi-VN')} cụm từ vào thư viện.`);
+        return;
+      }
+    } catch (error) {
+      // The fallback cards keep the app usable when opened directly from the file system.
+    }
+  }
+}
+
+function setDeck() {
+  const source = state.activeTopic === 'all' ? state.allCards : state.allCards.filter((card) => card.topic === state.activeTopic);
+  state.deck = source.length ? source : [...fallbackCards];
+  state.index = Math.min(state.index, state.deck.length - 1);
+  state.flipped = false;
+}
+
+function currentCard() { return state.deck[state.index] || fallbackCards[0]; }
+function cardKey(card) { return `${card.english}::${card.vietnamese}`; }
+
+function renderCard() {
+  const card = currentCard();
+  $('#card-english').textContent = card.english;
+  $('#card-vietnamese').textContent = card.vietnamese;
+  $('#card-category').textContent = card.category;
+  $('#pronunciation-text').textContent = card.pronunciation || 'Nhấn loa để nghe';
+  $('#card-note').textContent = card.notes;
+  $('#card-example').textContent = card.example;
+  $('#card-count').textContent = `${String(state.index + 1).padStart(2, '0')} / ${String(state.deck.length).padStart(2, '0')}`;
+  $('#flashcard').classList.toggle('is-flipped', state.flipped);
+  $('#flashcard').setAttribute('aria-label', state.flipped ? 'Mặt sau của thẻ, bấm để lật lại' : 'Mặt trước của thẻ, bấm để lật');
+  $('#flip-label-text').textContent = state.flipped ? 'Mặt sau' : 'Mặt trước';
+  $('#favorite-button').classList.toggle('is-favorite', state.favorites.includes(cardKey(card)));
+  $('#favorite-button').setAttribute('aria-pressed', String(state.favorites.includes(cardKey(card))));
+  updatePronunciation(card.english);
+}
+
+function updateProgress() {
+  const today = Math.min(state.reviewed, 10);
+  const percent = Math.min(today * 10, 100);
+  $('#completed-count').textContent = today;
+  $('#daily-progress').textContent = `${percent}%`;
+  $('#progress-ring').style.setProperty('--progress', `${percent}%`);
+  $('#session-bar-fill').style.width = `${percent}%`;
+  $('#session-reviewed').textContent = today;
+  $('#session-left').textContent = Math.max(10 - today, 0);
+  $('#session-accuracy').textContent = state.reviewed ? `${Math.round((state.correct / state.reviewed) * 100)}%` : '—';
+  $('#sidebar-streak').textContent = '4 ngày';
+  $('#streak-number').textContent = '4';
+  $('#favorite-count').textContent = `${state.favorites.length} thẻ đã lưu`;
+  $('#stats-reviewed').textContent = state.reviewed;
+  $('#stats-favorites').textContent = state.favorites.length;
+  $('#stats-streak').textContent = '4 ngày';
+}
+
+function renderAll() {
+  renderCard();
+  updateProgress();
+  renderLibrary();
+  renderChart();
+}
+
+function flipCard() {
+  state.flipped = !state.flipped;
+  renderCard();
+}
+
+function nextCard(isCorrect) {
+  state.reviewed += 1;
+  if (isCorrect) state.correct += 1;
+  localStorage.setItem('englishCardsReviewed', state.reviewed);
+  localStorage.setItem('englishCardsCorrect', state.correct);
+  syncProgress();
+  state.index = (state.index + 1) % state.deck.length;
+  state.flipped = false;
+  renderAll();
+  toast(isCorrect ? 'Tốt lắm — thẻ tiếp theo đang chờ bạn.' : 'Không sao, mình sẽ gặp lại thẻ này sau nhé.');
+}
+
+function toggleFavorite() {
+  const key = cardKey(currentCard());
+  const found = state.favorites.indexOf(key);
+  if (found >= 0) state.favorites.splice(found, 1);
+  else state.favorites.push(key);
+  localStorage.setItem('englishCardsFavorites', JSON.stringify(state.favorites));
+  syncProgress();
+  renderAll();
+  toast(found >= 0 ? 'Đã bỏ khỏi thẻ yêu thích.' : 'Đã lưu vào thẻ yêu thích.');
+}
+
+async function loadRemoteProgress() {
+  try {
+    const response = await fetch(`/api/progress?userId=${encodeURIComponent(state.userId)}`);
+    if (!response.ok) return;
+    const remote = await response.json();
+    state.reviewed = Math.max(state.reviewed, Number(remote.reviewed) || 0);
+    state.correct = Math.max(state.correct, Number(remote.correct) || 0);
+    if (Array.isArray(remote.favorites)) state.favorites = [...new Set([...state.favorites, ...remote.favorites])];
+    localStorage.setItem('englishCardsReviewed', state.reviewed);
+    localStorage.setItem('englishCardsCorrect', state.correct);
+    localStorage.setItem('englishCardsFavorites', JSON.stringify(state.favorites));
+    updateProgress();
+  } catch {
+    // GitHub Pages/local static preview has no /api route, so localStorage remains the fallback.
+  }
+}
+
+async function syncProgress() {
+  try {
+    await fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ userId: state.userId, reviewed: state.reviewed, correct: state.correct, favorites: state.favorites }),
+    });
+  } catch {
+    // Cloud sync is optional; the local copy is already saved before this request.
+  }
+}
+
+function speakCurrent() {
+  if (!('speechSynthesis' in window)) return toast('Trình duyệt của bạn chưa hỗ trợ phát âm.');
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(currentCard().english);
+  utterance.lang = 'en-US';
+  utterance.rate = .86;
+  window.speechSynthesis.speak(utterance);
+}
+
+function selectTopic(topic) {
+  state.activeTopic = topic;
+  state.index = 0;
+  $$('.topic-tab').forEach((button) => button.classList.toggle('is-active', button.dataset.topic === topic));
+  $('#deck-title').textContent = topic === 'all' ? 'Daily conversations' : topic === 'work' ? 'Work & meetings' : topic === 'travel' ? 'Travel essentials' : 'Everyday conversations';
+  setDeck();
+  renderAll();
+}
+
+function renderLibrary() {
+  const filtered = state.libraryTopic === 'all' ? state.allCards : state.allCards.filter((card) => card.topic === state.libraryTopic);
+  $('#library-total').textContent = `${filtered.length.toLocaleString('vi-VN')} thẻ`;
+  const cards = filtered.slice(0, 60);
+  $('#library-grid').innerHTML = cards.length ? cards.map((card, index) => `
+    <article class="library-card">
+      <div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div>
+      <h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.vietnamese)}</p></div>
+      <div class="library-card-footer"><span>${escapeHtml(card.topic === 'work' ? 'Công việc' : card.topic === 'travel' ? 'Du lịch' : 'Giao tiếp')}</span><button type="button" data-study-index="${state.allCards.indexOf(card)}">Học thẻ này →</button></div>
+    </article>`).join('') : '<div class="empty-state">Chưa tìm thấy thẻ phù hợp.</div>';
+  $$('.library-card button').forEach((button) => button.addEventListener('click', () => {
+    const target = Number(button.dataset.studyIndex);
+    state.activeTopic = 'all';
+    state.deck = [...state.allCards];
+    state.index = Math.max(0, target);
+    showView('study');
+    renderAll();
+  }));
+}
+
+function renderChart() {
+  const values = [4, 6, 3, 8, 5, 3, Math.min(state.reviewed, 10)];
+  const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  $('#week-chart').innerHTML = values.map((value, index) => `<div class="chart-day"><div class="chart-bar ${index === values.length - 1 ? 'is-today' : ''}" style="height:${Math.max(value * 10, 7)}%" title="${value} thẻ"></div><small>${days[index]}</small></div>`).join('');
+}
+
+function showView(viewName) {
+  $$('.view').forEach((view) => view.classList.toggle('is-visible', view.id === `view-${viewName}`));
+  $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === viewName));
+  if (viewName === 'library') renderLibrary();
+  if (viewName === 'stats') renderChart();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
+}
+
+let toastTimer;
+function toast(message) {
+  const element = $('#toast');
+  element.textContent = message;
+  element.classList.add('is-visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => element.classList.remove('is-visible'), 2600);
+}
+
+function shuffleDeck() {
+  for (let index = state.deck.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [state.deck[index], state.deck[swap]] = [state.deck[swap], state.deck[index]];
+  }
+  state.index = 0;
+  state.flipped = false;
+  renderCard();
+  toast('Đã trộn bộ thẻ.');
+}
+
+function initEvents() {
+  $$('.nav-item').forEach((button) => button.addEventListener('click', () => showView(button.dataset.view)));
+  $$('.topic-tab').forEach((button) => button.addEventListener('click', () => selectTopic(button.dataset.topic)));
+  $$('.filter-chip').forEach((button) => button.addEventListener('click', () => {
+    state.libraryTopic = button.dataset.libraryTopic;
+    $$('.filter-chip').forEach((chip) => chip.classList.toggle('is-active', chip === button));
+    renderLibrary();
+  }));
+  $('#flashcard').addEventListener('click', (event) => { if (!event.target.closest('button')) flipCard(); });
+  $('#flashcard').addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(); } });
+  $('#reveal-hint').addEventListener('click', flipCard);
+  $('#speak-button').addEventListener('click', (event) => { event.stopPropagation(); speakCurrent(); });
+  $('#favorite-button').addEventListener('click', (event) => { event.stopPropagation(); toggleFavorite(); });
+  $('#again-button').addEventListener('click', () => nextCard(false));
+  $('#good-button').addEventListener('click', () => nextCard(true));
+  $('#shuffle-button').addEventListener('click', shuffleDeck);
+  $('#favorites-button').addEventListener('click', () => {
+    if (!state.favorites.length) return toast('Hãy nhấn biểu tượng ☆ để lưu thẻ bạn thích.');
+    state.libraryTopic = 'all';
+    showView('library');
+    $('#library-grid').innerHTML = state.allCards.filter((card) => state.favorites.includes(cardKey(card))).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>★</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.vietnamese)}</p></div></article>`).join('');
+  });
+  $('#search-toggle').addEventListener('click', () => {
+    const panel = $('#search-panel');
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) $('#search-input').focus();
+  });
+  $('#search-input').addEventListener('input', (event) => {
+    const query = event.target.value.trim().toLowerCase();
+    if (!query) return renderLibrary();
+    const matches = state.allCards.filter((card) => `${card.english} ${card.vietnamese}`.toLowerCase().includes(query));
+    state.libraryTopic = 'all';
+    showView('library');
+    $('#library-total').textContent = `${matches.length.toLocaleString('vi-VN')} kết quả`;
+    $('#library-grid').innerHTML = matches.slice(0, 60).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.vietnamese)}</p></div></article>`).join('') || '<div class="empty-state">Không tìm thấy cụm từ này.</div>';
+  });
+  $('#theme-toggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('englishCardsDarkMode', document.body.classList.contains('dark-mode') ? '1' : '0');
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.target.matches('input')) return;
+    if (event.key === ' ') { event.preventDefault(); flipCard(); }
+    if (event.key === '1') nextCard(false);
+    if (event.key === '3') nextCard(true);
+  });
+}
+
+function init() {
+  if (localStorage.getItem('englishCardsDarkMode') === '1') document.body.classList.add('dark-mode');
+  initEvents();
+  renderAll();
+  loadRemoteProgress();
+  loadDataset();
+}
+
+init();

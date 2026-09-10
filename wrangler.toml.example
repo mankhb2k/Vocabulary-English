@@ -1,0 +1,9 @@
+name = "english-cards"
+compatibility_date = "2026-09-10"
+pages_build_output_dir = "src"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "english-cards-db"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"

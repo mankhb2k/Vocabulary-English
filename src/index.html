@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f3ed" />
+    <meta
+      name="description"
+      content="English Cards — học từ vựng và cụm từ tiếng Anh theo dạng flashcard."
+    />
+    <title>English Cards — Học tiếng Anh mỗi ngày</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Điều hướng chính">
+        <a class="brand" href="#study" aria-label="English Cards - trang học">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span>english<span class="brand-dot">.</span></span>
+        </a>
+
+        <nav class="main-nav">
+          <button class="nav-item is-active" data-view="study" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20M8 7h8M8 11h5"/></svg>
+            <span>Học bài</span>
+          </button>
+          <button class="nav-item" data-view="library" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M4 7h16M8 11h8M8 14h5"/></svg>
+            <span>Thư viện</span>
+          </button>
+          <button class="nav-item" data-view="stats" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="m7 15 3-4 3 2 5-7"/></svg>
+            <span>Tiến độ</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="mini-streak">
+            <div class="mini-streak-icon">✦</div>
+            <div>
+              <strong id="sidebar-streak">4 ngày</strong>
+              <span>chuỗi hiện tại</span>
+            </div>
+          </div>
+          <button class="settings-link" id="theme-toggle" type="button" aria-label="Đổi giao diện sáng tối">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><circle cx="12" cy="12" r="4"/></svg>
+            <span>Giao diện</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="mobile-brand brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span>english<span class="brand-dot">.</span></span></div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="search-toggle" type="button" aria-label="Tìm kiếm">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            </button>
+            <div class="profile-chip">
+              <span class="avatar">AN</span>
+              <span class="profile-name">An Nguyen</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+            </div>
+          </div>
+        </header>
+
+        <section class="search-panel" id="search-panel" hidden>
+          <label for="search-input">Tìm trong bộ thẻ</label>
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            <input id="search-input" type="search" placeholder="Ví dụ: meeting, cảm ơn..." autocomplete="off" />
+          </div>
+        </section>
+
+        <div class="view view-study is-visible" id="view-study">
+          <section class="welcome-row">
+            <div>
+              <p class="eyebrow">THỨ TƯ, 10 THÁNG 9</p>
+              <h1>Chào buổi sáng, An <span class="wave">✦</span></h1>
+              <p class="welcome-copy">Một vài phút hôm nay, thêm một bước gần hơn đến việc nói tự nhiên.</p>
+            </div>
+            <div class="streak-card">
+              <span class="streak-spark">✦</span>
+              <div><strong><span id="streak-number">4</span> ngày</strong><small>chuỗi học liên tục</small></div>
+            </div>
+          </section>
+
+          <section class="daily-banner">
+            <div class="banner-copy">
+              <span class="banner-kicker">MỤC TIÊU HÔM NAY</span>
+              <h2>Giữ nhịp học thật nhẹ nhàng</h2>
+              <p>Ôn 10 thẻ để hoàn thành mục tiêu ngày hôm nay.</p>
+            </div>
+            <div class="goal-progress" aria-label="Tiến độ mục tiêu hôm nay">
+              <div class="progress-ring" id="progress-ring"><span id="daily-progress">30%</span></div>
+              <div><strong><span id="completed-count">3</span> / 10</strong><small>thẻ đã ôn</small></div>
+            </div>
+          </section>
+
+          <section class="study-layout">
+            <div class="lesson-column">
+              <div class="section-heading">
+                <div>
+                  <span class="section-label">BỘ THẺ ĐANG HỌC</span>
+                  <h2 id="deck-title">Daily conversations</h2>
+                </div>
+                <div class="heading-actions">
+                  <button class="text-button" id="shuffle-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h2.3c3.6 0 5.2 10 9 10H20M4 17h2.3c1.1 0 2-1 2.7-2.1M15.3 7c.6-1.2 1.5-2 2.7-2H20M17 3l3 2-3 2M17 15l3 2-3 2"/></svg> Trộn thẻ</button>
+                  <span class="card-count" id="card-count">01 / 20</span>
+                </div>
+              </div>
+
+              <div class="topic-tabs" role="tablist" aria-label="Chủ đề học">
+                <button class="topic-tab is-active" data-topic="all" type="button">Tất cả</button>
+                <button class="topic-tab" data-topic="greetings" type="button">Giao tiếp</button>
+                <button class="topic-tab" data-topic="work" type="button">Công việc</button>
+                <button class="topic-tab" data-topic="travel" type="button">Du lịch</button>
+              </div>
+
+              <article class="flashcard" id="flashcard" tabindex="0" aria-label="Thẻ học, bấm để lật">
+                <div class="flashcard-glow"></div>
+                <div class="flashcard-topline">
+                  <span class="category-pill" id="card-category">EVERYDAY ENGLISH</span>
+                  <button class="star-button" id="favorite-button" type="button" aria-label="Lưu thẻ này" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>
+                  </button>
+                </div>
+                <div class="card-face card-front">
+                  <p class="card-overline">CỤM TỪ</p>
+                  <h3 id="card-english">How is it going?</h3>
+                  <div class="pronunciation"><span id="pronunciation-text">/haʊ ɪz ɪt ˈɡoʊɪŋ/</span><button id="speak-button" type="button" aria-label="Nghe phát âm"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4ZM16 9.5a4 4 0 0 1 0 5M18.5 7a7.3 7.3 0 0 1 0 10"/></svg></button></div>
+                  <button class="reveal-hint" id="reveal-hint" type="button"><span class="hint-icon">↗</span> Bấm để xem nghĩa tiếng Việt</button>
+                </div>
+                <div class="card-face card-back" aria-hidden="true">
+                  <p class="card-overline">NGHĨA TIẾNG VIỆT</p>
+                  <h3 id="card-vietnamese">Dạo này bạn thế nào?</h3>
+                  <div class="example-box"><span>VÍ DỤ</span><p id="card-example">Hey, long time no see! How is it going?</p></div>
+                  <p class="card-note" id="card-note">Cách hỏi thăm thân mật, dùng trong hội thoại hằng ngày.</p>
+                </div>
+                <div class="flip-label"><span id="flip-label-text">Mặt trước</span><span class="flip-dots"><i class="is-active"></i><i></i></span></div>
+              </article>
+
+              <div class="study-controls">
+                <p class="control-hint">Phím tắt: <kbd>Space</kbd> lật thẻ <span>·</span> <kbd>1</kbd> chưa nhớ <span>·</span> <kbd>3</kbd> đã nhớ</p>
+                <div class="answer-buttons">
+                  <button class="answer-button answer-again" id="again-button" type="button"><span class="answer-icon">↺</span><span><strong>Ôn lại</strong><small>Chưa nhớ</small></span><kbd>1</kbd></button>
+                  <button class="answer-button answer-good" id="good-button" type="button"><span class="answer-icon">✓</span><span><strong>Tốt</strong><small>Đã nhớ</small></span><kbd>3</kbd></button>
+                </div>
+              </div>
+            </div>
+
+            <aside class="right-rail">
+              <section class="side-card session-card">
+                <div class="side-card-heading"><div><span class="section-label">PHIÊN HỌC</span><h3>Tiến độ hôm nay</h3></div><span class="session-icon">✦</span></div>
+                <div class="session-bar"><span id="session-bar-fill"></span></div>
+                <div class="session-stats"><span><strong id="session-reviewed">3</strong><small>đã ôn</small></span><span><strong id="session-left">7</strong><small>còn lại</small></span><span><strong id="session-accuracy">—</strong><small>chính xác</small></span></div>
+              </section>
+              <section class="side-card continue-card">
+                <div class="side-card-heading"><div><span class="section-label">TIẾP TỤC HỌC</span><h3>Ôn lại từ yêu thích</h3></div><span class="mini-arrow">↗</span></div>
+                <div class="continue-item"><span class="continue-icon">★</span><div><strong id="favorite-count">0 thẻ đã lưu</strong><small>Nhấn ☆ để lưu thẻ</small></div><button class="round-arrow" id="favorites-button" type="button" aria-label="Mở thẻ yêu thích">→</button></div>
+              </section>
+              <section class="quote-card"><span class="quote-mark">“</span><p>Consistency is the key to turning small steps into big progress.</p><span class="quote-author">— English Cards</span></section>
+            </aside>
+          </section>
+        </div>
+
+        <div class="view" id="view-library">
+          <section class="page-heading"><p class="eyebrow">THƯ VIỆN CỦA BẠN</p><h1>Tìm thẻ để học tiếp</h1><p>Chọn một chủ đề hoặc tìm kiếm cụm từ bạn muốn luyện hôm nay.</p></section>
+          <div class="library-toolbar"><div class="library-filters" id="library-filters"><button class="filter-chip is-active" data-library-topic="all" type="button">Tất cả</button><button class="filter-chip" data-library-topic="greetings" type="button">Giao tiếp</button><button class="filter-chip" data-library-topic="work" type="button">Công việc</button><button class="filter-chip" data-library-topic="travel" type="button">Du lịch</button></div><span class="library-total" id="library-total"></span></div>
+          <div class="library-grid" id="library-grid"></div>
+        </div>
+
+        <div class="view" id="view-stats">
+          <section class="page-heading"><p class="eyebrow">TỔNG QUAN</p><h1>Tiến bộ của bạn</h1><p>Những bước nhỏ đều được ghi nhận. Cứ tiếp tục nhé.</p></section>
+          <div class="stats-grid"><div class="stat-panel stat-highlight"><span class="stat-icon">✦</span><span class="section-label">CHUỖI HIỆN TẠI</span><strong id="stats-streak">4 ngày</strong><small>Giữ nhịp rất tốt!</small></div><div class="stat-panel"><span class="section-label">TỔNG ĐÃ ÔN</span><strong id="stats-reviewed">3</strong><small>thẻ trong phiên này</small></div><div class="stat-panel"><span class="section-label">ĐÃ LƯU</span><strong id="stats-favorites">0</strong><small>thẻ yêu thích</small></div></div>
+          <section class="history-panel"><div class="side-card-heading"><div><span class="section-label">7 NGÀY GẦN NHẤT</span><h3>Nhịp học của bạn</h3></div><span class="history-total">Mục tiêu: 10 thẻ/ngày</span></div><div class="week-chart" id="week-chart"></div></section>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./script.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS user_progress (
+  user_id TEXT PRIMARY KEY NOT NULL,
+  reviewed_count INTEGER NOT NULL DEFAULT 0,
+  correct_count INTEGER NOT NULL DEFAULT 0,
+  favorites_json TEXT NOT NULL DEFAULT '[]',
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
