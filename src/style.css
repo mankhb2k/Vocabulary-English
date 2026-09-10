@@ -47,7 +47,7 @@ button:focus-visible, input:focus-visible, .flashcard:focus-visible { outline: 3
 .mini-streak span { margin-top: 3px; color: #8da8a3; font-size: 10px; }
 .settings-link { padding-left: 10px; }
 
-.main-content { width: min(1420px, calc(100% - var(--sidebar-width))); min-width: 0; padding: 0 52px 70px; margin: 0 0 0 var(--sidebar-width); }
+.main-content { width: calc(100% - var(--sidebar-width)); min-width: 0; padding: 0 52px 70px; margin: 0 0 0 var(--sidebar-width); }
 .topbar { height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); }
 .mobile-brand { display: none; }
 .topbar-search { width: min(100%, 440px); flex: 1 1 440px; }
@@ -64,7 +64,7 @@ button:focus-visible, input:focus-visible, .flashcard:focus-visible { outline: 3
 .search-input-wrap input:focus { border-color: var(--mint-strong); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-.view { display: none; padding-top: 46px; }
+.view { display: none; max-width: 1440px; margin-right: auto; margin-left: auto; padding-top: 46px; }
 .view.is-visible { display: block; }
 .welcome-row { display: flex; align-items: end; justify-content: space-between; gap: 25px; }
 .eyebrow, .section-label { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .13em; }
@@ -196,7 +196,7 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .filter-chip { padding: 8px 13px; border: 1px solid var(--line); border-radius: 30px; color: var(--muted); background: transparent; font-size: 11px; font-weight: 700; }
 .filter-chip:hover, .filter-chip.is-active { border-color: var(--navy); color: var(--white); background: var(--navy); }
 .library-total { color: var(--muted); font-size: 11px; }
-.library-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
+.library-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
 .library-card { min-height: 157px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--white); cursor: pointer; }
 .library-card:focus-visible { outline: 3px solid rgba(227, 163, 127, .65); outline-offset: 3px; }
 .library-card-image { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: contain; background: var(--paper-deep); }
@@ -345,7 +345,7 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .add-tip p { margin: 0; color: #a6bfbb; font-size: 11px; line-height: 1.55; }
 .recent-vocabulary { margin-top: 42px; }
 .recent-vocabulary .section-heading h2 { margin-top: 7px; }
-.custom-vocabulary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
+.custom-vocabulary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
 .custom-vocab-card { overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--white); }
 .custom-vocab-image { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: contain; background: var(--paper-deep); }
 .custom-vocab-content { padding: 14px; }
