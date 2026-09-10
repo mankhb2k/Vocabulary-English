@@ -110,7 +110,7 @@ export async function onRequestPost({ request, env }) {
   if (!generated) return json({ error: 'The AI response did not match the vocabulary format.' }, 502);
 
   const word = normalizeWord(generated.word || prompt);
-  const definition = text(generated.definition, 240);
+  const definition = text(generated.definition, 500);
   const example = text(generated.example, 500);
   if (!word || !definition || !example) return json({ error: 'The AI response is missing a word, definition, or example.' }, 502);
 

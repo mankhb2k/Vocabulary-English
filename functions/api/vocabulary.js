@@ -56,7 +56,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   const word = textField(form, 'word', 120).replace(/\s+/g, ' ');
-  const definition = textField(form, 'definition', 240);
+  const definition = textField(form, 'definition', 500);
   const pronunciation = textField(form, 'pronunciation', 120);
   const example = textField(form, 'example', 500);
   const familyRoot = textField(form, 'familyRoot', 120);
