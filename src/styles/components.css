@@ -1,0 +1,43 @@
+/* Shared contracts for the vanilla JS components rendered by app.js. */
+
+#app {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.main-content {
+  min-width: 0;
+}
+
+.view[hidden],
+.search-panel[hidden],
+.image-preview[hidden] {
+  display: none;
+}
+
+.component-icon,
+.nav-item svg,
+.icon-button svg,
+.settings-link svg,
+.text-button svg,
+.star-button svg,
+.pronunciation button svg,
+.round-arrow svg,
+.search-input-wrap svg,
+.profile-chip svg {
+  flex: 0 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flashcard,
+  .nav-item,
+  .answer-button,
+  .primary-button,
+  .filter-chip,
+  .topic-tab {
+    transition: none;
+  }
+}

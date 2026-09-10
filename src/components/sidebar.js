@@ -1,0 +1,19 @@
+export function Sidebar() {
+  return `
+    <aside class="sidebar" aria-label="Điều hướng chính">
+      <a class="brand" href="#study" aria-label="English Cards - trang học">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>english<span class="brand-dot">.</span></span>
+      </a>
+      <nav class="main-nav">
+        <button class="nav-item is-active" data-view="study" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20M8 7h8M8 11h5"/></svg><span>Học bài</span></button>
+        <button class="nav-item" data-view="library" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M4 7h16M8 11h8M8 14h5"/></svg><span>Thư viện</span></button>
+        <button class="nav-item" data-view="stats" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="m7 15 3-4 3 2 5-7"/></svg><span>Tiến độ</span></button>
+        <button class="nav-item" data-view="add" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/><rect x="3.5" y="3.5" width="17" height="17" rx="4"/></svg><span>Thêm từ</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="mini-streak"><div class="mini-streak-icon">✦</div><div><strong id="sidebar-streak">4 ngày</strong><span>chuỗi hiện tại</span></div></div>
+        <button class="settings-link" id="theme-toggle" type="button" aria-label="Đổi giao diện sáng tối"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><circle cx="12" cy="12" r="4"/></svg><span>Giao diện</span></button>
+      </div>
+    </aside>`;
+}

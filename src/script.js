@@ -1,3 +1,5 @@
+import { renderApp } from './components/app.js';
+
 const fallbackCards = [
   { english: 'How is it going?', vietnamese: 'Dạo này bạn thế nào?', notes: 'Cách hỏi thăm thân mật, dùng trong hội thoại hằng ngày.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/haʊ ɪz ɪt ˈɡoʊɪŋ/', example: 'Hey, long time no see! How is it going?' },
   { english: 'I really appreciate it.', vietnamese: 'Tôi thực sự cảm kích điều đó.', notes: 'Cách cảm ơn chân thành và tự nhiên.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/əˈpriːʃieɪt/', example: 'Thanks for your help. I really appreciate it.' },
@@ -410,6 +412,7 @@ function initEvents() {
 
 function init() {
   if (localStorage.getItem('englishCardsDarkMode') === '1') document.body.classList.add('dark-mode');
+  renderApp(document.querySelector('#app'));
   initEvents();
   renderAll();
   loadRemoteProgress();
