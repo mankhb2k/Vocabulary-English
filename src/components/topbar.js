@@ -6,7 +6,7 @@ export function Topbar() {
         <label class="sr-only" for="search-input">Search your library</label>
         <div class="search-input-wrap">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
-          <input class="c-control" id="search-input" type="search" placeholder="Search words and phrases..." autocomplete="off" />
+          <input class="c-control" id="search-input" type="search" placeholder="Search words..." autocomplete="off" />
         </div>
       </div>
       <div class="topbar-actions">

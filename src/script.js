@@ -1,16 +1,14 @@
 import { renderApp } from './components/app.js';
 
 const fallbackCards = [
-  { english: 'How is it going?', definition: 'Used to ask someone how they are or how things are going.', notes: 'A friendly phrase commonly used in everyday conversation.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/haʊ ɪz ɪt ˈɡoʊɪŋ/', example: 'Hey, long time no see! How is it going?' },
-  { english: 'I really appreciate it.', definition: 'Used to show sincere thanks for something someone has done.', notes: 'A warm and natural way to express gratitude.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/əˈpriːʃieɪt/', example: 'Thanks for your help. I really appreciate it.' },
-  { english: 'Could you give me a hand?', definition: 'A polite way to ask someone to help you.', notes: 'Useful when asking for help in everyday or work situations.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/kəd juː ɡɪv mi ə hænd/', example: 'Could you give me a hand with this report?' },
-  { english: 'Let me get back to you.', definition: 'Used to say that you will reply after checking or considering something.', notes: 'A useful phrase when you need more time before answering.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/let mi ɡet bæk tə juː/', example: 'I need to check the details. Let me get back to you.' },
-  { english: 'I’m looking forward to it.', definition: 'Used to say that you are excited about something that will happen.', notes: 'Commonly used when talking about future plans.', topic: 'travel', category: 'TRAVEL', pronunciation: '/aɪm ˈlʊkɪŋ ˈfɔːrwərd tə ɪt/', example: 'Our trip is next week. I’m looking forward to it!' },
-  { english: 'Is there anything I should know?', definition: 'A question asking whether there is important information you need to know.', notes: 'Useful when you want to understand a situation before starting.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪz ðer ˈeniθɪŋ aɪ ʃəd noʊ/', example: 'Before we start, is there anything I should know?' },
-  { english: 'That sounds like a plan.', definition: 'Used to agree with a suggestion or proposed plan.', notes: 'A friendly way to show that you agree with an idea.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/ðæt saʊndz laɪk ə plæn/', example: 'Let’s meet at six. That sounds like a plan.' },
-  { english: 'Could I have the bill, please?', definition: 'A polite request for the bill at a restaurant.', notes: 'Use this phrase when you are ready to pay for a meal.', topic: 'travel', category: 'TRAVEL', pronunciation: '/kəd aɪ hæv ðə bɪl pliːz/', example: 'Everything was delicious. Could I have the bill, please?' },
-  { english: 'I’m just browsing.', definition: 'Used to say that you are looking around a shop without needing help.', notes: 'A natural response when a shop assistant offers help.', topic: 'travel', category: 'TRAVEL', pronunciation: '/aɪm dʒʌst ˈbraʊzɪŋ/', example: 'Thanks, I’m just browsing for now.' },
-  { english: 'It slipped my mind.', definition: 'Used to say that you forgot something.', notes: 'A natural phrase for explaining that you forgot to do or remember something.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪt slɪpt maɪ maɪnd/', example: 'Sorry, it slipped my mind. I’ll do it now.' },
+  { english: 'resilient', definition: 'Able to recover quickly from difficulties.', notes: 'Often used to describe a person, team, or system that adapts well to problems.', topic: 'work', category: 'CORE VOCABULARY', pronunciation: '/rɪˈzɪliənt/', example: 'She is resilient and never gives up.' },
+  { english: 'curious', definition: 'Wanting to know or learn something.', notes: 'A positive word for someone who enjoys discovering new ideas.', topic: 'greetings', category: 'CORE VOCABULARY', pronunciation: '/ˈkjʊəriəs/', example: 'He is curious about how the machine works.' },
+  { english: 'consistent', definition: 'Doing something in the same reliable way over time.', notes: 'Useful when talking about habits, effort, or quality.', topic: 'work', category: 'CORE VOCABULARY', pronunciation: '/kənˈsɪstənt/', example: 'Consistent practice leads to steady progress.' },
+  { english: 'adapt', definition: 'To change your behaviour or methods to suit a new situation.', notes: 'A useful verb for change, learning, and problem-solving.', topic: 'work', category: 'CORE VOCABULARY', pronunciation: '/əˈdæpt/', example: 'Good learners adapt when a strategy does not work.' },
+  { english: 'confident', definition: 'Feeling sure about your abilities or decisions.', notes: 'Commonly used for skills, communication, and performance.', topic: 'greetings', category: 'CORE VOCABULARY', pronunciation: '/ˈkɒnfɪdənt/', example: 'She feels more confident after practising every day.' },
+  { english: 'patient', definition: 'Able to wait or deal with difficulties without becoming upset.', notes: 'This adjective can describe a person, attitude, or approach.', topic: 'greetings', category: 'CORE VOCABULARY', pronunciation: '/ˈpeɪʃənt/', example: 'Be patient with yourself while you learn.' },
+  { english: 'improve', definition: 'To become better or make something better.', notes: 'A common verb for progress, skills, and performance.', topic: 'work', category: 'CORE VOCABULARY', pronunciation: '/ɪmˈpruːv/', example: 'Reading regularly can improve your vocabulary.' },
+  { english: 'unwind', definition: 'To relax after a period of work or activity.', notes: 'Often used when talking about relaxing in the evening or at the weekend.', topic: 'travel', category: 'CORE VOCABULARY', pronunciation: '/ʌnˈwaɪnd/', example: 'I like to unwind with a short walk after work.' },
 ];
 
 const wordFamilyExamples = [
@@ -40,8 +38,13 @@ function cardKey(card) { return card.english; }
 
 function cardImageUrl(card) { return card.imageUrl || PLACEHOLDER_IMAGE; }
 
+function isVocabularyWord(value) {
+  return /^[A-Za-z]+(?:[-'][A-Za-z]+)*$/.test(String(value || '').trim());
+}
+
 function normalizeCard(chunk, topic, category) {
   const english = chunk.english || chunk.word || '';
+  if (!isVocabularyWord(english)) return null;
   const topicLabel = toEnglishLabel(topic, 'Everyday English');
   const categoryLabel = toEnglishLabel(category, 'Everyday English');
   const topicName = `${topicLabel} ${categoryLabel}`.toLowerCase();
@@ -64,16 +67,20 @@ function flattenDataset(data) {
       (subTopic.chunks || []).forEach((chunk) => cards.push(normalizeCard(chunk, topic.name_english, subTopic.name)));
     });
   }));
-  return cards.filter((card) => card.english && card.definition);
+  return cards.filter((card) => card && card.english && card.definition);
 }
 
 function customVocabularyCard(item) {
   return { english: item.word, definition: item.definition || 'A word added to your personal vocabulary.', notes: 'A custom card from your personal vocabulary.', topic: item.topic || 'other', category: 'MY VOCABULARY', pronunciation: item.pronunciation || '', example: item.example || `Use “${item.word}” in a natural conversation.`, imageUrl: item.imageUrl, isCustom: true };
 }
 
+function uniqueCards(cards) {
+  return [...new Map(cards.map((card) => [card.english.toLowerCase(), card])).values()];
+}
+
 function mergeCustomVocabulary() {
   const staticCards = state.allCards.filter((card) => !card.isCustom);
-  state.allCards = [...staticCards, ...state.customVocabulary.map(customVocabularyCard)];
+  state.allCards = uniqueCards([...staticCards, ...state.customVocabulary.map(customVocabularyCard)]);
   renderAll();
 }
 
@@ -85,7 +92,7 @@ async function loadDataset() {
       if (!response.ok) continue;
       const cards = flattenDataset(await response.json());
       if (cards.length) {
-        state.allCards = [...cards, ...wordFamilyExamples, ...state.customVocabulary.map(customVocabularyCard)];
+        state.allCards = uniqueCards([...fallbackCards, ...cards, ...wordFamilyExamples, ...state.customVocabulary.map(customVocabularyCard)]);
         renderAll();
         toast(`Loaded ${cards.length.toLocaleString('en-US')} English expressions into your library.`);
         return;
