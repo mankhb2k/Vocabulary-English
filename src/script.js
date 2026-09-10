@@ -176,6 +176,7 @@ function openCardDetails(card, { pushHistory = true } = {}) {
   $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === 'library'));
   $('#library-index').hidden = true;
   $('#vocabulary-detail').hidden = false;
+  $('#detail-back').textContent = '← Back';
   renderVocabularyDetail(state.selectedCard);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
