@@ -29,6 +29,7 @@ Required fields are `word` and `definition`. `pronunciation`, `example`, `topic`
 - Use English only. Do not add Vietnamese translations or Vietnamese explanations.
 - `word` can be a single word, phrasal verb, collocation, or useful vocabulary phrase. Do not create a full sentence as the card title.
 - Write a clear English learner-friendly definition, not a translation.
+- If the item has more than one common part of speech, explain each form separately in the definition with clear labels such as `Verb:`, `Noun:`, `Adjective:`, or `Adverb:`. Do not merge different forms into one vague definition.
 - Write a natural English example sentence that demonstrates the item.
 - Use one of these topic values: `greetings`, `work`, `travel`, or `other`.
 - Use IPA when pronunciation is known; otherwise leave it empty rather than inventing a pronunciation.

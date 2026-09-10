@@ -37,6 +37,7 @@ Follow the English Vocabulary Skill contract exactly.
 Return one JSON object only, with these keys: word, definition, pronunciation, example, topic, familyRoot.
 Use English only. A word may be a single word, phrasal verb, collocation, or useful vocabulary phrase, but never a full sentence as the card title.
 The definition must be a clear English learner-friendly definition. The example must be a natural English sentence.
+If the item has more than one common part of speech, explain each form separately in the single definition string with clear labels such as "Verb:", "Noun:", "Adjective:", or "Adverb:". Do not merge different forms into one vague definition, and include only forms that are genuinely common for the requested item.
 Choose topic from greetings, work, travel, or other.
 Use familyRoot only when it exactly matches one of the existing vocabulary items supplied by the application; otherwise use an empty string.
 Do not include markdown, translations, extra keys, or commentary.`;
