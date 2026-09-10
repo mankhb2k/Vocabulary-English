@@ -29,6 +29,7 @@ const state = {
   searchQuery: '',
   selectedCard: null,
   aiDraft: null,
+  editingVocabulary: null,
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -76,8 +77,12 @@ function uniqueCards(cards) {
 
 function mergeCustomVocabulary() {
   const staticCards = state.allCards.filter((card) => !card.isCustom);
-  state.allCards = uniqueCards([...staticCards, ...state.customVocabulary.map(customVocabularyCard)]);
+  state.allCards = uniqueCards([...staticCards, ...state.customVocabulary.map(customVocabularyCardWithId)]);
   renderAll();
+}
+
+function customVocabularyCardWithId(item) {
+  return { ...customVocabularyCard(item), id: item.id, examples: item.examples || exampleList(item.example), example: item.example, familyId: item.familyRoot || '', isCustom: true };
 }
 
 async function loadDataset() {
@@ -141,6 +146,8 @@ function renderVocabularyDetail(card) {
   $('#detail-category').textContent = card.category || 'WORD';
   $('#detail-word').textContent = card.english;
   $('#detail-pronunciation').textContent = card.pronunciation || 'Press the speaker to listen';
+  const editButton = $('#detail-edit');
+  editButton.hidden = !card.isCustom || !card.id;
   $('#detail-definition').textContent = card.definition || 'An English word used in everyday communication.';
   $('#detail-examples').innerHTML = cardExamples(card).map((example) => `<li>${escapeHtml(example)}</li>`).join('') || '<li>Practise this word in a natural sentence.</li>';
   $('#detail-notes').textContent = card.notes || '';
@@ -310,6 +317,42 @@ function applyAiDraft() {
   $('#vocab-word').focus();
 }
 
+function setVocabularyFormMode(editing = false) {
+  const button = $('#save-vocabulary');
+  const image = $('#vocab-image');
+  const imageRequired = $('#vocab-image-required');
+  if (button) button.innerHTML = editing ? 'Update vocabulary <span>&rarr;</span>' : 'Save vocabulary <span>&rarr;</span>';
+  if (image) image.required = !editing;
+  if (imageRequired) imageRequired.textContent = editing ? '' : '*';
+}
+
+function prepareNewVocabulary() {
+  state.editingVocabulary = null;
+  const form = $('#vocabulary-form');
+  if (form) form.reset();
+  resetImagePreview();
+  setVocabularyFormMode(false);
+  setFormStatus('');
+  renderAiDraft(null);
+}
+
+function startEditingVocabulary(card) {
+  if (!card?.id) return toast('Only personal vocabulary can be edited.');
+  showView('add');
+  state.editingVocabulary = card;
+  $('#vocab-word').value = card.english || '';
+  $('#vocab-definition').value = card.definition || '';
+  $('#vocab-pronunciation').value = card.pronunciation || '';
+  $('#vocab-topic').value = card.topic || 'other';
+  $('#vocab-family-root').value = card.familyId || '';
+  $('#vocab-example').value = cardExamples(card).join('\n');
+  resetImagePreview();
+  setVocabularyFormMode(true);
+  renderAiDraft(null);
+  setFormStatus(`Editing ${card.english}. Choose a replacement image only if needed.`, 'success');
+  $('#vocab-word').focus();
+}
+
 function renderAll() {
   renderLibrary();
   renderChart();
@@ -344,18 +387,23 @@ async function submitVocabulary(event) {
   const form = event.currentTarget;
   const button = $('#save-vocabulary');
   const file = $('#vocab-image').files[0];
-  if (!file) return setFormStatus('Please choose an image.', 'error');
-  if (file.size > 5 * 1024 * 1024) return setFormStatus('The image must be smaller than 5MB.', 'error');
+  const isEditing = Boolean(state.editingVocabulary?.id);
+  if (!isEditing && !file) return setFormStatus('Please choose an image.', 'error');
+  if (file && file.size > 5 * 1024 * 1024) return setFormStatus('The image must be smaller than 5MB.', 'error');
   button.disabled = true;
-  setFormStatus('Uploading the image and saving the vocabulary…');
+  setFormStatus(isEditing ? 'Updating the vocabulary...' : 'Uploading the image and saving the vocabulary...');
   try {
-    const response = await fetch('/api/vocabulary', { method: 'POST', body: new FormData(form) });
+    const formData = new FormData(form);
+    if (isEditing) formData.append('id', state.editingVocabulary.id);
+    const response = await fetch('/api/vocabulary', { method: isEditing ? 'PUT' : 'POST', body: formData });
     const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || 'Unable to save the vocabulary.');
+    if (!response.ok) throw new Error(payload.error || (isEditing ? 'Unable to update the vocabulary.' : 'Unable to save the vocabulary.'));
     form.reset();
     resetImagePreview();
     renderAiDraft(null);
-    setFormStatus('New vocabulary saved successfully.', 'success');
+    state.editingVocabulary = null;
+    setVocabularyFormMode(false);
+    setFormStatus(isEditing ? 'Vocabulary updated successfully.' : 'New vocabulary saved successfully.', 'success');
     await loadCustomVocabulary();
   } catch (error) {
     setFormStatus(error.message || 'Something went wrong. Please try again.', 'error');
@@ -407,7 +455,10 @@ function toggleCardFavorite(card) {
 }
 
 function initEvents() {
-  $$('.nav-item').forEach((button) => button.addEventListener('click', () => showView(button.dataset.view)));
+  $$('.nav-item').forEach((button) => button.addEventListener('click', () => {
+    if (button.dataset.view === 'add') prepareNewVocabulary();
+    showView(button.dataset.view);
+  }));
   $('#ai-vocabulary-form').addEventListener('submit', generateAiDraft);
   $('#ai-apply-draft').addEventListener('click', applyAiDraft);
   $$('.filter-chip').forEach((button) => button.addEventListener('click', () => {
@@ -423,6 +474,7 @@ function initEvents() {
   });
   $('#detail-speak').addEventListener('click', () => { if (state.selectedCard) speakWord(state.selectedCard.english); });
   $('#detail-favorite').addEventListener('click', () => { if (state.selectedCard) toggleCardFavorite(state.selectedCard); });
+  $('#detail-edit').addEventListener('click', () => { if (state.selectedCard) startEditingVocabulary(state.selectedCard); });
   $('#search-input').addEventListener('input', (event) => {
     state.searchQuery = event.target.value.trim().toLowerCase();
     state.libraryTopic = 'all';

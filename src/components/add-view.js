@@ -86,7 +86,7 @@ export function AddView() {
           </div>
           <label class="image-upload" for="vocab-image">
             <span class="upload-icon">&uarr;</span>
-            <span><strong>Choose an image <b>*</b></strong><small>PNG, JPG or WEBP &middot; max 5MB</small></span>
+            <span><strong>Choose an image <b id="vocab-image-required">*</b></strong><small>PNG, JPG or WEBP &middot; max 5MB</small></span>
             <input id="vocab-image" name="image" type="file" accept="image/png,image/jpeg,image/webp" required />
           </label>
           <div class="image-preview" id="image-preview" hidden>

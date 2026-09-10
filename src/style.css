@@ -207,7 +207,7 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .library-card p { margin: 0; color: var(--muted); font-size: 11px; }
 .library-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; color: var(--muted); font-size: 9px; }
 .library-card-link { color: var(--navy); font-size: 11px; font-weight: 700; }
-.vocabulary-detail { max-width: 940px; margin-top: 12px; }
+.vocabulary-detail { max-width: 940px; margin: 12px auto 0; }
 .detail-back { padding: 0; color: var(--muted); background: transparent; font-size: 11px; font-weight: 700; }
 .detail-back:hover { color: var(--navy); }
 .detail-card { margin-top: 18px; overflow: hidden; }
@@ -215,6 +215,9 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .detail-image { height: 100%; min-height: 270px; object-fit: contain; background: var(--paper-deep); }
 .detail-heading { display: flex; flex-direction: column; justify-content: center; padding: 35px 42px; background: var(--white); }
 .detail-heading-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.detail-actions { display: flex; align-items: center; gap: 10px; }
+.detail-edit { padding: 7px 12px; border: 1px solid var(--line); border-radius: 7px; color: var(--navy); background: var(--paper); font-size: 10px; font-weight: 800; }
+.detail-edit:hover { border-color: var(--mint-strong); background: var(--mint); }
 .detail-heading h2 { margin: 20px 0 14px; color: var(--navy); font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(28px, 4vw, 48px); letter-spacing: -1.8px; line-height: 1.08; }
 .detail-pronunciation { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; }
 .detail-pronunciation button { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: var(--navy); background: var(--mint); }
