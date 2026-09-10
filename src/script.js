@@ -1,16 +1,16 @@
 import { renderApp } from './components/app.js';
 
 const fallbackCards = [
-  { english: 'How is it going?', vietnamese: 'Dạo này bạn thế nào?', notes: 'Cách hỏi thăm thân mật, dùng trong hội thoại hằng ngày.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/haʊ ɪz ɪt ˈɡoʊɪŋ/', example: 'Hey, long time no see! How is it going?' },
-  { english: 'I really appreciate it.', vietnamese: 'Tôi thực sự cảm kích điều đó.', notes: 'Cách cảm ơn chân thành và tự nhiên.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/əˈpriːʃieɪt/', example: 'Thanks for your help. I really appreciate it.' },
-  { english: 'Could you give me a hand?', vietnamese: 'Bạn có thể giúp tôi một tay không?', notes: 'Lời nhờ giúp đỡ lịch sự trong tình huống hằng ngày.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/kəd juː ɡɪv mi ə hænd/', example: 'Could you give me a hand with this report?' },
-  { english: 'Let me get back to you.', vietnamese: 'Để tôi phản hồi bạn sau nhé.', notes: 'Dùng khi cần thêm thời gian để kiểm tra hoặc suy nghĩ.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/let mi ɡet bæk tə juː/', example: 'I need to check the details. Let me get back to you.' },
-  { english: 'I’m looking forward to it.', vietnamese: 'Tôi rất mong chờ điều đó.', notes: 'Thể hiện sự hào hứng về một kế hoạch sắp tới.', topic: 'travel', category: 'TRAVEL', pronunciation: '/aɪm ˈlʊkɪŋ ˈfɔːrwərd tə ɪt/', example: 'Our trip is next week. I’m looking forward to it!' },
-  { english: 'Is there anything I should know?', vietnamese: 'Có điều gì tôi nên biết không?', notes: 'Một câu hỏi hữu ích khi muốn nắm thêm thông tin.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪz ðer ˈeniθɪŋ aɪ ʃəd noʊ/', example: 'Before we start, is there anything I should know?' },
-  { english: 'That sounds like a plan.', vietnamese: 'Nghe có vẻ là một kế hoạch hay đấy.', notes: 'Cách đồng ý thân thiện với một đề xuất.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/ðæt saʊndz laɪk ə plæn/', example: 'Let’s meet at six. That sounds like a plan.' },
-  { english: 'Could I have the bill, please?', vietnamese: 'Cho tôi xin hóa đơn nhé?', notes: 'Câu nói lịch sự khi thanh toán tại nhà hàng.', topic: 'travel', category: 'TRAVEL', pronunciation: '/kəd aɪ hæv ðə bɪl pliːz/', example: 'Everything was delicious. Could I have the bill, please?' },
-  { english: 'I’m just browsing.', vietnamese: 'Tôi chỉ xem qua thôi.', notes: 'Dùng khi nhân viên bán hàng hỏi bạn có cần giúp gì không.', topic: 'travel', category: 'TRAVEL', pronunciation: '/aɪm dʒʌst ˈbraʊzɪŋ/', example: 'Thanks, I’m just browsing for now.' },
-  { english: 'It slipped my mind.', vietnamese: 'Tôi quên mất.', notes: 'Cách nói tự nhiên khi quên làm một việc.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪt slɪpt maɪ maɪnd/', example: 'Sorry, it slipped my mind. I’ll do it now.' },
+  { english: 'How is it going?', definition: 'Used to ask someone how they are or how things are going.', notes: 'A friendly phrase commonly used in everyday conversation.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/haʊ ɪz ɪt ˈɡoʊɪŋ/', example: 'Hey, long time no see! How is it going?' },
+  { english: 'I really appreciate it.', definition: 'Used to show sincere thanks for something someone has done.', notes: 'A warm and natural way to express gratitude.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/əˈpriːʃieɪt/', example: 'Thanks for your help. I really appreciate it.' },
+  { english: 'Could you give me a hand?', definition: 'A polite way to ask someone to help you.', notes: 'Useful when asking for help in everyday or work situations.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/kəd juː ɡɪv mi ə hænd/', example: 'Could you give me a hand with this report?' },
+  { english: 'Let me get back to you.', definition: 'Used to say that you will reply after checking or considering something.', notes: 'A useful phrase when you need more time before answering.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/let mi ɡet bæk tə juː/', example: 'I need to check the details. Let me get back to you.' },
+  { english: 'I’m looking forward to it.', definition: 'Used to say that you are excited about something that will happen.', notes: 'Commonly used when talking about future plans.', topic: 'travel', category: 'TRAVEL', pronunciation: '/aɪm ˈlʊkɪŋ ˈfɔːrwərd tə ɪt/', example: 'Our trip is next week. I’m looking forward to it!' },
+  { english: 'Is there anything I should know?', definition: 'A question asking whether there is important information you need to know.', notes: 'Useful when you want to understand a situation before starting.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪz ðer ˈeniθɪŋ aɪ ʃəd noʊ/', example: 'Before we start, is there anything I should know?' },
+  { english: 'That sounds like a plan.', definition: 'Used to agree with a suggestion or proposed plan.', notes: 'A friendly way to show that you agree with an idea.', topic: 'greetings', category: 'EVERYDAY ENGLISH', pronunciation: '/ðæt saʊndz laɪk ə plæn/', example: 'Let’s meet at six. That sounds like a plan.' },
+  { english: 'Could I have the bill, please?', definition: 'A polite request for the bill at a restaurant.', notes: 'Use this phrase when you are ready to pay for a meal.', topic: 'travel', category: 'TRAVEL', pronunciation: '/kəd aɪ hæv ðə bɪl pliːz/', example: 'Everything was delicious. Could I have the bill, please?' },
+  { english: 'I’m just browsing.', definition: 'Used to say that you are looking around a shop without needing help.', notes: 'A natural response when a shop assistant offers help.', topic: 'travel', category: 'TRAVEL', pronunciation: '/aɪm dʒʌst ˈbraʊzɪŋ/', example: 'Thanks, I’m just browsing for now.' },
+  { english: 'It slipped my mind.', definition: 'Used to say that you forgot something.', notes: 'A natural phrase for explaining that you forgot to do or remember something.', topic: 'work', category: 'WORK & MEETINGS', pronunciation: '/ɪt slɪpt maɪ maɪnd/', example: 'Sorry, it slipped my mind. I’ll do it now.' },
 ];
 
 const state = {
@@ -38,10 +38,18 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 function normalizeCard(chunk, topic, category) {
   const english = chunk.english || chunk.word || '';
-  const vietnamese = chunk.vietnamese || chunk.meaning || '';
-  const topicName = `${topic} ${category}`.toLowerCase();
-  const inferredTopic = topicName.includes('work') || topicName.includes('office') || topicName.includes('meeting') || topicName.includes('công việc') ? 'work' : topicName.includes('travel') || topicName.includes('du lịch') || topicName.includes('transport') ? 'travel' : 'greetings';
-  return { english, vietnamese, notes: chunk.notes || 'Một cụm từ hữu ích trong giao tiếp hằng ngày.', topic: inferredTopic, category: category || 'EVERYDAY ENGLISH', pronunciation: chunk.pronunciation || '', example: chunk.example || `${english} — ${vietnamese}` };
+  const topicLabel = toEnglishLabel(topic, 'Everyday English');
+  const categoryLabel = toEnglishLabel(category, 'Everyday English');
+  const topicName = `${topicLabel} ${categoryLabel}`.toLowerCase();
+  const inferredTopic = topicName.includes('work') || topicName.includes('office') || topicName.includes('meeting') ? 'work' : topicName.includes('travel') || topicName.includes('transport') ? 'travel' : 'greetings';
+  return { english, definition: chunk.definition || 'An English expression used in everyday communication.', notes: chunk.usageNote || 'Listen to the pronunciation and practise the expression in context.', topic: inferredTopic, category: categoryLabel.toUpperCase(), pronunciation: chunk.pronunciation || '', example: chunk.example || `Use “${english}” in a natural conversation.` };
+}
+
+function toEnglishLabel(value, fallback) {
+  const text = String(value || '').trim();
+  const parts = text.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  if (!parts) return /[^\x00-\x7F]/.test(text) ? fallback : text || fallback;
+  return /[^\x00-\x7F]/.test(parts[1]) ? parts[2].trim() || fallback : parts[1].trim() || fallback;
 }
 
 function flattenDataset(data) {
@@ -52,18 +60,18 @@ function flattenDataset(data) {
       (subTopic.chunks || []).forEach((chunk) => cards.push(normalizeCard(chunk, topic.name_english, subTopic.name)));
     });
   }));
-  return cards.filter((card) => card.english && card.vietnamese);
+  return cards.filter((card) => card.english && card.definition);
 }
 
 function customVocabularyCard(item) {
   return {
     english: item.word,
-    vietnamese: item.meaning,
-    notes: item.example ? 'Từ do bạn tự thêm vào thư viện.' : 'Từ do bạn tự thêm vào thư viện.',
+    definition: item.definition || 'A word added to your personal vocabulary.',
+    notes: 'A custom card from your personal vocabulary.',
     topic: item.topic || 'other',
     category: 'MY VOCABULARY',
     pronunciation: item.pronunciation || '',
-    example: item.example || `${item.word} — ${item.meaning}`,
+    example: item.example || `Use “${item.word}” in a natural conversation.`,
     imageUrl: item.imageUrl,
     isCustom: true,
   };
@@ -87,7 +95,7 @@ async function loadDataset() {
         state.allCards = [...cards, ...state.customVocabulary.map(customVocabularyCard)];
         setDeck();
         renderAll();
-        toast(`Đã tải ${cards.length.toLocaleString('vi-VN')} cụm từ vào thư viện.`);
+        toast(`Loaded ${cards.length.toLocaleString('en-US')} English expressions into your library.`);
         return;
       }
     } catch (error) {
@@ -116,20 +124,20 @@ function setDeck() {
 }
 
 function currentCard() { return state.deck[state.index] || fallbackCards[0]; }
-function cardKey(card) { return `${card.english}::${card.vietnamese}`; }
+function cardKey(card) { return card.english; }
 
 function renderCard() {
   const card = currentCard();
   $('#card-english').textContent = card.english;
-  $('#card-vietnamese').textContent = card.vietnamese;
+  $('#card-definition').textContent = card.definition;
   $('#card-category').textContent = card.category;
-  $('#pronunciation-text').textContent = card.pronunciation || 'Nhấn loa để nghe';
+  $('#pronunciation-text').textContent = card.pronunciation || 'Press the speaker to listen';
   $('#card-note').textContent = card.notes;
   $('#card-example').textContent = card.example;
   $('#card-count').textContent = `${String(state.index + 1).padStart(2, '0')} / ${String(state.deck.length).padStart(2, '0')}`;
   $('#flashcard').classList.toggle('is-flipped', state.flipped);
-  $('#flashcard').setAttribute('aria-label', state.flipped ? 'Mặt sau của thẻ, bấm để lật lại' : 'Mặt trước của thẻ, bấm để lật');
-  $('#flip-label-text').textContent = state.flipped ? 'Mặt sau' : 'Mặt trước';
+  $('#flashcard').setAttribute('aria-label', state.flipped ? 'Back of flashcard, tap to flip back' : 'Front of flashcard, tap to flip');
+  $('#flip-label-text').textContent = state.flipped ? 'Back' : 'Front';
   $('#favorite-button').classList.toggle('is-favorite', state.favorites.includes(cardKey(card)));
   $('#favorite-button').setAttribute('aria-pressed', String(state.favorites.includes(cardKey(card))));
   updatePronunciation(card.english);
@@ -145,12 +153,12 @@ function updateProgress() {
   $('#session-reviewed').textContent = today;
   $('#session-left').textContent = Math.max(10 - today, 0);
   $('#session-accuracy').textContent = state.reviewed ? `${Math.round((state.correct / state.reviewed) * 100)}%` : '—';
-  $('#sidebar-streak').textContent = '4 ngày';
+  $('#sidebar-streak').textContent = '4 days';
   $('#streak-number').textContent = '4';
-  $('#favorite-count').textContent = `${state.favorites.length} thẻ đã lưu`;
+  $('#favorite-count').textContent = `${state.favorites.length} saved cards`;
   $('#stats-reviewed').textContent = state.reviewed;
   $('#stats-favorites').textContent = state.favorites.length;
-  $('#stats-streak').textContent = '4 ngày';
+  $('#stats-streak').textContent = '4 days';
 }
 
 function renderAll() {
@@ -175,7 +183,7 @@ function nextCard(isCorrect) {
   state.index = (state.index + 1) % state.deck.length;
   state.flipped = false;
   renderAll();
-  toast(isCorrect ? 'Tốt lắm — thẻ tiếp theo đang chờ bạn.' : 'Không sao, mình sẽ gặp lại thẻ này sau nhé.');
+  toast(isCorrect ? 'Nice work — your next card is ready.' : 'No worries — we will review this card again later.');
 }
 
 function toggleFavorite() {
@@ -186,7 +194,7 @@ function toggleFavorite() {
   localStorage.setItem('englishCardsFavorites', JSON.stringify(state.favorites));
   syncProgress();
   renderAll();
-  toast(found >= 0 ? 'Đã bỏ khỏi thẻ yêu thích.' : 'Đã lưu vào thẻ yêu thích.');
+  toast(found >= 0 ? 'Removed from favorites.' : 'Saved to favorites.');
 }
 
 async function loadRemoteProgress() {
@@ -219,7 +227,7 @@ async function syncProgress() {
 }
 
 function speakCurrent() {
-  if (!('speechSynthesis' in window)) return toast('Trình duyệt của bạn chưa hỗ trợ phát âm.');
+  if (!('speechSynthesis' in window)) return toast('Your browser does not support pronunciation playback.');
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(currentCard().english);
   utterance.lang = 'en-US';
@@ -238,14 +246,14 @@ function selectTopic(topic) {
 
 function renderLibrary() {
   const filtered = state.libraryTopic === 'all' ? state.allCards : state.allCards.filter((card) => card.topic === state.libraryTopic);
-  $('#library-total').textContent = `${filtered.length.toLocaleString('vi-VN')} thẻ`;
+  $('#library-total').textContent = `${filtered.length.toLocaleString('en-US')} cards`;
   const cards = filtered.slice(0, 60);
   $('#library-grid').innerHTML = cards.length ? cards.map((card, index) => `
     <article class="library-card">
       <div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div>
-      <h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.vietnamese)}</p></div>
-      <div class="library-card-footer"><span>${escapeHtml(card.topic === 'work' ? 'Công việc' : card.topic === 'travel' ? 'Du lịch' : 'Giao tiếp')}</span><button type="button" data-study-index="${state.allCards.indexOf(card)}">Học thẻ này →</button></div>
-    </article>`).join('') : '<div class="empty-state">Chưa tìm thấy thẻ phù hợp.</div>';
+      <h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div>
+      <div class="library-card-footer"><span>${escapeHtml(card.topic === 'work' ? 'Work' : card.topic === 'travel' ? 'Travel' : 'Conversation')}</span><button type="button" data-study-index="${state.allCards.indexOf(card)}">Study this card →</button></div>
+    </article>`).join('') : '<div class="empty-state">No matching cards found.</div>';
   $$('.library-card button').forEach((button) => button.addEventListener('click', () => {
     const target = Number(button.dataset.studyIndex);
     state.activeTopic = 'all';
@@ -258,23 +266,23 @@ function renderLibrary() {
 
 function renderChart() {
   const values = [4, 6, 3, 8, 5, 3, Math.min(state.reviewed, 10)];
-  const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
-  $('#week-chart').innerHTML = values.map((value, index) => `<div class="chart-day"><div class="chart-bar ${index === values.length - 1 ? 'is-today' : ''}" style="height:${Math.max(value * 10, 7)}%" title="${value} thẻ"></div><small>${days[index]}</small></div>`).join('');
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  $('#week-chart').innerHTML = values.map((value, index) => `<div class="chart-day"><div class="chart-bar ${index === values.length - 1 ? 'is-today' : ''}" style="height:${Math.max(value * 10, 7)}%" title="${value} cards"></div><small>${days[index]}</small></div>`).join('');
 }
 
 function renderCustomVocabulary() {
   const grid = $('#custom-vocabulary-grid');
   if (!grid) return;
-  $('#custom-vocabulary-total').textContent = `${state.customVocabulary.length} thẻ`;
+  $('#custom-vocabulary-total').textContent = `${state.customVocabulary.length} cards`;
   if (!state.customVocabulary.length) {
-    grid.innerHTML = '<div class="empty-state">Bạn chưa thêm từ nào. Hãy bắt đầu với một từ thật hữu ích.</div>';
+    grid.innerHTML = '<div class="empty-state">You have not added any words yet. Start with one useful word.</div>';
     return;
   }
   grid.innerHTML = state.customVocabulary.map((item) => {
-    const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : 'Vừa thêm';
+    const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US') : 'Just added';
     return `<article class="custom-vocab-card">
-      <img class="custom-vocab-image" src="${escapeHtml(item.imageUrl)}" alt="Ảnh minh họa cho ${escapeHtml(item.word)}" loading="lazy" />
-      <div class="custom-vocab-content"><span class="category-pill">${escapeHtml(item.topicName || 'KHÁC')}</span><h3>${escapeHtml(item.word)}</h3><p>${escapeHtml(item.meaning)}</p>${item.example ? `<small>${escapeHtml(item.example)}</small>` : ''}<small>Đã thêm ${escapeHtml(date)}</small></div>
+      <img class="custom-vocab-image" src="${escapeHtml(item.imageUrl)}" alt="Illustration for ${escapeHtml(item.word)}" loading="lazy" />
+      <div class="custom-vocab-content"><span class="category-pill">${escapeHtml(item.topicName || 'OTHER')}</span><h3>${escapeHtml(item.word)}</h3><p>${escapeHtml(item.definition || '')}</p>${item.example ? `<small>${escapeHtml(item.example)}</small>` : ''}<small>Added ${escapeHtml(date)}</small></div>
     </article>`;
   }).join('');
 }
@@ -307,21 +315,21 @@ async function submitVocabulary(event) {
   const form = event.currentTarget;
   const button = $('#save-vocabulary');
   const file = $('#vocab-image').files[0];
-  if (!file) return setFormStatus('Bạn cần chọn ảnh minh họa.', 'error');
-  if (file.size > 5 * 1024 * 1024) return setFormStatus('Ảnh phải nhỏ hơn 5MB.', 'error');
+  if (!file) return setFormStatus('Please choose an image.', 'error');
+  if (file.size > 5 * 1024 * 1024) return setFormStatus('The image must be smaller than 5MB.', 'error');
 
   button.disabled = true;
-  setFormStatus('Đang upload ảnh và lưu từ vựng…');
+  setFormStatus('Uploading the image and saving the vocabulary…');
   try {
     const response = await fetch('/api/vocabulary', { method: 'POST', body: new FormData(form) });
     const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || 'Không thể lưu từ vựng.');
+    if (!response.ok) throw new Error(payload.error || 'Unable to save the vocabulary.');
     form.reset();
     resetImagePreview();
-    setFormStatus('Đã lưu từ mới thành công.', 'success');
+    setFormStatus('New vocabulary saved successfully.', 'success');
     await loadCustomVocabulary();
   } catch (error) {
-    setFormStatus(error.message || 'Có lỗi xảy ra, hãy thử lại.', 'error');
+    setFormStatus(error.message || 'Something went wrong. Please try again.', 'error');
   } finally {
     button.disabled = false;
   }
@@ -356,7 +364,7 @@ function shuffleDeck() {
   state.index = 0;
   state.flipped = false;
   renderCard();
-  toast('Đã trộn bộ thẻ.');
+  toast('Deck shuffled.');
 }
 
 function initEvents() {
@@ -376,19 +384,19 @@ function initEvents() {
   $('#good-button').addEventListener('click', () => nextCard(true));
   $('#shuffle-button').addEventListener('click', shuffleDeck);
   $('#favorites-button').addEventListener('click', () => {
-    if (!state.favorites.length) return toast('Hãy nhấn biểu tượng ☆ để lưu thẻ bạn thích.');
+    if (!state.favorites.length) return toast('Tap ☆ to save cards you like.');
     state.libraryTopic = 'all';
     showView('library');
-    $('#library-grid').innerHTML = state.allCards.filter((card) => state.favorites.includes(cardKey(card))).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>★</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.vietnamese)}</p></div></article>`).join('');
+    $('#library-grid').innerHTML = state.allCards.filter((card) => state.favorites.includes(cardKey(card))).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>★</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div></article>`).join('');
   });
   $('#search-input').addEventListener('input', (event) => {
     const query = event.target.value.trim().toLowerCase();
     if (!query) return renderLibrary();
-    const matches = state.allCards.filter((card) => `${card.english} ${card.vietnamese}`.toLowerCase().includes(query));
+    const matches = state.allCards.filter((card) => `${card.english} ${card.definition}`.toLowerCase().includes(query));
     state.libraryTopic = 'all';
     showView('library');
-    $('#library-total').textContent = `${matches.length.toLocaleString('vi-VN')} kết quả`;
-    $('#library-grid').innerHTML = matches.slice(0, 60).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.vietnamese)}</p></div></article>`).join('') || '<div class="empty-state">Không tìm thấy cụm từ này.</div>';
+    $('#library-total').textContent = `${matches.length.toLocaleString('en-US')} results`;
+    $('#library-grid').innerHTML = matches.slice(0, 60).map((card) => `<article class="library-card"><div><div class="library-card-top"><span class="category-pill">${escapeHtml(card.category)}</span><span>${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div></article>`).join('') || '<div class="empty-state">No matching expressions found.</div>';
   });
   $('#theme-toggle').addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');

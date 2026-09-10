@@ -15,14 +15,14 @@ function textField(form, name, maxLength = 500) {
 }
 
 function topicName(topic) {
-  return ({ greetings: 'Giao tiếp', work: 'Công việc', travel: 'Du lịch', other: 'Khác' })[topic] || 'Khác';
+  return ({ greetings: 'Conversation', work: 'Work', travel: 'Travel', other: 'Other' })[topic] || 'Other';
 }
 
 function toClientItem(row) {
   return {
     id: row.id,
     word: row.word,
-    meaning: row.meaning,
+    definition: row.definition,
     pronunciation: row.pronunciation,
     example: row.example,
     topic: row.topic,
@@ -33,9 +33,9 @@ function toClientItem(row) {
 }
 
 export async function onRequestGet({ env }) {
-  if (!env.DB) return json({ error: 'D1 binding DB chưa được cấu hình.' }, 503);
+  if (!env.DB) return json({ error: 'The D1 database binding is not configured.' }, 503);
   const result = await env.DB.prepare(`
-    SELECT id, word, meaning, pronunciation, example, topic, image_key, created_at
+    SELECT id, word, definition, pronunciation, example, topic, image_key, created_at
     FROM vocabulary_entries
     ORDER BY created_at DESC
     LIMIT 100
@@ -44,26 +44,26 @@ export async function onRequestGet({ env }) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!env.DB || !env.VOCABULARY_IMAGES) return json({ error: 'D1 hoặc R2 binding chưa được cấu hình.' }, 503);
+  if (!env.DB || !env.VOCABULARY_IMAGES) return json({ error: 'The D1 or R2 binding is not configured.' }, 503);
 
   let form;
   try {
     form = await request.formData();
   } catch {
-    return json({ error: 'Dữ liệu gửi lên không hợp lệ.' }, 400);
+    return json({ error: 'The submitted data is invalid.' }, 400);
   }
 
   const word = textField(form, 'word', 120);
-  const meaning = textField(form, 'meaning', 240);
+  const definition = textField(form, 'definition', 240);
   const pronunciation = textField(form, 'pronunciation', 120);
   const example = textField(form, 'example', 500);
   const topic = ['greetings', 'work', 'travel', 'other'].includes(form.get('topic')) ? form.get('topic') : 'other';
   const file = form.get('image');
 
-  if (!word || !meaning) return json({ error: 'Từ và nghĩa tiếng Việt là bắt buộc.' }, 400);
-  if (!(file instanceof File) || !file.size) return json({ error: 'Bạn cần chọn ảnh minh họa.' }, 400);
-  if (!ALLOWED_IMAGE_TYPES.has(file.type)) return json({ error: 'Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.' }, 415);
-  if (file.size > MAX_IMAGE_BYTES) return json({ error: 'Ảnh phải nhỏ hơn 5MB.' }, 413);
+  if (!word || !definition) return json({ error: 'Word and English definition are required.' }, 400);
+  if (!(file instanceof File) || !file.size) return json({ error: 'Please choose an image.' }, 400);
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) return json({ error: 'Only JPG, PNG, or WEBP images are accepted.' }, 415);
+  if (file.size > MAX_IMAGE_BYTES) return json({ error: 'The image must be smaller than 5MB.' }, 413);
 
   const id = crypto.randomUUID();
   const key = `vocabulary/${id}.${ALLOWED_IMAGE_TYPES.get(file.type)}`;
@@ -73,13 +73,13 @@ export async function onRequestPost({ request, env }) {
 
   try {
     const row = await env.DB.prepare(`
-      INSERT INTO vocabulary_entries (id, word, meaning, pronunciation, example, topic, image_key)
+      INSERT INTO vocabulary_entries (id, word, definition, pronunciation, example, topic, image_key)
       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-      RETURNING id, word, meaning, pronunciation, example, topic, image_key, created_at
-    `).bind(id, word, meaning, pronunciation, example, topic, key).first();
+      RETURNING id, word, definition, pronunciation, example, topic, image_key, created_at
+    `).bind(id, word, definition, pronunciation, example, topic, key).first();
     return json({ ok: true, item: toClientItem(row) }, 201);
   } catch (error) {
     await env.VOCABULARY_IMAGES.delete(key);
-    return json({ error: 'Không thể lưu từ vựng. Vui lòng thử lại.' }, 500);
+    return json({ error: 'Unable to save the vocabulary. Please try again.' }, 500);
   }
 }

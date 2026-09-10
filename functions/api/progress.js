@@ -9,9 +9,9 @@ function validateUserId(userId) {
 }
 
 export async function onRequestGet({ request, env }) {
-  if (!env.DB) return json({ error: 'D1 binding DB chưa được cấu hình.' }, 503);
+  if (!env.DB) return json({ error: 'The D1 database binding is not configured.' }, 503);
   const userId = new URL(request.url).searchParams.get('userId');
-  if (!validateUserId(userId)) return json({ error: 'userId không hợp lệ.' }, 400);
+  if (!validateUserId(userId)) return json({ error: 'Invalid user ID.' }, 400);
 
   const row = await env.DB.prepare(
     'SELECT reviewed_count, correct_count, favorites_json FROM user_progress WHERE user_id = ?1',
@@ -25,13 +25,13 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!env.DB) return json({ error: 'D1 binding DB chưa được cấu hình.' }, 503);
+  if (!env.DB) return json({ error: 'The D1 database binding is not configured.' }, 503);
 
   let body;
   try {
     body = await request.json();
   } catch {
-    return json({ error: 'Request body phải là JSON.' }, 400);
+    return json({ error: 'Request body must be valid JSON.' }, 400);
   }
 
   const userId = body?.userId;
@@ -39,7 +39,7 @@ export async function onRequestPost({ request, env }) {
   const correct = Number.isInteger(body?.correct) ? Math.max(0, Math.min(body.correct, reviewed)) : 0;
   const favorites = Array.isArray(body?.favorites) ? body.favorites.filter((item) => typeof item === 'string').slice(0, 1000) : [];
 
-  if (!validateUserId(userId)) return json({ error: 'userId không hợp lệ.' }, 400);
+  if (!validateUserId(userId)) return json({ error: 'Invalid user ID.' }, 400);
 
   await env.DB.prepare(`
     INSERT INTO user_progress (user_id, reviewed_count, correct_count, favorites_json, updated_at)
