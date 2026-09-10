@@ -100,25 +100,11 @@ export function AddView() {
           </div>
         </form>
 
-        <aside class="ai-chat c-surface" id="ai-chat">
-          <div class="ai-chat-heading">
-            <div>
-              <span class="section-label">ASK AI</span>
-              <h3>Talk through your vocabulary</h3>
-              <p>Ask about meaning, grammar, pronunciation, or natural usage.</p>
-            </div>
-            <span class="ai-chat-icon" aria-hidden="true">&#10022;</span>
-          </div>
-          <div class="ai-chat-messages" id="ai-chat-messages" aria-live="polite">
-            <div class="ai-chat-message ai-chat-message-assistant">Hi! Ask me anything about the word you want to learn.</div>
-          </div>
-          <form class="ai-chat-form" id="ai-chat-form">
-            <label class="sr-only" for="ai-chat-input">Ask the AI assistant</label>
-            <input id="ai-chat-input" name="message" type="text" placeholder="Ask a question..." maxlength="1200" autocomplete="off" required />
-            <button class="primary-button c-button" id="ai-chat-submit" type="submit">Send <span>&rarr;</span></button>
-          </form>
-          <p class="ai-chat-status" id="ai-chat-status" role="status"></p>
-          <p class="ai-chat-context" id="ai-chat-context">Context limit: 200,000 tokens · automatic comparison enabled</p>
+        <aside class="add-tip">
+          <span class="tip-icon">&#10022;</span>
+          <span class="section-label">MEMORY TIP</span>
+          <h3>The closer an image is to real experience, the easier the word is to remember.</h3>
+          <p>Choose an image with one clear detail and write example sentences connected to your life.</p>
         </aside>
       </section>
 
