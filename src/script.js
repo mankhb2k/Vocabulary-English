@@ -363,17 +363,12 @@ function initEvents() {
     $$('.filter-chip').forEach((chip) => chip.classList.toggle('is-active', chip.dataset.libraryTopic === 'all'));
     renderLibrary();
   });
-  $('#theme-toggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('englishCardsDarkMode', document.body.classList.contains('dark-mode') ? '1' : '0');
-  });
   $('#vocabulary-form').addEventListener('submit', submitVocabulary);
   $('#vocab-image').addEventListener('change', (event) => previewImage(event.target.files[0]));
   $('#clear-image').addEventListener('click', resetImagePreview);
 }
 
 function init() {
-  if (localStorage.getItem('englishCardsDarkMode') === '1') document.body.classList.add('dark-mode');
   renderApp(document.querySelector('#app'));
   initEvents();
   renderAll();

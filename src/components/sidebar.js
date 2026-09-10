@@ -12,7 +12,6 @@ export function Sidebar() {
       </nav>
       <div class="sidebar-bottom">
         <div class="mini-streak"><div class="mini-streak-icon">✦</div><div><strong id="sidebar-streak">4 days</strong><span>current streak</span></div></div>
-        <button class="settings-link c-button" id="theme-toggle" type="button" aria-label="Toggle light and dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><circle cx="12" cy="12" r="4"/></svg><span>Theme</span></button>
       </div>
     </aside>`;
 }

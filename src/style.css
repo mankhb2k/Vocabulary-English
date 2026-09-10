@@ -375,10 +375,3 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
   .detail-section:nth-last-child(-n + 2) { border-bottom: 1px solid var(--line); }
   .detail-family-section { border-bottom: 0 !important; }
 }
-
-body.dark-mode { --paper: #172628; --paper-deep: #213639; --ink: #eef5f1; --muted: #9eb1ad; --line: #30474a; --white: #203437; --navy: #cbeadd; --navy-dark: #102022; --mint: #2d514c; --mint-strong: #83c9ae; --coral: #e6a985; --coral-pale: #4e3d36; --shadow: 0 20px 45px rgba(0,0,0,.15); }
-body.dark-mode .sidebar { background: #102022; }
-body.dark-mode .nav-item.is-active { color: #102022; }
-body.dark-mode .daily-banner { background: #0f2022; }
-body.dark-mode .progress-ring::after { background: #0f2022; }
-body.dark-mode .flashcard { border-color: #385054; }
