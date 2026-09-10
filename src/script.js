@@ -27,6 +27,8 @@ const state = {
   customVocabulary: [],
   vocabularyCards: [],
   libraryTopic: 'all',
+  librarySort: 'az',
+  libraryRandomOrder: [],
   searchQuery: '',
   selectedCard: null,
   aiDraft: null,
@@ -238,6 +240,7 @@ function initHistory() {
 function renderLibrary() {
   let filtered = state.libraryTopic === 'all' ? state.allCards : state.allCards.filter((card) => card.topic === state.libraryTopic);
   if (state.searchQuery) filtered = filtered.filter((card) => `${card.english} ${card.definition}`.toLowerCase().includes(state.searchQuery));
+  filtered = orderLibraryCards(filtered);
   $('#library-total').textContent = `${filtered.length.toLocaleString('en-US')} ${state.searchQuery ? 'results' : 'cards'}`;
   const cards = filtered.slice(0, 60);
   $('#library-grid').innerHTML = cards.length ? cards.map(libraryCardMarkup).join('') : '<div class="empty-state">No matching cards found.</div>';
@@ -248,6 +251,47 @@ function renderLibrary() {
       if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
     });
   });
+}
+
+function libraryCardId(card) {
+  return card.id || card.english.toLowerCase();
+}
+
+function shuffledCards(cards) {
+  const result = [...cards];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+  }
+  return result;
+}
+
+function orderLibraryCards(cards) {
+  if (state.librarySort === 'random') {
+    const lookup = new Map(cards.map((card) => [libraryCardId(card), card]));
+    const ordered = state.libraryRandomOrder.filter((id) => lookup.has(id)).map((id) => lookup.get(id));
+    const missing = cards.filter((card) => !state.libraryRandomOrder.includes(libraryCardId(card)));
+    if (missing.length) {
+      const added = shuffledCards(missing);
+      state.libraryRandomOrder = [...state.libraryRandomOrder, ...added.map(libraryCardId)];
+      return [...ordered, ...added];
+    }
+    return ordered;
+  }
+  return [...cards].sort((left, right) => left.english.localeCompare(right.english, undefined, { sensitivity: 'base' }));
+}
+
+function shuffleLibrary() {
+  state.librarySort = 'random';
+  state.libraryRandomOrder = shuffledCards(state.allCards).map(libraryCardId);
+  const select = $('#library-sort');
+  if (select) select.value = 'random';
+  const button = $('#library-shuffle');
+  if (button) {
+    button.classList.remove('is-spinning');
+    requestAnimationFrame(() => button.classList.add('is-spinning'));
+  }
+  renderLibrary();
 }
 
 function renderChart() {
@@ -491,6 +535,12 @@ function initEvents() {
     $$('.filter-chip').forEach((chip) => chip.classList.toggle('is-active', chip === button));
     renderLibrary();
   }));
+  $('#library-sort').addEventListener('change', (event) => {
+    state.librarySort = event.target.value;
+    if (state.librarySort === 'random' && !state.libraryRandomOrder.length) state.libraryRandomOrder = shuffledCards(state.allCards).map(libraryCardId);
+    renderLibrary();
+  });
+  $('#library-shuffle').addEventListener('click', shuffleLibrary);
   $('#detail-back').addEventListener('click', () => {
     if (window.history.state?.app === 'english-cards' && window.history.state.card) window.history.back();
     else showView('library');

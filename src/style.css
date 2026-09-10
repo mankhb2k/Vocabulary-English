@@ -195,6 +195,13 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .library-filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .filter-chip { padding: 8px 13px; border: 1px solid var(--line); border-radius: 30px; color: var(--muted); background: transparent; font-size: 11px; font-weight: 700; }
 .filter-chip:hover, .filter-chip.is-active { border-color: var(--navy); color: var(--white); background: var(--navy); }
+.library-tools { display: flex; align-items: center; gap: 8px; }
+.library-sort-label { color: var(--muted); font-size: 10px; }
+.library-sort { min-height: 32px; padding: 0 28px 0 10px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: var(--white); font-size: 10px; }
+.library-shuffle { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 7px; color: var(--navy); background: var(--white); font-size: 18px; line-height: 1; }
+.library-shuffle:hover { border-color: var(--mint-strong); background: var(--mint); }
+.library-shuffle.is-spinning { animation: library-shuffle-spin .45s ease; }
+@keyframes library-shuffle-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
 .library-total { color: var(--muted); font-size: 11px; }
 .library-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
 .library-card { min-height: 157px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--white); cursor: pointer; }
@@ -432,6 +439,7 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
   .answer-button { padding: 9px; }
   .answer-button kbd { display: none; }
   .library-toolbar { align-items: start; flex-direction: column; margin-top: 28px; }
+  .library-tools { width: 100%; justify-content: flex-end; }
   .library-grid, .stats-grid { grid-template-columns: 1fr; }
   .custom-vocabulary-grid, .form-grid { grid-template-columns: 1fr; }
   .ai-form { grid-template-columns: 1fr; }

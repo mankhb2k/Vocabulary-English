@@ -14,7 +14,15 @@ export function LibraryView() {
             <button class="filter-chip c-button" data-library-topic="work" type="button">Work</button>
             <button class="filter-chip c-button" data-library-topic="travel" type="button">Travel</button>
           </div>
-          <span class="library-total" id="library-total"></span>
+          <div class="library-tools">
+            <label class="library-sort-label" for="library-sort">Sort by</label>
+            <select class="library-sort" id="library-sort" aria-label="Sort library cards">
+              <option value="az">A–Z</option>
+              <option value="random">Random</option>
+            </select>
+            <button class="library-shuffle c-button" id="library-shuffle" type="button" aria-label="Shuffle cards" title="Shuffle cards">↻</button>
+            <span class="library-total" id="library-total"></span>
+          </div>
         </div>
         <div class="library-grid" id="library-grid"></div>
       </div>
