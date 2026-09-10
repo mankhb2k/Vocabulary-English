@@ -1,6 +1,6 @@
 import { renderApp } from './components/app.js';
 
-const fallbackCards = [
+const fallbackCards = []; /* Legacy card data moved to D1.
   { english: 'resilient', definition: 'Able to recover quickly from difficulties.', notes: 'Often used to describe a person, team, or system that adapts well to problems.', topic: 'work', category: 'CORE VOCABULARY', pronunciation: '/rɪˈzɪliənt/', example: 'She is resilient and never gives up.' },
   { english: 'curious', definition: 'Wanting to know or learn something.', notes: 'A positive word for someone who enjoys discovering new ideas.', topic: 'greetings', category: 'CORE VOCABULARY', pronunciation: '/ˈkjʊəriəs/', example: 'He is curious about how the machine works.' },
   { english: 'consistent', definition: 'Doing something in the same reliable way over time.', notes: 'Useful when talking about habits, effort, or quality.', topic: 'work', category: 'CORE VOCABULARY', pronunciation: '/kənˈsɪstənt/', example: 'Consistent practice leads to steady progress.' },
@@ -9,27 +9,31 @@ const fallbackCards = [
   { english: 'patient', definition: 'Able to wait or deal with difficulties without becoming upset.', notes: 'This adjective can describe a person, attitude, or approach.', topic: 'greetings', category: 'CORE VOCABULARY', pronunciation: '/ˈpeɪʃənt/', example: 'Be patient with yourself while you learn.' },
   { english: 'improve', definition: 'To become better or make something better.', notes: 'A common verb for progress, skills, and performance.', topic: 'work', category: 'CORE VOCABULARY', pronunciation: '/ɪmˈpruːv/', example: 'Reading regularly can improve your vocabulary.' },
   { english: 'unwind', definition: 'To relax after a period of work or activity.', notes: 'Often used when talking about relaxing in the evening or at the weekend.', topic: 'travel', category: 'CORE VOCABULARY', pronunciation: '/ʌnˈwaɪnd/', example: 'I like to unwind with a short walk after work.' },
-];
+]; */
 
-const wordFamilyExamples = [
+const wordFamilyExamples = []; /* Legacy family data moved to D1.
   { english: 'help', definition: 'To make it easier for someone to do something.', notes: 'The base word in this family.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/help/', example: 'Can you help me with this task?', familyId: 'help' },
   { english: 'helpful', definition: 'Useful or able to provide help.', notes: 'The suffix -ful means “full of” or “providing”.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ˈhelpfəl/', example: 'The instructions were very helpful.', familyId: 'help', relationType: 'suffix', affix: '-ful' },
   { english: 'helpless', definition: 'Unable to help yourself or control a situation.', notes: 'The suffix -less means “without”.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ˈhelpləs/', example: 'He felt helpless during the emergency.', familyId: 'help', relationType: 'suffix', affix: '-less' },
   { english: 'helper', definition: 'A person who helps someone.', notes: 'The suffix -er can describe a person who does an action.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ˈhelpər/', example: 'She works as a classroom helper.', familyId: 'help', relationType: 'suffix', affix: '-er' },
   { english: 'helpfully', definition: 'In a way that provides useful help.', notes: 'The suffix -ly forms an adverb.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ˈhelpfəli/', example: 'He helpfully explained the next steps.', familyId: 'help', relationType: 'suffix', affix: '-fully' },
   { english: 'unhelpful', definition: 'Not useful or not providing the help that is needed.', notes: 'The prefix un- often gives a word the opposite meaning.', topic: 'other', category: 'WORD FAMILY', pronunciation: '/ʌnˈhelpfəl/', example: 'The reply was vague and unhelpful.', familyId: 'help', relationType: 'prefix', affix: 'un-' },
-];
+]; */
 
 const state = {
-  allCards: [...fallbackCards, ...wordFamilyExamples],
+  allCards: [],
   reviewed: Number(localStorage.getItem('englishCardsReviewed') || 3),
   favorites: JSON.parse(localStorage.getItem('englishCardsFavorites') || '[]'),
   customVocabulary: [],
+  vocabularyCards: [],
   libraryTopic: 'all',
   searchQuery: '',
   selectedCard: null,
   aiDraft: null,
   editingVocabulary: null,
+  chatSessions: [],
+  activeChatSessionId: null,
+  aiChatMessages: [],
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -76,13 +80,28 @@ function uniqueCards(cards) {
 }
 
 function mergeCustomVocabulary() {
-  const staticCards = state.allCards.filter((card) => !card.isCustom);
-  state.allCards = uniqueCards([...staticCards, ...state.customVocabulary.map(customVocabularyCardWithId)]);
+  state.allCards = uniqueCards(state.vocabularyCards.map(databaseVocabularyCard));
   renderAll();
 }
 
-function customVocabularyCardWithId(item) {
-  return { ...customVocabularyCard(item), id: item.id, examples: item.examples || exampleList(item.example), example: item.example, familyId: item.familyRoot || '', isCustom: true };
+function databaseVocabularyCard(item) {
+  const examples = item.examples || exampleList(item.example);
+  const isUserCard = item.source !== 'system';
+  const isFamilyCard = Boolean(item.familyRoot);
+  return {
+    id: item.id,
+    english: item.word,
+    definition: item.definition || 'A word added to your personal vocabulary.',
+    notes: item.notes || (isUserCard ? 'A custom card from your personal vocabulary.' : 'Listen to the pronunciation and practise the word in context.'),
+    topic: item.topic || 'other',
+    category: isUserCard ? 'MY VOCABULARY' : (isFamilyCard ? 'WORD FAMILY' : 'CORE VOCABULARY'),
+    pronunciation: item.pronunciation || '',
+    examples,
+    example: examples.join('\n'),
+    familyId: item.familyRoot || '',
+    imageUrl: item.imageUrl,
+    isCustom: isUserCard,
+  };
 }
 
 async function loadDataset() {
@@ -93,10 +112,11 @@ async function loadDataset() {
 
 async function loadCustomVocabulary() {
   try {
-    const response = await fetch('/api/vocabulary');
+    const response = await fetch('/api/vocabulary?scope=all');
     if (!response.ok) return;
     const payload = await response.json();
-    state.customVocabulary = Array.isArray(payload.items) ? payload.items : [];
+    state.vocabularyCards = Array.isArray(payload.items) ? payload.items : [];
+    state.customVocabulary = state.vocabularyCards.filter((item) => item.source !== 'system');
     mergeCustomVocabulary();
   } catch {
     // The form still works as a static UI when the API is unavailable.
@@ -126,15 +146,14 @@ function renderDetailFamily(card, relatedCards) {
 }
 
 async function loadDetailFamily(card) {
-  const localRelated = wordFamilyExamples.filter((item) => item.familyId && item.familyId === card.familyId);
-  renderDetailFamily(card, localRelated);
+  renderDetailFamily(card, []);
   try {
     const response = await fetch(`/api/word-relations?word=${encodeURIComponent(card.english)}`);
     if (!response.ok || state.selectedCard?.english !== card.english) return;
     const payload = await response.json();
-    renderDetailFamily(card, [...localRelated, ...(payload.items || []).map(detailCardFromRelation)]);
+    renderDetailFamily(card, (payload.items || []).map(detailCardFromRelation));
   } catch {
-    // Local examples remain visible when the API is unavailable.
+    // Related vocabulary is loaded from D1.
   }
 }
 
@@ -492,12 +511,14 @@ function initEvents() {
   $('#clear-image').addEventListener('click', resetImagePreview);
 }
 
-function init() {
+async function init() {
   renderApp(document.querySelector('#app'));
   initEvents();
   renderAll();
+  await loadCustomVocabulary();
   initHistory();
-  loadCustomVocabulary();
+  renderAiChat();
+  loadChatSessions();
 }
 
 function exampleList(value) {
@@ -525,8 +546,79 @@ function renderAiChat() {
   const history = Array.isArray(state.aiChatMessages) ? state.aiChatMessages : [];
   messages.innerHTML = history.length
     ? history.map((message) => `<div class="ai-chat-message ai-chat-message-${message.role}">${escapeHtml(message.content)}</div>`).join('')
-    : '<div class="ai-chat-message ai-chat-message-assistant">Hi! Ask me anything about the word you want to learn.</div>';
+    : '<div class="ai-chat-message ai-chat-message-assistant">Hi! Ask me anything about English vocabulary, grammar, pronunciation, or natural usage.</div>';
   messages.scrollTop = messages.scrollHeight;
+}
+
+function renderChatSessions() {
+  const list = document.querySelector('#chat-session-list');
+  if (!list) return;
+  list.innerHTML = state.chatSessions.length
+    ? state.chatSessions.map((session) => `<div class="chat-session-item ${session.id === state.activeChatSessionId ? 'is-active' : ''}"><button class="chat-session-title" type="button" data-session-id="${escapeHtml(session.id)}">${escapeHtml(session.title || 'New chat')}</button><button class="chat-session-delete" type="button" data-delete-session-id="${escapeHtml(session.id)}" aria-label="Delete ${escapeHtml(session.title || 'chat')}">&times;</button></div>`).join('')
+    : '<p class="chat-session-empty">No chats yet.</p>';
+}
+
+async function loadChatSessions() {
+  try {
+    const response = await fetch('/api/ai/chat');
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to load chat sessions.');
+    state.chatSessions = Array.isArray(payload.sessions) ? payload.sessions : [];
+    renderChatSessions();
+    if (!state.chatSessions.length) return createChatSession();
+    const active = state.chatSessions.find((session) => session.id === state.activeChatSessionId) || state.chatSessions[0];
+    return loadChatSession(active.id);
+  } catch (error) {
+    setAiChatStatus(error.message || 'Unable to load chat sessions.', 'error');
+  }
+}
+
+async function createChatSession() {
+  try {
+    const response = await fetch('/api/ai/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'create' }) });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to create a chat session.');
+    state.chatSessions = [payload.session, ...state.chatSessions.filter((session) => session.id !== payload.session.id)];
+    state.activeChatSessionId = payload.session.id;
+    state.aiChatMessages = [];
+    renderChatSessions();
+    renderAiChat();
+    setAiChatStatus('');
+    document.querySelector('#ai-chat-input')?.focus();
+  } catch (error) {
+    setAiChatStatus(error.message || 'Unable to create a chat session.', 'error');
+  }
+}
+
+async function loadChatSession(sessionId) {
+  if (!sessionId) return;
+  try {
+    const response = await fetch(`/api/ai/chat?sessionId=${encodeURIComponent(sessionId)}`);
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to load this chat.');
+    state.activeChatSessionId = payload.session.id;
+    state.aiChatMessages = Array.isArray(payload.messages) ? payload.messages : [];
+    renderChatSessions();
+    renderAiChat();
+    setAiChatStatus('');
+  } catch (error) {
+    setAiChatStatus(error.message || 'Unable to load this chat.', 'error');
+  }
+}
+
+async function deleteChatSession(sessionId) {
+  const response = await fetch('/api/ai/chat', { method: 'DELETE', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sessionId }) });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || 'Unable to delete this chat.');
+  state.chatSessions = state.chatSessions.filter((session) => session.id !== sessionId);
+  if (state.activeChatSessionId === sessionId) {
+    state.activeChatSessionId = null;
+    state.aiChatMessages = [];
+    renderAiChat();
+    if (state.chatSessions.length) await loadChatSession(state.chatSessions[0].id);
+    else await createChatSession();
+  }
+  renderChatSessions();
 }
 
 async function submitAiChat(event) {
@@ -535,7 +627,6 @@ async function submitAiChat(event) {
   const button = document.querySelector('#ai-chat-submit');
   const content = input.value.trim();
   if (!content || button.disabled) return;
-  if (!Array.isArray(state.aiChatMessages)) state.aiChatMessages = [];
   state.aiChatMessages.push({ role: 'user', content });
   renderAiChat();
   input.value = '';
@@ -545,11 +636,16 @@ async function submitAiChat(event) {
     const response = await fetch('/api/ai/chat', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ messages: state.aiChatMessages }),
+      body: JSON.stringify({ sessionId: state.activeChatSessionId, message: content }),
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || 'Unable to contact the AI assistant.');
-    state.aiChatMessages.push({ role: 'assistant', content: payload.answer || 'The AI returned an empty answer.' });
+    state.aiChatMessages.push(payload.message || { role: 'assistant', content: 'The AI returned an empty answer.' });
+    if (payload.session) {
+      state.activeChatSessionId = payload.session.id;
+      state.chatSessions = [payload.session, ...state.chatSessions.filter((session) => session.id !== payload.session.id)];
+      renderChatSessions();
+    }
     renderAiChat();
     const context = payload.context;
     if (context) {
@@ -568,6 +664,18 @@ async function submitAiChat(event) {
   }
 }
 
+document.addEventListener('submit', (event) => {
+  if (event.target.id === 'ai-chat-form') submitAiChat(event);
+});
+document.addEventListener('click', (event) => {
+  const sessionButton = event.target.closest('[data-session-id]');
+  if (sessionButton) loadChatSession(sessionButton.dataset.sessionId);
+  const deleteButton = event.target.closest('[data-delete-session-id]');
+  if (deleteButton) {
+    event.stopPropagation();
+    deleteChatSession(deleteButton.dataset.deleteSessionId).catch((error) => setAiChatStatus(error.message, 'error'));
+  }
+  if (event.target.closest('#new-chat')) createChatSession();
+});
+
 init();
-const aiChatForm = document.querySelector('#ai-chat-form');
-if (aiChatForm) aiChatForm.addEventListener('submit', submitAiChat);

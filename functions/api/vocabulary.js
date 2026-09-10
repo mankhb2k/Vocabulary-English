@@ -36,26 +36,30 @@ function toClientItem(row) {
     examples: normalizeExamples(row.example),
     topic: row.topic,
     topicName: topicName(row.topic),
+    notes: row.usage_note || '',
+    source: row.source || 'user',
     imageUrl: `/api/vocabulary-image?key=${encodeURIComponent(row.image_key || 'placeholder-1.png')}`,
     createdAt: row.created_at,
     familyRoot: row.family_root || '',
   };
 }
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ env, request }) {
   if (!env.DB) return json({ error: 'The D1 database binding is not configured.' }, 503);
+  const scope = new URL(request.url).searchParams.get('scope') === 'all' ? 'all' : 'user';
+  const sourceFilter = scope === 'all' ? "entry.source IN ('user', 'system')" : "entry.source = 'user'";
   const result = await env.DB.prepare(`
-    SELECT entry.id, entry.word, entry.definition, entry.pronunciation, entry.example, entry.topic, entry.image_key, entry.created_at,
+    SELECT entry.id, entry.word, entry.definition, entry.pronunciation, entry.example, entry.topic, entry.image_key, entry.created_at, entry.usage_note, entry.source,
       (
         SELECT root.word
         FROM word_relations AS relation
         JOIN vocabulary_entries AS root ON root.id = relation.source_word_id
         WHERE relation.target_word_id = entry.id
-          AND relation.relation_type = 'family'
+          AND relation.relation_type IN ('family', 'suffix', 'prefix')
         LIMIT 1
       ) AS family_root
     FROM vocabulary_entries AS entry
-    WHERE entry.source = 'user'
+    WHERE ${sourceFilter}
       AND entry.word <> ''
     ORDER BY entry.created_at DESC
     LIMIT 100
