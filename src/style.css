@@ -106,8 +106,7 @@ h1 { margin-bottom: 10px; font-family: 'Plus Jakarta Sans', sans-serif; font-siz
 .topic-tab:hover, .topic-tab.is-active { color: var(--navy); }
 .topic-tab.is-active::after { background: var(--coral); }
 
-.flashcard { min-height: 390px; display: flex; flex-direction: column; justify-content: space-between; margin-top: 27px; padding: 27px 31px 20px; border: 1px solid rgba(30,61,66,.08); border-radius: 16px; background: var(--white); box-shadow: var(--shadow); position: relative; overflow: hidden; transition: transform .28s ease, box-shadow .28s ease; }
-.flashcard:hover { box-shadow: 0 25px 55px rgba(43,55,53,.11); transform: translateY(-2px); }
+.flashcard { min-height: 390px; display: flex; flex-direction: column; justify-content: space-between; margin-top: 27px; padding: 27px 31px 20px; border: 1px solid rgba(30,61,66,.08); border-radius: 16px; background: var(--white); box-shadow: var(--shadow); position: relative; overflow: hidden; }
 .flashcard.is-flipped { background: #f5fbf7; }
 .flashcard-glow { position: absolute; top: -120px; right: -80px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(216,238,230,.85), rgba(216,238,230,0) 68%); pointer-events: none; }
 .flashcard-topline, .card-face, .flip-label { position: relative; z-index: 1; }
@@ -198,8 +197,7 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
 .filter-chip:hover, .filter-chip.is-active { border-color: var(--navy); color: var(--white); background: var(--navy); }
 .library-total { color: var(--muted); font-size: 11px; }
 .library-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
-.library-card { min-height: 157px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--white); cursor: pointer; transition: .2s ease; }
-.library-card:hover { border-color: var(--mint-strong); transform: translateY(-2px); box-shadow: var(--shadow); }
+.library-card { min-height: 157px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--white); cursor: pointer; }
 .library-card:focus-visible { outline: 3px solid rgba(227, 163, 127, .65); outline-offset: 3px; }
 .library-card-image { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: contain; background: var(--paper-deep); }
 .library-card-body { display: flex; flex: 1; flex-direction: column; justify-content: space-between; padding: 19px; }
