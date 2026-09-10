@@ -284,9 +284,20 @@ kbd { display: inline-grid; place-items: center; min-width: 17px; height: 17px; 
   .vocab-form-layout { grid-template-columns: 1fr; }
 }
 @media (max-width: 590px) {
-  .main-content { padding: 0 16px 42px; }
+  :root { --sidebar-width: 0px; }
+  body { padding-bottom: 76px; }
+  .sidebar { inset: auto 0 0; width: 100%; height: 68px; flex-direction: row; overflow: visible; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); align-items: stretch; box-shadow: 0 -8px 24px rgba(20, 40, 42, .12); }
+  .sidebar .brand, .mini-streak { display: none; }
+  .main-nav { display: flex; flex: 1; align-items: stretch; justify-content: space-around; gap: 4px; width: auto; margin: 0; }
+  .nav-item, .settings-link { flex: 1; flex-direction: column; justify-content: center; gap: 4px; padding: 7px 3px; text-align: center; font-size: 9px; }
+  .nav-item span, .settings-link span { display: block; }
+  .sidebar-bottom { display: flex; align-items: stretch; gap: 4px; margin: 0; }
+  .sidebar-bottom .settings-link { min-width: 44px; }
+  .main-content { width: 100%; margin-left: 0; padding: 0 16px 32px; }
   .topbar { height: 60px; justify-content: space-between; }
   .mobile-brand { display: inline-flex; color: var(--navy); font-size: 16px; }
+  .topbar-search { min-width: 0; }
+  .topbar-search .search-input-wrap input { padding-left: 35px; font-size: 12px; }
   .profile-name, .profile-chip > svg { display: none; }
   .topbar-actions { gap: 8px; }
   .view { padding-top: 31px; }
