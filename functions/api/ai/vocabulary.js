@@ -47,7 +47,7 @@ export async function onRequestPost({ request, env }) {
 
   let body;
   try {
-    body = await request.json();
+    body = JSON.parse(await request.text());
   } catch {
     return json({ error: 'The AI request is invalid.' }, 400);
   }
