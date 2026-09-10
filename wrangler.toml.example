@@ -7,3 +7,7 @@ binding = "DB"
 database_name = "english-cards-db"
 database_id = "REPLACE_WITH_D1_DATABASE_ID"
 migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "VOCABULARY_IMAGES"
+bucket_name = "english-vocabulary-image"

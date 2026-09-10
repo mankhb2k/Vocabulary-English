@@ -10,5 +10,11 @@
       "database_id": "b3a4a466-8dc4-4259-9278-2dbb61f21e12",
       "migrations_dir": "migrations"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "VOCABULARY_IMAGES",
+      "bucket_name": "english-vocabulary-image"
+    }
   ]
 }

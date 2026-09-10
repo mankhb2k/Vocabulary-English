@@ -19,6 +19,7 @@ const state = {
   reviewed: Number(localStorage.getItem('englishCardsReviewed') || 3),
   correct: Number(localStorage.getItem('englishCardsCorrect') || 0),
   favorites: JSON.parse(localStorage.getItem('englishCardsFavorites') || '[]'),
+  customVocabulary: [],
   flipped: false,
   libraryTopic: 'all',
   userId: localStorage.getItem('englishCardsUserId') || createUserId(),
@@ -52,6 +53,27 @@ function flattenDataset(data) {
   return cards.filter((card) => card.english && card.vietnamese);
 }
 
+function customVocabularyCard(item) {
+  return {
+    english: item.word,
+    vietnamese: item.meaning,
+    notes: item.example ? 'Từ do bạn tự thêm vào thư viện.' : 'Từ do bạn tự thêm vào thư viện.',
+    topic: item.topic || 'other',
+    category: 'MY VOCABULARY',
+    pronunciation: item.pronunciation || '',
+    example: item.example || `${item.word} — ${item.meaning}`,
+    imageUrl: item.imageUrl,
+    isCustom: true,
+  };
+}
+
+function mergeCustomVocabulary() {
+  const staticCards = state.allCards.filter((card) => !card.isCustom);
+  state.allCards = [...staticCards, ...state.customVocabulary.map(customVocabularyCard)];
+  setDeck();
+  renderAll();
+}
+
 async function loadDataset() {
   const paths = ['./json/chunk-en-vi.json', '../json/chunk-en-vi.json'];
   for (const path of paths) {
@@ -60,7 +82,7 @@ async function loadDataset() {
       if (!response.ok) continue;
       const cards = flattenDataset(await response.json());
       if (cards.length) {
-        state.allCards = cards;
+        state.allCards = [...cards, ...state.customVocabulary.map(customVocabularyCard)];
         setDeck();
         renderAll();
         toast(`Đã tải ${cards.length.toLocaleString('vi-VN')} cụm từ vào thư viện.`);
@@ -69,6 +91,18 @@ async function loadDataset() {
     } catch (error) {
       // The fallback cards keep the app usable when opened directly from the file system.
     }
+  }
+}
+
+async function loadCustomVocabulary() {
+  try {
+    const response = await fetch('/api/vocabulary');
+    if (!response.ok) return;
+    const payload = await response.json();
+    state.customVocabulary = Array.isArray(payload.items) ? payload.items : [];
+    mergeCustomVocabulary();
+  } catch {
+    // The form becomes active after the Pages Function is deployed with D1/R2 bindings.
   }
 }
 
@@ -122,6 +156,7 @@ function renderAll() {
   updateProgress();
   renderLibrary();
   renderChart();
+  renderCustomVocabulary();
 }
 
 function flipCard() {
@@ -225,6 +260,71 @@ function renderChart() {
   $('#week-chart').innerHTML = values.map((value, index) => `<div class="chart-day"><div class="chart-bar ${index === values.length - 1 ? 'is-today' : ''}" style="height:${Math.max(value * 10, 7)}%" title="${value} thẻ"></div><small>${days[index]}</small></div>`).join('');
 }
 
+function renderCustomVocabulary() {
+  const grid = $('#custom-vocabulary-grid');
+  if (!grid) return;
+  $('#custom-vocabulary-total').textContent = `${state.customVocabulary.length} thẻ`;
+  if (!state.customVocabulary.length) {
+    grid.innerHTML = '<div class="empty-state">Bạn chưa thêm từ nào. Hãy bắt đầu với một từ thật hữu ích.</div>';
+    return;
+  }
+  grid.innerHTML = state.customVocabulary.map((item) => {
+    const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : 'Vừa thêm';
+    return `<article class="custom-vocab-card">
+      <img class="custom-vocab-image" src="${escapeHtml(item.imageUrl)}" alt="Ảnh minh họa cho ${escapeHtml(item.word)}" loading="lazy" />
+      <div class="custom-vocab-content"><span class="category-pill">${escapeHtml(item.topicName || 'KHÁC')}</span><h3>${escapeHtml(item.word)}</h3><p>${escapeHtml(item.meaning)}</p>${item.example ? `<small>${escapeHtml(item.example)}</small>` : ''}<small>Đã thêm ${escapeHtml(date)}</small></div>
+    </article>`;
+  }).join('');
+}
+
+function setFormStatus(message = '', type = '') {
+  const element = $('#form-status');
+  element.textContent = message;
+  element.className = type ? `is-${type}` : '';
+}
+
+function resetImagePreview() {
+  const input = $('#vocab-image');
+  const preview = $('#image-preview');
+  input.value = '';
+  preview.hidden = true;
+  $('#image-preview-img').removeAttribute('src');
+  $('#image-preview-name').textContent = '';
+}
+
+function previewImage(file) {
+  if (!file) return resetImagePreview();
+  const preview = $('#image-preview');
+  $('#image-preview-img').src = URL.createObjectURL(file);
+  $('#image-preview-name').textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+  preview.hidden = false;
+}
+
+async function submitVocabulary(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = $('#save-vocabulary');
+  const file = $('#vocab-image').files[0];
+  if (!file) return setFormStatus('Bạn cần chọn ảnh minh họa.', 'error');
+  if (file.size > 5 * 1024 * 1024) return setFormStatus('Ảnh phải nhỏ hơn 5MB.', 'error');
+
+  button.disabled = true;
+  setFormStatus('Đang upload ảnh và lưu từ vựng…');
+  try {
+    const response = await fetch('/api/vocabulary', { method: 'POST', body: new FormData(form) });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Không thể lưu từ vựng.');
+    form.reset();
+    resetImagePreview();
+    setFormStatus('Đã lưu từ mới thành công.', 'success');
+    await loadCustomVocabulary();
+  } catch (error) {
+    setFormStatus(error.message || 'Có lỗi xảy ra, hãy thử lại.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+}
+
 function showView(viewName) {
   $$('.view').forEach((view) => view.classList.toggle('is-visible', view.id === `view-${viewName}`));
   $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === viewName));
@@ -297,6 +397,9 @@ function initEvents() {
     document.body.classList.toggle('dark-mode');
     localStorage.setItem('englishCardsDarkMode', document.body.classList.contains('dark-mode') ? '1' : '0');
   });
+  $('#vocabulary-form').addEventListener('submit', submitVocabulary);
+  $('#vocab-image').addEventListener('change', (event) => previewImage(event.target.files[0]));
+  $('#clear-image').addEventListener('click', resetImagePreview);
   document.addEventListener('keydown', (event) => {
     if (event.target.matches('input')) return;
     if (event.key === ' ') { event.preventDefault(); flipCard(); }
@@ -310,7 +413,7 @@ function init() {
   initEvents();
   renderAll();
   loadRemoteProgress();
-  loadDataset();
+  loadDataset().then(loadCustomVocabulary);
 }
 
 init();
