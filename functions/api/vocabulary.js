@@ -14,10 +14,6 @@ function textField(form, name, maxLength = 500) {
   return String(form.get(name) || '').trim().slice(0, maxLength);
 }
 
-function isVocabularyWord(value) {
-  return /^[A-Za-z]+(?:[-'][A-Za-z]+)*$/.test(String(value || '').trim());
-}
-
 function topicName(topic) {
   return ({ greetings: 'Conversation', work: 'Work', travel: 'Travel', other: 'Other' })[topic] || 'Other';
 }
@@ -43,7 +39,6 @@ export async function onRequestGet({ env }) {
     FROM vocabulary_entries
     WHERE source = 'user'
       AND word <> ''
-      AND word NOT GLOB '*[^A-Za-z''-]*'
     ORDER BY created_at DESC
     LIMIT 100
   `).all();
@@ -68,7 +63,6 @@ export async function onRequestPost({ request, env }) {
   const file = form.get('image');
 
   if (!word || !definition) return json({ error: 'Word and English definition are required.' }, 400);
-  if (!isVocabularyWord(word)) return json({ error: 'Please enter one English word, not a phrase or sentence.' }, 400);
   if (!(file instanceof File) || !file.size) return json({ error: 'Please choose an image.' }, 400);
   if (!ALLOWED_IMAGE_TYPES.has(file.type)) return json({ error: 'Only JPG, PNG, or WEBP images are accepted.' }, 415);
   if (file.size > MAX_IMAGE_BYTES) return json({ error: 'The image must be smaller than 5MB.' }, 413);

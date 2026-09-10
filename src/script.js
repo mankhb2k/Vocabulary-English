@@ -38,13 +38,8 @@ function cardKey(card) { return card.english; }
 
 function cardImageUrl(card) { return card.imageUrl || PLACEHOLDER_IMAGE; }
 
-function isVocabularyWord(value) {
-  return /^[A-Za-z]+(?:[-'][A-Za-z]+)*$/.test(String(value || '').trim());
-}
-
 function normalizeCard(chunk, topic, category) {
   const english = chunk.english || chunk.word || '';
-  if (!isVocabularyWord(english)) return null;
   const topicLabel = toEnglishLabel(topic, 'Everyday English');
   const categoryLabel = toEnglishLabel(category, 'Everyday English');
   const topicName = `${topicLabel} ${categoryLabel}`.toLowerCase();
@@ -85,22 +80,9 @@ function mergeCustomVocabulary() {
 }
 
 async function loadDataset() {
-  const paths = ['./chunk-en-vi.json', './json/chunk-en-vi.json', '../json/chunk-en-vi.json'];
-  for (const path of paths) {
-    try {
-      const response = await fetch(path);
-      if (!response.ok) continue;
-      const cards = flattenDataset(await response.json());
-      if (cards.length) {
-        state.allCards = uniqueCards([...fallbackCards, ...cards, ...wordFamilyExamples, ...state.customVocabulary.map(customVocabularyCard)]);
-        renderAll();
-        toast(`Loaded ${cards.length.toLocaleString('en-US')} English expressions into your library.`);
-        return;
-      }
-    } catch {
-      // The fallback cards keep the app usable when the dataset is unavailable.
-    }
-  }
+  // The old chunk dataset contains sentences and phrases, so it is intentionally
+  // not loaded into the vocabulary-only Library. Entries come from vocabulary
+  // cards, word-family data, and the user's D1 records instead.
 }
 
 async function loadCustomVocabulary() {
@@ -351,7 +333,7 @@ function init() {
   renderApp(document.querySelector('#app'));
   initEvents();
   renderAll();
-  loadDataset().then(loadCustomVocabulary);
+  loadCustomVocabulary();
 }
 
 init();
