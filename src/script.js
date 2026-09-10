@@ -24,27 +24,21 @@ const wordFamilyExamples = [
 
 const state = {
   allCards: [...fallbackCards, ...wordFamilyExamples],
-  activeTopic: 'all',
-  deck: [...fallbackCards],
-  index: 0,
   reviewed: Number(localStorage.getItem('englishCardsReviewed') || 3),
-  correct: Number(localStorage.getItem('englishCardsCorrect') || 0),
   favorites: JSON.parse(localStorage.getItem('englishCardsFavorites') || '[]'),
   customVocabulary: [],
-  flipped: false,
   libraryTopic: 'all',
-  userId: localStorage.getItem('englishCardsUserId') || createUserId(),
-  relatedCards: new Map(),
+  searchQuery: '',
+  selectedCard: null,
 };
-
-function createUserId() {
-  const id = `user_${crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2)}`}`;
-  localStorage.setItem('englishCardsUserId', id);
-  return id;
-}
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const PLACEHOLDER_IMAGE = '/api/vocabulary-image?key=placeholder-1.png';
+
+function cardKey(card) { return card.english; }
+
+function cardImageUrl(card) { return card.imageUrl || PLACEHOLDER_IMAGE; }
 
 function normalizeCard(chunk, topic, category) {
   const english = chunk.english || chunk.word || '';
@@ -74,23 +68,12 @@ function flattenDataset(data) {
 }
 
 function customVocabularyCard(item) {
-  return {
-    english: item.word,
-    definition: item.definition || 'A word added to your personal vocabulary.',
-    notes: 'A custom card from your personal vocabulary.',
-    topic: item.topic || 'other',
-    category: 'MY VOCABULARY',
-    pronunciation: item.pronunciation || '',
-    example: item.example || `Use “${item.word}” in a natural conversation.`,
-    imageUrl: item.imageUrl,
-    isCustom: true,
-  };
+  return { english: item.word, definition: item.definition || 'A word added to your personal vocabulary.', notes: 'A custom card from your personal vocabulary.', topic: item.topic || 'other', category: 'MY VOCABULARY', pronunciation: item.pronunciation || '', example: item.example || `Use “${item.word}” in a natural conversation.`, imageUrl: item.imageUrl, isCustom: true };
 }
 
 function mergeCustomVocabulary() {
   const staticCards = state.allCards.filter((card) => !card.isCustom);
   state.allCards = [...staticCards, ...state.customVocabulary.map(customVocabularyCard)];
-  setDeck();
   renderAll();
 }
 
@@ -103,13 +86,12 @@ async function loadDataset() {
       const cards = flattenDataset(await response.json());
       if (cards.length) {
         state.allCards = [...cards, ...wordFamilyExamples, ...state.customVocabulary.map(customVocabularyCard)];
-        setDeck();
         renderAll();
         toast(`Loaded ${cards.length.toLocaleString('en-US')} English expressions into your library.`);
         return;
       }
-    } catch (error) {
-      // The fallback cards keep the app usable when opened directly from the file system.
+    } catch {
+      // The fallback cards keep the app usable when the dataset is unavailable.
     }
   }
 }
@@ -122,260 +104,130 @@ async function loadCustomVocabulary() {
     state.customVocabulary = Array.isArray(payload.items) ? payload.items : [];
     mergeCustomVocabulary();
   } catch {
-    // The form becomes active after the Pages Function is deployed with D1/R2 bindings.
+    // The form still works as a static UI when the API is unavailable.
   }
-}
-
-function setDeck() {
-  const source = state.activeTopic === 'all' ? state.allCards : state.allCards.filter((card) => card.topic === state.activeTopic);
-  state.deck = source.length ? source : [...fallbackCards];
-  state.index = Math.min(state.index, state.deck.length - 1);
-  state.flipped = false;
-}
-
-function currentCard() { return state.deck[state.index] || fallbackCards[0]; }
-function cardKey(card) { return card.english; }
-
-const PLACEHOLDER_IMAGE = '/api/vocabulary-image?key=placeholder-1.png';
-
-function cardImageUrl(card) {
-  return card.imageUrl || PLACEHOLDER_IMAGE;
 }
 
 function libraryCardMarkup(card) {
   const topicLabel = card.topic === 'work' ? 'Work' : card.topic === 'travel' ? 'Travel' : card.topic === 'greetings' ? 'Conversation' : 'Other';
-  return `<article class="library-card c-surface">
-    <img class="library-card-image c-media" src="${escapeHtml(cardImageUrl(card))}" alt="Illustration for ${escapeHtml(card.english)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" />
-    <div class="library-card-body"><div><div class="library-card-top"><span class="category-pill c-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div>
-    <h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div>
-    <div class="library-card-footer"><span>${topicLabel}</span><button type="button" data-study-index="${state.allCards.indexOf(card)}">Study this card →</button></div></div>
-  </article>`;
+  const cardIndex = state.allCards.indexOf(card);
+  return `<article class="library-card c-surface" data-card-index="${cardIndex}" tabindex="0" role="button" aria-label="View details for ${escapeHtml(card.english)}"><img class="library-card-image c-media" src="${escapeHtml(cardImageUrl(card))}" alt="Illustration for ${escapeHtml(card.english)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" /><div class="library-card-body"><div><div class="library-card-top"><span class="category-pill c-pill">${escapeHtml(card.category)}</span><span aria-hidden="true">${state.favorites.includes(cardKey(card)) ? '★' : '☆'}</span></div><h3>${escapeHtml(card.english)}</h3><p>${escapeHtml(card.definition)}</p></div><div class="library-card-footer"><span>${topicLabel}</span><span class="library-card-link">View details →</span></div></div></article>`;
 }
 
-function renderWordFamily(card, relatedCards) {
-  const section = $('#word-family');
-  const list = $('#word-family-list');
-  const root = $('#word-family-root');
-  if (!section || !list || !root) return;
+function cardExamples(card) {
+  const examples = Array.isArray(card.examples) ? card.examples : [card.example];
+  return examples.filter(Boolean);
+}
 
-  state.relatedCards.clear();
+function detailCardFromRelation(item) {
+  return { english: item.word, definition: item.definition || 'A related English word.', notes: 'A related word from your vocabulary.', topic: item.topic || 'other', category: 'WORD FAMILY', pronunciation: item.pronunciation || '', examples: item.example ? [item.example] : [], imageUrl: item.imageUrl, relationType: item.relationType, affix: item.affix, familyId: item.sourceWord };
+}
+
+function renderDetailFamily(card, relatedCards) {
+  const section = $('#detail-family-section');
+  const list = $('#detail-family-list');
+  const root = $('#detail-family-root');
+  if (!section || !list || !root) return;
   const uniqueCards = [...new Map(relatedCards.filter((item) => item.english !== card.english).map((item) => [item.english, item])).values()];
   section.hidden = !uniqueCards.length;
   root.textContent = card.familyId ? `Root: ${card.familyId}` : '';
-  list.innerHTML = uniqueCards.map((item) => {
-    state.relatedCards.set(item.english, item);
-    return `<button class="related-word" type="button" data-related-word="${escapeHtml(item.english)}"><strong>${escapeHtml(item.english)}</strong><small>${escapeHtml(item.affix ? `${item.relationType} ${item.affix}` : item.partOfSpeech || 'related word')}</small></button>`;
-  }).join('');
-  $$('.related-word', list).forEach((button) => button.addEventListener('click', (event) => {
-    event.stopPropagation();
-    openRelatedCard(button.dataset.relatedWord);
-  }));
+  list.innerHTML = uniqueCards.map((item) => `<button class="detail-family-word c-button" type="button"><strong>${escapeHtml(item.english)}</strong><small>${escapeHtml(item.affix ? `${item.relationType} ${item.affix}` : 'related word')}</small></button>`).join('');
+  $$('.detail-family-word', list).forEach((button, index) => button.addEventListener('click', () => openCardDetails(uniqueCards[index])));
 }
 
-async function loadWordFamily(card) {
+async function loadDetailFamily(card) {
   const localRelated = wordFamilyExamples.filter((item) => item.familyId && item.familyId === card.familyId);
-  renderWordFamily(card, localRelated);
+  renderDetailFamily(card, localRelated);
   try {
     const response = await fetch(`/api/word-relations?word=${encodeURIComponent(card.english)}`);
-    if (!response.ok) return;
+    if (!response.ok || state.selectedCard?.english !== card.english) return;
     const payload = await response.json();
-    if (currentCard().english !== card.english) return;
-    const apiRelated = (payload.items || []).map((item) => ({
-      english: item.word,
-      definition: item.definition,
-      notes: 'A related word from your vocabulary.',
-      topic: item.topic || 'other',
-      category: 'WORD FAMILY',
-      pronunciation: item.pronunciation || '',
-      example: item.example || `Use “${item.word}” in a natural sentence.`,
-      imageUrl: item.imageUrl,
-      entryId: item.id,
-      relationType: item.relationType,
-      affix: item.affix,
-    }));
-    renderWordFamily(card, [...localRelated, ...apiRelated]);
+    renderDetailFamily(card, [...localRelated, ...(payload.items || []).map(detailCardFromRelation)]);
   } catch {
-    // The local examples keep the word family available on static hosting.
+    // Local examples remain visible when the API is unavailable.
   }
 }
 
-function openRelatedCard(word) {
-  const relatedCard = state.relatedCards.get(word);
-  let targetIndex = state.allCards.findIndex((item) => item.english === word);
-  if (targetIndex < 0 && relatedCard) {
-    state.allCards.push(relatedCard);
-    targetIndex = state.allCards.length - 1;
-  }
-  if (targetIndex < 0) return;
-  state.activeTopic = 'all';
-  state.deck = [...state.allCards];
-  state.index = targetIndex;
-  state.flipped = false;
-  showView('study');
-  renderAll();
+function renderVocabularyDetail(card) {
+  const detailImage = $('#detail-image');
+  detailImage.onerror = () => { detailImage.onerror = null; detailImage.src = '/placeholder-1.png'; };
+  detailImage.src = cardImageUrl(card);
+  detailImage.alt = `Illustration for ${card.english}`;
+  $('#detail-category').textContent = card.category || 'WORD';
+  $('#detail-word').textContent = card.english;
+  $('#detail-pronunciation').textContent = card.pronunciation || 'Press the speaker to listen';
+  $('#detail-definition').textContent = card.definition || 'An English word used in everyday communication.';
+  $('#detail-examples').innerHTML = cardExamples(card).map((example) => `<li>${escapeHtml(example)}</li>`).join('') || '<li>Practise this word in a natural sentence.</li>';
+  $('#detail-notes').textContent = card.notes || '';
+  $('#detail-notes-section').hidden = !card.notes;
+  const saved = state.favorites.includes(cardKey(card));
+  $('#detail-favorite').textContent = saved ? '★' : '☆';
+  $('#detail-favorite').classList.toggle('is-favorite', saved);
+  $('#detail-favorite').setAttribute('aria-pressed', String(saved));
+  loadDetailFamily(card);
 }
 
-function renderCard() {
-  const card = currentCard();
-  $('#card-english').textContent = card.english;
-  $('#card-definition').textContent = card.definition;
-  $('#card-category').textContent = card.category;
-  $('#pronunciation-text').textContent = card.pronunciation || 'Press the speaker to listen';
-  $('#card-note').textContent = card.notes;
-  $('#card-example').textContent = card.example;
-  $('#card-count').textContent = `${String(state.index + 1).padStart(2, '0')} / ${String(state.deck.length).padStart(2, '0')}`;
-  $('#flashcard').classList.toggle('is-flipped', state.flipped);
-  $('#flashcard').setAttribute('aria-label', state.flipped ? 'Back of flashcard, tap to flip back' : 'Front of flashcard, tap to flip');
-  $('#flip-label-text').textContent = state.flipped ? 'Back' : 'Front';
-  $('#favorite-button').classList.toggle('is-favorite', state.favorites.includes(cardKey(card)));
-  $('#favorite-button').setAttribute('aria-pressed', String(state.favorites.includes(cardKey(card))));
-  updatePronunciation(card.english);
-  loadWordFamily(card);
+function openCardDetails(card) {
+  state.selectedCard = typeof card === 'string' ? state.allCards.find((item) => item.english === card) : card;
+  if (!state.selectedCard) return;
+  $$('.view').forEach((view) => view.classList.toggle('is-visible', view.id === 'view-library'));
+  $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === 'library'));
+  $('#library-index').hidden = true;
+  $('#vocabulary-detail').hidden = false;
+  renderVocabularyDetail(state.selectedCard);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function updateProgress() {
-  const today = Math.min(state.reviewed, 10);
-  const percent = Math.min(today * 10, 100);
-  $('#completed-count').textContent = today;
-  $('#daily-progress').textContent = `${percent}%`;
-  $('#progress-ring').style.setProperty('--progress', `${percent}%`);
-  $('#session-bar-fill').style.width = `${percent}%`;
-  $('#session-reviewed').textContent = today;
-  $('#session-left').textContent = Math.max(10 - today, 0);
-  $('#session-accuracy').textContent = state.reviewed ? `${Math.round((state.correct / state.reviewed) * 100)}%` : '—';
-  $('#sidebar-streak').textContent = '4 days';
-  $('#streak-number').textContent = '4';
-  $('#favorite-count').textContent = `${state.favorites.length} saved cards`;
-  $('#stats-reviewed').textContent = state.reviewed;
-  $('#stats-favorites').textContent = state.favorites.length;
-  $('#stats-streak').textContent = '4 days';
-}
-
-function renderAll() {
-  renderCard();
-  updateProgress();
-  renderLibrary();
-  renderChart();
-  renderCustomVocabulary();
-}
-
-function flipCard() {
-  state.flipped = !state.flipped;
-  renderCard();
-}
-
-function nextCard(isCorrect) {
-  state.reviewed += 1;
-  if (isCorrect) state.correct += 1;
-  localStorage.setItem('englishCardsReviewed', state.reviewed);
-  localStorage.setItem('englishCardsCorrect', state.correct);
-  syncProgress();
-  state.index = (state.index + 1) % state.deck.length;
-  state.flipped = false;
-  renderAll();
-  toast(isCorrect ? 'Nice work — your next card is ready.' : 'No worries — we will review this card again later.');
-}
-
-function toggleFavorite() {
-  const key = cardKey(currentCard());
-  const found = state.favorites.indexOf(key);
-  if (found >= 0) state.favorites.splice(found, 1);
-  else state.favorites.push(key);
-  localStorage.setItem('englishCardsFavorites', JSON.stringify(state.favorites));
-  syncProgress();
-  renderAll();
-  toast(found >= 0 ? 'Removed from favorites.' : 'Saved to favorites.');
-}
-
-async function loadRemoteProgress() {
-  try {
-    const response = await fetch(`/api/progress?userId=${encodeURIComponent(state.userId)}`);
-    if (!response.ok) return;
-    const remote = await response.json();
-    state.reviewed = Math.max(state.reviewed, Number(remote.reviewed) || 0);
-    state.correct = Math.max(state.correct, Number(remote.correct) || 0);
-    if (Array.isArray(remote.favorites)) state.favorites = [...new Set([...state.favorites, ...remote.favorites])];
-    localStorage.setItem('englishCardsReviewed', state.reviewed);
-    localStorage.setItem('englishCardsCorrect', state.correct);
-    localStorage.setItem('englishCardsFavorites', JSON.stringify(state.favorites));
-    updateProgress();
-  } catch {
-    // GitHub Pages/local static preview has no /api route, so localStorage remains the fallback.
-  }
-}
-
-async function syncProgress() {
-  try {
-    await fetch('/api/progress', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ userId: state.userId, reviewed: state.reviewed, correct: state.correct, favorites: state.favorites }),
-    });
-  } catch {
-    // Cloud sync is optional; the local copy is already saved before this request.
-  }
-}
-
-function speakCurrent() {
-  if (!('speechSynthesis' in window)) return toast('Your browser does not support pronunciation playback.');
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(currentCard().english);
-  utterance.lang = 'en-US';
-  utterance.rate = .86;
-  window.speechSynthesis.speak(utterance);
-}
-
-function selectTopic(topic) {
-  state.activeTopic = topic;
-  state.index = 0;
-  $$('.topic-tab').forEach((button) => button.classList.toggle('is-active', button.dataset.topic === topic));
-  $('#deck-title').textContent = topic === 'all' ? 'Daily conversations' : topic === 'work' ? 'Work & meetings' : topic === 'travel' ? 'Travel essentials' : 'Everyday conversations';
-  setDeck();
-  renderAll();
+function closeVocabularyDetail() {
+  state.selectedCard = null;
+  $('#vocabulary-detail').hidden = true;
+  $('#library-index').hidden = false;
 }
 
 function renderLibrary() {
-  const filtered = state.libraryTopic === 'all' ? state.allCards : state.allCards.filter((card) => card.topic === state.libraryTopic);
-  $('#library-total').textContent = `${filtered.length.toLocaleString('en-US')} cards`;
+  let filtered = state.libraryTopic === 'all' ? state.allCards : state.allCards.filter((card) => card.topic === state.libraryTopic);
+  if (state.searchQuery) filtered = filtered.filter((card) => `${card.english} ${card.definition}`.toLowerCase().includes(state.searchQuery));
+  $('#library-total').textContent = `${filtered.length.toLocaleString('en-US')} ${state.searchQuery ? 'results' : 'cards'}`;
   const cards = filtered.slice(0, 60);
   $('#library-grid').innerHTML = cards.length ? cards.map(libraryCardMarkup).join('') : '<div class="empty-state">No matching cards found.</div>';
-  $$('.library-card button').forEach((button) => button.addEventListener('click', () => {
-    const target = Number(button.dataset.studyIndex);
-    state.activeTopic = 'all';
-    state.deck = [...state.allCards];
-    state.index = Math.max(0, target);
-    showView('study');
-    renderAll();
-  }));
+  $$('.library-card').forEach((cardElement) => {
+    const open = () => openCardDetails(state.allCards[Number(cardElement.dataset.cardIndex)]);
+    cardElement.addEventListener('click', open);
+    cardElement.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
+    });
+  });
 }
 
 function renderChart() {
+  const chart = $('#week-chart');
+  if (!chart) return;
   const values = [4, 6, 3, 8, 5, 3, Math.min(state.reviewed, 10)];
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  $('#week-chart').innerHTML = values.map((value, index) => `<div class="chart-day"><div class="chart-bar ${index === values.length - 1 ? 'is-today' : ''}" style="height:${Math.max(value * 10, 7)}%" title="${value} cards"></div><small>${days[index]}</small></div>`).join('');
+  chart.innerHTML = values.map((value, index) => `<div class="chart-day"><div class="chart-bar ${index === values.length - 1 ? 'is-today' : ''}" style="height:${Math.max(value * 10, 7)}%" title="${value} cards"></div><small>${days[index]}</small></div>`).join('');
 }
 
 function renderCustomVocabulary() {
   const grid = $('#custom-vocabulary-grid');
   if (!grid) return;
   $('#custom-vocabulary-total').textContent = `${state.customVocabulary.length} cards`;
-  if (!state.customVocabulary.length) {
-    grid.innerHTML = '<div class="empty-state">You have not added any words yet. Start with one useful word.</div>';
-    return;
-  }
+  if (!state.customVocabulary.length) { grid.innerHTML = '<div class="empty-state">You have not added any words yet. Start with one useful word.</div>'; return; }
   grid.innerHTML = state.customVocabulary.map((item) => {
     const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US') : 'Just added';
-    return `<article class="custom-vocab-card c-surface">
-      <img class="custom-vocab-image c-media" src="${escapeHtml(item.imageUrl || PLACEHOLDER_IMAGE)}" alt="Illustration for ${escapeHtml(item.word)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" />
-      <div class="custom-vocab-content"><span class="category-pill c-pill">${escapeHtml(item.topicName || 'OTHER')}</span><h3>${escapeHtml(item.word)}</h3><p>${escapeHtml(item.definition || '')}</p>${item.example ? `<small>${escapeHtml(item.example)}</small>` : ''}<small>Added ${escapeHtml(date)}</small></div>
-    </article>`;
+    return `<article class="custom-vocab-card c-surface"><img class="custom-vocab-image c-media" src="${escapeHtml(item.imageUrl || PLACEHOLDER_IMAGE)}" alt="Illustration for ${escapeHtml(item.word)}" loading="lazy" onerror="this.onerror=null;this.src='/placeholder-1.png'" /><div class="custom-vocab-content"><span class="category-pill c-pill">${escapeHtml(item.topicName || 'OTHER')}</span><h3>${escapeHtml(item.word)}</h3><p>${escapeHtml(item.definition || '')}</p>${item.example ? `<small>${escapeHtml(item.example)}</small>` : ''}<small>Added ${escapeHtml(date)}</small></div></article>`;
   }).join('');
+}
+
+function renderAll() {
+  renderLibrary();
+  renderChart();
+  renderCustomVocabulary();
 }
 
 function setFormStatus(message = '', type = '') {
   const element = $('#form-status');
   element.textContent = message;
-  element.className = type ? `is-${type}` : '';
+  element.className = `form-status${type ? ` is-${type}` : ''}`;
 }
 
 function resetImagePreview() {
@@ -389,10 +241,9 @@ function resetImagePreview() {
 
 function previewImage(file) {
   if (!file) return resetImagePreview();
-  const preview = $('#image-preview');
   $('#image-preview-img').src = URL.createObjectURL(file);
   $('#image-preview-name').textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)}MB`;
-  preview.hidden = false;
+  $('#image-preview').hidden = false;
 }
 
 async function submitVocabulary(event) {
@@ -402,7 +253,6 @@ async function submitVocabulary(event) {
   const file = $('#vocab-image').files[0];
   if (!file) return setFormStatus('Please choose an image.', 'error');
   if (file.size > 5 * 1024 * 1024) return setFormStatus('The image must be smaller than 5MB.', 'error');
-
   button.disabled = true;
   setFormStatus('Uploading the image and saving the vocabulary…');
   try {
@@ -421,6 +271,7 @@ async function submitVocabulary(event) {
 }
 
 function showView(viewName) {
+  if (state.selectedCard) closeVocabularyDetail();
   $$('.view').forEach((view) => view.classList.toggle('is-visible', view.id === `view-${viewName}`));
   $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === viewName));
   if (viewName === 'library') renderLibrary();
@@ -432,6 +283,15 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 }
 
+function speakWord(word) {
+  if (!('speechSynthesis' in window)) return toast('Your browser does not support pronunciation playback.');
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = 'en-US';
+  utterance.rate = .86;
+  window.speechSynthesis.speak(utterance);
+}
+
 let toastTimer;
 function toast(message) {
   const element = $('#toast');
@@ -441,47 +301,34 @@ function toast(message) {
   toastTimer = setTimeout(() => element.classList.remove('is-visible'), 2600);
 }
 
-function shuffleDeck() {
-  for (let index = state.deck.length - 1; index > 0; index -= 1) {
-    const swap = Math.floor(Math.random() * (index + 1));
-    [state.deck[index], state.deck[swap]] = [state.deck[swap], state.deck[index]];
-  }
-  state.index = 0;
-  state.flipped = false;
-  renderCard();
-  toast('Deck shuffled.');
+function toggleCardFavorite(card) {
+  const key = cardKey(card);
+  const found = state.favorites.indexOf(key);
+  if (found >= 0) state.favorites.splice(found, 1);
+  else state.favorites.push(key);
+  localStorage.setItem('englishCardsFavorites', JSON.stringify(state.favorites));
+  renderVocabularyDetail(card);
+  renderLibrary();
 }
 
 function initEvents() {
   $$('.nav-item').forEach((button) => button.addEventListener('click', () => showView(button.dataset.view)));
-  $$('.topic-tab').forEach((button) => button.addEventListener('click', () => selectTopic(button.dataset.topic)));
   $$('.filter-chip').forEach((button) => button.addEventListener('click', () => {
     state.libraryTopic = button.dataset.libraryTopic;
+    state.searchQuery = '';
+    $('#search-input').value = '';
     $$('.filter-chip').forEach((chip) => chip.classList.toggle('is-active', chip === button));
     renderLibrary();
   }));
-  $('#flashcard').addEventListener('click', (event) => { if (!event.target.closest('button')) flipCard(); });
-  $('#flashcard').addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(); } });
-  $('#reveal-hint').addEventListener('click', flipCard);
-  $('#speak-button').addEventListener('click', (event) => { event.stopPropagation(); speakCurrent(); });
-  $('#favorite-button').addEventListener('click', (event) => { event.stopPropagation(); toggleFavorite(); });
-  $('#again-button').addEventListener('click', () => nextCard(false));
-  $('#good-button').addEventListener('click', () => nextCard(true));
-  $('#shuffle-button').addEventListener('click', shuffleDeck);
-  $('#favorites-button').addEventListener('click', () => {
-    if (!state.favorites.length) return toast('Tap ☆ to save cards you like.');
-    state.libraryTopic = 'all';
-    showView('library');
-    $('#library-grid').innerHTML = state.allCards.filter((card) => state.favorites.includes(cardKey(card))).map(libraryCardMarkup).join('');
-  });
+  $('#detail-back').addEventListener('click', () => { closeVocabularyDetail(); showView('library'); });
+  $('#detail-speak').addEventListener('click', () => { if (state.selectedCard) speakWord(state.selectedCard.english); });
+  $('#detail-favorite').addEventListener('click', () => { if (state.selectedCard) toggleCardFavorite(state.selectedCard); });
   $('#search-input').addEventListener('input', (event) => {
-    const query = event.target.value.trim().toLowerCase();
-    if (!query) return renderLibrary();
-    const matches = state.allCards.filter((card) => `${card.english} ${card.definition}`.toLowerCase().includes(query));
+    state.searchQuery = event.target.value.trim().toLowerCase();
     state.libraryTopic = 'all';
     showView('library');
-    $('#library-total').textContent = `${matches.length.toLocaleString('en-US')} results`;
-    $('#library-grid').innerHTML = matches.slice(0, 60).map(libraryCardMarkup).join('') || '<div class="empty-state">No matching expressions found.</div>';
+    $$('.filter-chip').forEach((chip) => chip.classList.toggle('is-active', chip.dataset.libraryTopic === 'all'));
+    renderLibrary();
   });
   $('#theme-toggle').addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
@@ -490,12 +337,6 @@ function initEvents() {
   $('#vocabulary-form').addEventListener('submit', submitVocabulary);
   $('#vocab-image').addEventListener('change', (event) => previewImage(event.target.files[0]));
   $('#clear-image').addEventListener('click', resetImagePreview);
-  document.addEventListener('keydown', (event) => {
-    if (event.target.matches('input')) return;
-    if (event.key === ' ') { event.preventDefault(); flipCard(); }
-    if (event.key === '1') nextCard(false);
-    if (event.key === '3') nextCard(true);
-  });
 }
 
 function init() {
@@ -503,7 +344,6 @@ function init() {
   renderApp(document.querySelector('#app'));
   initEvents();
   renderAll();
-  loadRemoteProgress();
   loadDataset().then(loadCustomVocabulary);
 }
 
