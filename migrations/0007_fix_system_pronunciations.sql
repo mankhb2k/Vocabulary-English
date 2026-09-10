@@ -1,0 +1,14 @@
+UPDATE vocabulary_entries SET pronunciation = '/' || char(104,101,108,112) || '/' WHERE id = 'demo-help';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(712) || 'help' || char(601) || '/' WHERE id = 'demo-helper';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(712) || 'helpf' || char(601) || 'l/' WHERE id = 'demo-helpful';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(712) || 'helpf' || char(601) || 'li/' WHERE id = 'demo-helpfully';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(712) || 'helpl' || char(601) || 's/' WHERE id = 'demo-helpless';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(652) || 'n' || char(712) || 'helpf' || char(601) || 'l/' WHERE id = 'demo-unhelpful';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(601) || char(712) || 'd' || char(230) || 'pt/' WHERE id = 'demo-adapt';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(712) || 'k' || char(594) || 'nf' || char(618) || 'd' || char(601) || 'nt/' WHERE id = 'demo-confident';
+UPDATE vocabulary_entries SET pronunciation = '/k' || char(601) || 'n' || char(712) || 's' || char(618) || 'st' || char(601) || 'nt/' WHERE id = 'demo-consistent';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(712) || 'kj' || char(650) || char(601) || 'ri' || char(601) || 's/' WHERE id = 'demo-curious';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(618) || 'm' || char(712) || 'pru' || char(720) || 'v/' WHERE id = 'demo-improve';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(712) || 'pe' || char(618) || char(643) || char(601) || 'nt/' WHERE id = 'demo-patient';
+UPDATE vocabulary_entries SET pronunciation = '/r' || char(618) || char(712) || 'z' || char(618) || 'li' || char(601) || 'nt/' WHERE id = 'demo-resilient';
+UPDATE vocabulary_entries SET pronunciation = '/' || char(652) || 'n' || char(712) || 'wa' || char(618) || 'nd/' WHERE id = 'demo-unwind';
