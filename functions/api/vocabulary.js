@@ -55,7 +55,7 @@ export async function onRequestPost({ request, env }) {
     return json({ error: 'The submitted data is invalid.' }, 400);
   }
 
-  const word = textField(form, 'word', 120);
+  const word = textField(form, 'word', 120).replace(/\s+/g, ' ');
   const definition = textField(form, 'definition', 240);
   const pronunciation = textField(form, 'pronunciation', 120);
   const example = textField(form, 'example', 500);
@@ -64,6 +64,13 @@ export async function onRequestPost({ request, env }) {
   const file = form.get('image');
 
   if (!word || !definition) return json({ error: 'Word and English definition are required.' }, 400);
+  const duplicate = await env.DB.prepare(`
+    SELECT word
+    FROM vocabulary_entries
+    WHERE lower(trim(word)) = lower(trim(?1))
+    LIMIT 1
+  `).bind(word).first();
+  if (duplicate) return json({ error: `"${duplicate.word}" is already in your vocabulary.` }, 409);
   if (familyRoot && familyRoot.toLowerCase() === word.toLowerCase()) return json({ error: 'The family root must be a different vocabulary item.' }, 400);
   if (!(file instanceof File) || !file.size) return json({ error: 'Please choose an image.' }, 400);
   if (!ALLOWED_IMAGE_TYPES.has(file.type)) return json({ error: 'Only JPG, PNG, or WEBP images are accepted.' }, 415);
