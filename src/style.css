@@ -221,12 +221,14 @@ input:focus-visible,
 }
 .search-input-wrap input {
   width: 100%;
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 10px 14px 10px 40px;
   color: var(--ink);
   background: var(--white);
-  font-size: var(--font-size-body);
+  /* iOS Safari avoids page zoom when focused inputs are at least 16px. */
+  font-size: var(--font-size-xl);
   outline: 0;
 }
 .search-input-wrap input:focus {
@@ -2219,7 +2221,7 @@ kbd {
   }
   .topbar-search .search-input-wrap input {
     padding-left: 35px;
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-xl);
   }
   .profile-name,
   .profile-chip > svg {
