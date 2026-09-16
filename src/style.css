@@ -1599,8 +1599,7 @@ kbd {
 }
 .vocab-form-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  gap: 22px;
+  grid-template-columns: minmax(0, 1fr);
   margin-top: 38px;
 }
 .vocab-form {
@@ -2079,88 +2078,6 @@ kbd {
   margin: 4px 0 0;
   text-align: center;
 }
-.add-tip {
-  align-self: start;
-  padding: 22px 20px;
-  border-radius: var(--radius-xl);
-  color: var(--color-sidebar-text);
-  background: var(--navy-dark);
-}
-.tip-icon {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  margin-bottom: 20px;
-  border-radius: var(--radius-lg);
-  color: var(--color-accent-strong);
-  background: var(--coral);
-}
-.add-tip .section-label {
-  color: #9dbbff;
-  font-size: var(--font-size-xs);
-}
-.add-tip h3 {
-  margin: 10px 0 12px;
-  color: var(--white);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-xl);
-  line-height: 1.35;
-  letter-spacing: -0.4px;
-}
-.add-tip p {
-  margin: 0;
-  color: var(--color-sidebar-muted);
-  font-size: var(--font-size-meta);
-  line-height: 1.55;
-}
-.recent-vocabulary {
-  margin-top: 42px;
-}
-.recent-vocabulary .section-heading h2 {
-  margin-top: 7px;
-}
-.custom-vocabulary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 20px;
-}
-.custom-vocab-card {
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-xl);
-  background: var(--white);
-}
-.custom-vocab-image {
-  display: block;
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: contain;
-  background: var(--paper-deep);
-}
-.custom-vocab-content {
-  padding: 14px;
-}
-.custom-vocab-content h3 {
-  margin: 10px 0 5px;
-  color: var(--navy);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-xl);
-  letter-spacing: -0.4px;
-}
-.custom-vocab-content p {
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--font-size-meta);
-}
-.custom-vocab-content small {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: var(--font-size-xxs);
-  line-height: 1.4;
-}
 .toast {
   position: fixed;
   right: 28px;
@@ -2193,9 +2110,6 @@ kbd {
     gap: 25px;
   }
   .library-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .custom-vocabulary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -2433,7 +2347,6 @@ kbd {
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  .custom-vocabulary-grid,
   .form-grid {
     grid-template-columns: 1fr;
   }

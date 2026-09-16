@@ -100,25 +100,6 @@ export function AddView() {
           </div>
         </form>
 
-        <aside class="add-tip">
-          <span class="tip-icon">&#10022;</span>
-          <span class="section-label">MEMORY TIP</span>
-          <h3>The closer an image is to real experience, the easier the word is to remember.</h3>
-          <p>Choose an image with one clear detail and write example sentences connected to your life.</p>
-        </aside>
-      </section>
-
-      <section class="recent-vocabulary">
-        <div class="section-heading">
-          <div>
-            <span class="section-label">RECENTLY ADDED</span>
-            <h2>Your vocabulary</h2>
-          </div>
-          <span class="library-total" id="custom-vocabulary-total">0 cards</span>
-        </div>
-        <div class="custom-vocabulary-grid" id="custom-vocabulary-grid">
-          <div class="empty-state">You have not added any vocabulary yet. Start with one useful item.</div>
-        </div>
       </section>
     </div>
   `;

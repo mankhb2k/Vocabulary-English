@@ -24,7 +24,6 @@ const state = {
   allCards: [],
   reviewed: Number(localStorage.getItem('englishCardsReviewed') || 3),
   favorites: JSON.parse(localStorage.getItem('englishCardsFavorites') || '[]'),
-  customVocabulary: [],
   vocabularyCards: [],
   libraryTopic: 'all',
   librarySort: 'az',
@@ -118,7 +117,6 @@ async function loadCustomVocabulary() {
     if (!response.ok) return;
     const payload = await response.json();
     state.vocabularyCards = Array.isArray(payload.items) ? payload.items : [];
-    state.customVocabulary = state.vocabularyCards.filter((item) => item.source !== 'system');
     mergeCustomVocabulary();
   } catch {
     // The form still works as a static UI when the API is unavailable.
@@ -419,7 +417,6 @@ function startEditingVocabulary(card) {
 function renderAll() {
   renderLibrary();
   renderChart();
-  renderCustomVocabulary();
   renderFamilyRootOptions();
 }
 
