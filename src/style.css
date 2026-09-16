@@ -2381,8 +2381,14 @@ kbd {
     max-width: 88%;
   }
   .simple-chat-send {
-    width: var(--mobile-touch-target);
-    height: var(--mobile-touch-target);
+    width: 38px;
+    height: 38px;
+  }
+  .simple-chat-composer .ai-chat-form {
+    padding: 4px 7px 4px 14px;
+  }
+  .simple-chat-composer .ai-chat-form input {
+    padding: 6px 0;
   }
   .ai-spark {
     width: 42px;
