@@ -7,6 +7,13 @@ export function LibraryView() {
           <h1>Find your next word</h1>
           <p>Choose a topic or search for an English word to practise today.</p>
         </section>
+        <div class="library-search">
+          <label class="sr-only" for="search-input">Search your library</label>
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            <input class="c-control" id="search-input" type="search" placeholder="Search words..." autocomplete="off" />
+          </div>
+        </div>
         <div class="library-toolbar">
           <div class="library-filters" id="library-filters">
             <button class="filter-chip c-button is-active" data-library-topic="all" type="button">All</button>

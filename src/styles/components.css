@@ -70,14 +70,12 @@
 
 .component-icon,
 .nav-item svg,
-.icon-button svg,
 .settings-link svg,
 .text-button svg,
 .star-button svg,
 .pronunciation button svg,
 .round-arrow svg,
-.search-input-wrap svg,
-.profile-chip svg {
+.search-input-wrap svg {
   flex: 0 0 auto;
 }
 
