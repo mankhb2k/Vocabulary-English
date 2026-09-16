@@ -5,7 +5,7 @@
    new cards, buttons, forms, and panels. */
 .c-surface {
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--radius-2xl);
   background: var(--white);
 }
 
@@ -30,7 +30,7 @@
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
 }
 
 .c-media {
@@ -43,7 +43,7 @@
 .c-status {
   min-height: 16px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--font-size-sm);
 }
 
 .c-control {
