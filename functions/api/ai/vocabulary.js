@@ -35,7 +35,7 @@ function normalizeDefinition(value) {
 function parseJsonContent(content) {
   if (content && typeof content === 'object') return content;
   const raw = Array.isArray(content)
-    ? content.map((part) => part?.text || '').join('')
+    ? content.map((part) => typeof part === 'string' ? part : part?.text ?? part?.content ?? '').join('')
     : String(content || '');
   const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
   const start = cleaned.indexOf('{');
@@ -54,7 +54,10 @@ function topic(value) {
 
 function providerRequestBody(model, messages, maxTokens, temperature) {
   const body = { model, messages };
-  if (/^gpt-5(?:[.-]|$)/i.test(model)) body.max_completion_tokens = maxTokens;
+  if (/^gpt-5(?:[.-]|$)/i.test(model)) {
+    body.max_completion_tokens = maxTokens;
+    body.reasoning_effort = 'minimal';
+  }
   else {
     body.temperature = temperature;
     body.max_tokens = maxTokens;
@@ -108,7 +111,7 @@ export async function onRequestPost({ request, env }) {
     ...providerRequestBody(env.AI_MODEL, [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: `Create a vocabulary card for: ${prompt}\n\nExisting vocabulary items that may be used as familyRoot:\n${existingWords.join(', ') || '(none)'}` },
-    ], 600, 0.2),
+    ], 1600, 0.2),
   };
 
   let upstream;

@@ -46,7 +46,15 @@ function compareContext(messages) {
 }
 
 function responseText(content) {
-  if (Array.isArray(content)) return content.map((part) => part?.text || '').join('').trim();
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === 'string') return part;
+        return part?.text ?? part?.content ?? '';
+      })
+      .join('')
+      .trim();
+  }
   return String(content || '').trim();
 }
 
@@ -65,7 +73,10 @@ function titleFromMessage(content) {
 
 function providerRequestBody(model, messages, maxTokens, temperature) {
   const body = { model, messages };
-  if (/^gpt-5(?:[.-]|$)/i.test(model)) body.max_completion_tokens = maxTokens;
+  if (/^gpt-5(?:[.-]|$)/i.test(model)) {
+    body.max_completion_tokens = maxTokens;
+    body.reasoning_effort = 'minimal';
+  }
   else {
     body.temperature = temperature;
     body.max_tokens = maxTokens;
@@ -152,7 +163,7 @@ export async function onRequestPost({ request, env }) {
     upstream = await fetch(env.AI_API_URL, {
       method: 'POST',
       headers: { authorization: 'Bearer ' + env.AI_API_KEY, 'content-type': 'application/json' },
-      body: JSON.stringify(providerRequestBody(env.AI_MODEL, [{ role: 'system', content: SYSTEM_PROMPT }, ...context.messages], 600, 0.4)),
+      body: JSON.stringify(providerRequestBody(env.AI_MODEL, [{ role: 'system', content: SYSTEM_PROMPT }, ...context.messages], 1200, 0.4)),
     });
   } catch {
     return json({ error: 'The AI provider could not be reached.' }, 502);
@@ -165,8 +176,14 @@ export async function onRequestPost({ request, env }) {
   } catch {
     return json({ error: 'The AI provider returned an invalid response.' }, 502);
   }
-  const answer = responseText(payload?.choices?.[0]?.message?.content ?? payload?.output_text ?? payload?.content);
-  if (!answer) return json({ error: 'The AI returned an empty answer.' }, 502);
+  const choice = payload?.choices?.[0];
+  const answer = responseText(choice?.message?.content ?? payload?.output_text ?? payload?.content);
+  if (!answer) {
+    const error = choice?.finish_reason === 'length'
+      ? 'The AI used its output limit before producing an answer. Please try again.'
+      : 'The AI returned an empty answer. Please try again.';
+    return json({ error }, 502);
+  }
 
   const assistantMessageId = crypto.randomUUID();
   await env.DB.batch([
