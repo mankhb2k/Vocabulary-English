@@ -52,6 +52,16 @@ function topic(value) {
   return ['greetings', 'work', 'travel', 'other'].includes(value) ? value : 'other';
 }
 
+function providerRequestBody(model, messages, maxTokens, temperature) {
+  const body = { model, messages };
+  if (/^gpt-5(?:[.-]|$)/i.test(model)) body.max_completion_tokens = maxTokens;
+  else {
+    body.temperature = temperature;
+    body.max_tokens = maxTokens;
+  }
+  return body;
+}
+
 const SYSTEM_PROMPT = `You create English vocabulary cards for a learner.
 Follow the English Vocabulary Skill contract exactly.
 Return one JSON object only, with these keys: word, definition, pronunciation, examples, topic, familyRoot.
@@ -95,12 +105,10 @@ export async function onRequestPost({ request, env }) {
   const existingLookup = new Map(existingWords.map((word) => [normalizeWord(word).toLowerCase(), word]));
 
   const upstreamBody = {
-    model: env.AI_MODEL,
-    temperature: 0.2,
-    messages: [
+    ...providerRequestBody(env.AI_MODEL, [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: `Create a vocabulary card for: ${prompt}\n\nExisting vocabulary items that may be used as familyRoot:\n${existingWords.join(', ') || '(none)'}` },
-    ],
+    ], 600, 0.2),
   };
 
   let upstream;

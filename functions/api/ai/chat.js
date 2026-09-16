@@ -63,6 +63,16 @@ function titleFromMessage(content) {
   return title || 'New chat';
 }
 
+function providerRequestBody(model, messages, maxTokens, temperature) {
+  const body = { model, messages };
+  if (/^gpt-5(?:[.-]|$)/i.test(model)) body.max_completion_tokens = maxTokens;
+  else {
+    body.temperature = temperature;
+    body.max_tokens = maxTokens;
+  }
+  return body;
+}
+
 async function getSession(env, sessionId) {
   if (!sessionId) return null;
   return env.DB.prepare('SELECT id, title, created_at, updated_at FROM chat_sessions WHERE id = ?1').bind(sessionId).first();
@@ -142,7 +152,7 @@ export async function onRequestPost({ request, env }) {
     upstream = await fetch(env.AI_API_URL, {
       method: 'POST',
       headers: { authorization: 'Bearer ' + env.AI_API_KEY, 'content-type': 'application/json' },
-      body: JSON.stringify({ model: env.AI_MODEL, temperature: 0.4, max_tokens: 600, messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...context.messages] }),
+      body: JSON.stringify(providerRequestBody(env.AI_MODEL, [{ role: 'system', content: SYSTEM_PROMPT }, ...context.messages], 600, 0.4)),
     });
   } catch {
     return json({ error: 'The AI provider could not be reached.' }, 502);
