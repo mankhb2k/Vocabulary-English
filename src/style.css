@@ -1916,8 +1916,6 @@ kbd {
   gap: 24px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-color: var(--color-primary-muted) transparent;
-  scrollbar-width: thin;
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - var(--chat-fade-height)), transparent 100%);
   mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - var(--chat-fade-height)), transparent 100%);
 }
