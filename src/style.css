@@ -1052,7 +1052,7 @@ kbd {
   margin: 15px 0 7px;
   color: var(--navy);
   font-family: var(--font-family-sans);
-  font-size: 17px;
+  font-size: var(--font-size-card-title);
   letter-spacing: -0.5px;
 }
 .library-card p {
