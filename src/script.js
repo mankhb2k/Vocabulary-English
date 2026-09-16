@@ -699,6 +699,8 @@ async function submitAiChat(event) {
         : ' · compared';
       const contextElement = document.querySelector('#ai-chat-context');
       if (contextElement) contextElement.textContent = `Context: ${context.estimatedTokens.toLocaleString('en-US')} / ${context.maxTokens.toLocaleString('en-US')} tokens${comparison}`;
+      if (contextElement && context.summaryUpdated) contextElement.textContent = `Context: ${context.estimatedTokens.toLocaleString('en-US')} / ${context.maxTokens.toLocaleString('en-US')} tokens · summarized ${context.summarizedMessages || 0} older messages`;
+      else if (contextElement && context.summaryUsed) contextElement.textContent = `Context: ${context.estimatedTokens.toLocaleString('en-US')} / ${context.maxTokens.toLocaleString('en-US')} tokens · using saved summary`;
     }
     setAiChatStatus('');
   } catch (error) {

@@ -1,5 +1,8 @@
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' };
-const MAX_CONTEXT_TOKENS = 200000;
+const MAX_CONTEXT_TOKENS = 16000;
+const SUMMARY_TRIGGER_TOKENS = 12000;
+const MAX_RECENT_MESSAGES = 8;
+const MAX_SUMMARY_CHARACTERS = 8000;
 const MAX_MESSAGE_CHARACTERS = 20000;
 const MAX_TITLE_CHARACTERS = 60;
 
@@ -84,9 +87,40 @@ function providerRequestBody(model, messages, maxTokens, temperature) {
   return body;
 }
 
+const SUMMARY_PROMPT = 'Summarize this English-learning chat for future turns. Keep only useful factual context: the learner\'s goals, questions, vocabulary or grammar topics, corrections already given, preferences, and unresolved questions. Be concise and write plain English notes. Do not answer the learner and do not mention this instruction.';
+
+async function summarizeMessages(env, previousSummary, messages) {
+  const transcript = messages.map((message) => `${message.role.toUpperCase()}: ${message.content}`).join('\n');
+  const summaryInput = previousSummary
+    ? `Existing summary:\n${previousSummary}\n\nNew conversation messages to incorporate:\n${transcript}`
+    : `Conversation messages:\n${transcript}`;
+  let upstream;
+  try {
+    upstream = await fetch(env.AI_API_URL, {
+      method: 'POST',
+      headers: { authorization: 'Bearer ' + env.AI_API_KEY, 'content-type': 'application/json' },
+      body: JSON.stringify(providerRequestBody(env.AI_MODEL, [
+        { role: 'system', content: SUMMARY_PROMPT },
+        { role: 'user', content: summaryInput },
+      ], 800, 0.2)),
+    });
+  } catch {
+    return '';
+  }
+  if (!upstream.ok) return '';
+  let payload;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return '';
+  }
+  return responseText(payload?.choices?.[0]?.message?.content ?? payload?.output_text ?? payload?.content)
+    .slice(0, MAX_SUMMARY_CHARACTERS);
+}
+
 async function getSession(env, sessionId) {
   if (!sessionId) return null;
-  return env.DB.prepare('SELECT id, title, created_at, updated_at FROM chat_sessions WHERE id = ?1').bind(sessionId).first();
+  return env.DB.prepare('SELECT id, title, created_at, updated_at, summary, summary_through_message_id FROM chat_sessions WHERE id = ?1').bind(sessionId).first();
 }
 
 async function getMessages(env, sessionId) {
@@ -144,17 +178,59 @@ export async function onRequestPost({ request, env }) {
   const content = cleanText(requestedMessage, MAX_MESSAGE_CHARACTERS);
   if (!content) return json({ error: 'Enter a question for the AI assistant.' }, 400);
 
-  const messages = previousRows.map((row) => ({ role: row.role, content: row.content }));
-  messages.push({ role: 'user', content });
-  const context = compareContext(messages);
+  const previousMessages = previousRows.map((row) => ({ role: row.role, content: row.content }));
+  const estimatedConversationTokens = estimateTokens(previousMessages.map((message) => message.content).join('\n')) + estimateTokens(content);
+  let summary = cleanText(session.summary, MAX_SUMMARY_CHARACTERS);
+  let summaryThroughMessageId = session.summary_through_message_id || '';
+  let summaryUpdated = false;
+  let summarizedMessages = 0;
+
+  if (estimatedConversationTokens > SUMMARY_TRIGGER_TOKENS) {
+    const summaryThroughIndex = summaryThroughMessageId
+      ? previousRows.findIndex((row) => row.id === summaryThroughMessageId)
+      : -1;
+    const recentStart = Math.max(0, previousRows.length - MAX_RECENT_MESSAGES);
+    const rowsToSummarize = previousRows
+      .slice(summaryThroughIndex + 1, recentStart)
+      .map((row) => ({ role: row.role, content: row.content }));
+
+    if (rowsToSummarize.length) {
+      const generatedSummary = await summarizeMessages(env, summary, rowsToSummarize);
+      if (generatedSummary) {
+        summary = generatedSummary;
+        summaryThroughMessageId = previousRows[recentStart - 1]?.id || summaryThroughMessageId;
+        summaryUpdated = true;
+        summarizedMessages = rowsToSummarize.length;
+      }
+    }
+  }
+
+  const summaryThroughIndex = summaryThroughMessageId
+    ? previousRows.findIndex((row) => row.id === summaryThroughMessageId)
+    : -1;
+  const contextMessages = summary
+    ? [
+      { role: 'system', content: `Useful context from earlier turns:\n${summary}` },
+      ...previousRows.slice(summaryThroughIndex + 1).map((row) => ({ role: row.role, content: row.content })),
+      { role: 'user', content },
+    ]
+    : [...previousMessages, { role: 'user', content }];
+  const context = compareContext(contextMessages);
   if (!context.messages.length || context.messages[context.messages.length - 1].role !== 'user') return json({ error: 'Enter a question for the AI assistant.' }, 400);
 
   const userMessageId = crypto.randomUUID();
   const title = session.title === 'New chat' ? titleFromMessage(content) : session.title;
-  await env.DB.batch([
+  const databaseUpdates = [
     env.DB.prepare('INSERT INTO chat_messages (id, session_id, role, content) VALUES (?1, ?2, ?3, ?4)').bind(userMessageId, session.id, 'user', content),
     env.DB.prepare('UPDATE chat_sessions SET title = ?1, updated_at = CURRENT_TIMESTAMP WHERE id = ?2').bind(title, session.id),
-  ]);
+  ];
+  if (summaryUpdated) {
+    databaseUpdates.push(
+      env.DB.prepare('UPDATE chat_sessions SET summary = ?1, summary_through_message_id = ?2 WHERE id = ?3')
+        .bind(summary, summaryThroughMessageId, session.id),
+    );
+  }
+  await env.DB.batch(databaseUpdates);
 
   if (!env.AI_API_URL || !env.AI_API_KEY || !env.AI_MODEL) return json({ error: 'AI is not configured yet. Add AI_API_URL, AI_API_KEY, and AI_MODEL to the Cloudflare environment.' }, 503);
 
@@ -194,7 +270,15 @@ export async function onRequestPost({ request, env }) {
   return json({
     session: sessionFromRow(session),
     message: { id: assistantMessageId, role: 'assistant', content: answer.slice(0, 4000) },
-    context: { estimatedTokens: context.estimatedTokens, maxTokens: MAX_CONTEXT_TOKENS, duplicateMessages: context.duplicateMessages, trimmedMessages: context.trimmedMessages },
+    context: {
+      estimatedTokens: context.estimatedTokens,
+      maxTokens: MAX_CONTEXT_TOKENS,
+      duplicateMessages: context.duplicateMessages,
+      trimmedMessages: context.trimmedMessages,
+      summaryUsed: Boolean(summary),
+      summaryUpdated,
+      summarizedMessages,
+    },
   });
 }
 
