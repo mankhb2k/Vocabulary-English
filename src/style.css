@@ -2134,7 +2134,7 @@ kbd {
     height: 68px;
     flex-direction: row;
     overflow: visible;
-    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    padding: 0 0 env(safe-area-inset-bottom);
     align-items: stretch;
     box-shadow: 0 -8px 24px rgba(20, 40, 42, 0.12);
   }
@@ -2145,8 +2145,8 @@ kbd {
     display: flex;
     flex: 1;
     align-items: stretch;
-    justify-content: space-around;
-    gap: 4px;
+    justify-content: space-between;
+    gap: 0;
     width: auto;
     margin: 0;
   }
@@ -2157,9 +2157,9 @@ kbd {
     justify-content: center;
     gap: 4px;
     min-height: var(--mobile-touch-target);
-    padding: 7px 3px;
+    padding: 0;
     text-align: center;
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
   }
   .nav-item svg,
   .settings-link svg {
