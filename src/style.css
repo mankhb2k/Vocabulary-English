@@ -2134,7 +2134,7 @@ kbd {
     height: 68px;
     flex-direction: row;
     overflow: visible;
-    padding: 0 0 env(safe-area-inset-bottom);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
     align-items: stretch;
     box-shadow: 0 -8px 24px rgba(20, 40, 42, 0.12);
   }
