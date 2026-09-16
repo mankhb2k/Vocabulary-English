@@ -1764,7 +1764,28 @@ kbd {
   color: var(--color-danger);
 }
 .form-status.is-success {
-  color: var(--color-success);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 30px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-success-text);
+  background: var(--color-success-soft);
+  font-weight: var(--font-weight-semibold);
+}
+.form-status.is-success::before {
+  content: "✓";
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  color: var(--color-text-inverse);
+  background: var(--color-success-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
 }
 .primary-button {
   display: inline-flex;

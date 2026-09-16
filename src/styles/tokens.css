@@ -70,6 +70,9 @@
   --color-accent-soft: #fff4d6;
   --color-accent-strong: #8a6500;
   --color-success: #4777c8;
+  --color-success-text: #267a3e;
+  --color-success-soft: #eaf7ed;
+  --color-success-border: #b9e3c1;
   --color-danger: #a25e54;
 
   /* Backward-compatible semantic aliases for existing components */
