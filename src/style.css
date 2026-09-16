@@ -2381,14 +2381,16 @@ kbd {
     max-width: 88%;
   }
   .simple-chat-send {
-    width: 38px;
-    height: 38px;
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
   }
   .simple-chat-composer .ai-chat-form {
-    padding: 4px 7px 4px 14px;
+    padding: 3px 6px 3px 12px;
   }
   .simple-chat-composer .ai-chat-form input {
-    padding: 6px 0;
+    height: 30px;
+    padding: 0;
   }
   .ai-spark {
     width: 42px;
