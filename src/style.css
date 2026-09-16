@@ -2121,8 +2121,12 @@ kbd {
   :root {
     --sidebar-width: 0px;
   }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     padding-bottom: 76px;
+    overflow-x: hidden;
   }
   .sidebar {
     inset: auto 0 0;
@@ -2164,6 +2168,22 @@ kbd {
     width: 100%;
     margin-left: 0;
     padding: 0 16px 32px;
+    overflow-x: hidden;
+  }
+  .form-field input,
+  .form-field select,
+  .form-field textarea,
+  .ai-form input,
+  .ai-chat-form input,
+  .library-sort {
+    font-size: var(--font-size-lg);
+  }
+  .image-upload {
+    font-size: var(--font-size-lg);
+    touch-action: manipulation;
+  }
+  .image-upload strong {
+    font-size: var(--font-size-lg);
   }
   .view {
     padding-top: 31px;
