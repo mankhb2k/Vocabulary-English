@@ -473,6 +473,7 @@ async function submitVocabulary(event) {
 
 function showView(viewName, { syncHistory = true } = {}) {
   if (state.selectedCard) closeVocabularyDetail();
+  setChatSessionsOpen(false);
   if (syncHistory) setAppRoute(viewName, null, true);
   $$('.view').forEach((view) => view.classList.toggle('is-visible', view.id === `view-${viewName}`));
   $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === viewName));
@@ -583,6 +584,14 @@ function setAiChatStatus(message = '', type = '') {
   if (!element) return;
   element.textContent = message;
   element.className = `ai-chat-status${type ? ` is-${type}` : ''}`;
+}
+
+function setChatSessionsOpen(isOpen) {
+  const panel = document.querySelector('.chat-sessions');
+  const toggle = document.querySelector('#chat-sessions-toggle');
+  if (!panel || !toggle) return;
+  panel.classList.toggle('is-open', isOpen);
+  toggle.setAttribute('aria-expanded', String(isOpen));
 }
 
 function renderAiChat() {
@@ -715,14 +724,26 @@ document.addEventListener('submit', (event) => {
   if (event.target.id === 'ai-chat-form') submitAiChat(event);
 });
 document.addEventListener('click', (event) => {
+  const sessionsToggle = event.target.closest('#chat-sessions-toggle');
+  if (sessionsToggle) {
+    const panel = document.querySelector('.chat-sessions');
+    setChatSessionsOpen(!panel?.classList.contains('is-open'));
+    return;
+  }
   const sessionButton = event.target.closest('[data-session-id]');
-  if (sessionButton) loadChatSession(sessionButton.dataset.sessionId);
+  if (sessionButton) {
+    setChatSessionsOpen(false);
+    loadChatSession(sessionButton.dataset.sessionId);
+  }
   const deleteButton = event.target.closest('[data-delete-session-id]');
   if (deleteButton) {
     event.stopPropagation();
     deleteChatSession(deleteButton.dataset.deleteSessionId).catch((error) => setAiChatStatus(error.message, 'error'));
   }
-  if (event.target.closest('#new-chat')) createChatSession();
+  if (event.target.closest('#new-chat')) {
+    setChatSessionsOpen(false);
+    createChatSession();
+  }
 });
 
 init();

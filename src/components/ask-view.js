@@ -2,11 +2,14 @@ export function AskView() {
   return `
     <div class="view" id="view-ask">
       <section class="ask-chat-shell">
-        <aside class="chat-sessions" aria-label="Chat sessions">
+        <aside class="chat-sessions" id="chat-sessions" aria-label="Chat sessions">
           <button class="new-chat-button" id="new-chat" type="button">+ New chat</button>
           <div class="chat-session-list" id="chat-session-list"></div>
         </aside>
         <section class="simple-chat-page">
+          <button class="chat-sessions-toggle" id="chat-sessions-toggle" type="button" aria-label="Open chat history" aria-controls="chat-sessions" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5h14M5 12h14M5 16.5h9" /></svg>
+          </button>
           <div class="simple-chat-messages ai-chat-messages" id="ai-chat-messages" aria-live="polite"></div>
           <div class="simple-chat-composer">
             <form class="ai-chat-form" id="ai-chat-form">
