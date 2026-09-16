@@ -127,42 +127,6 @@ input:focus-visible,
   background: var(--mint);
   box-shadow: var(--shadow-sm);
 }
-.sidebar-bottom {
-  margin-top: auto;
-  display: grid;
-  gap: 22px;
-}
-.mini-streak {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-.mini-streak-icon {
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  color: var(--navy-dark);
-  background: var(--coral);
-  font-size: 15px;
-}
-.mini-streak strong,
-.mini-streak span {
-  display: block;
-}
-.mini-streak strong {
-  color: #f8fbff;
-  font-size: var(--font-size-md);
-}
-.mini-streak span {
-  margin-top: 3px;
-  color: var(--color-sidebar-muted);
-  font-size: var(--font-size-sm);
-}
 .settings-link {
   padding-left: 10px;
 }
@@ -1094,17 +1058,6 @@ kbd {
 .library-shuffle:hover {
   border-color: var(--mint-strong);
   background: var(--mint);
-}
-.library-shuffle.is-spinning {
-  animation: library-shuffle-spin 0.45s ease;
-}
-@keyframes library-shuffle-spin {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 .library-total {
   color: var(--muted);
@@ -2144,8 +2097,7 @@ kbd {
   }
   .sidebar .brand > span:last-child,
   .nav-item span,
-  .settings-link span,
-  .mini-streak > div:last-child {
+  .settings-link span {
     display: none;
   }
   .main-nav {
@@ -2156,14 +2108,6 @@ kbd {
   .settings-link {
     justify-content: center;
     padding: 12px 0;
-  }
-  .mini-streak {
-    border: 0;
-    padding: 0;
-  }
-  .mini-streak-icon {
-    width: 34px;
-    height: 34px;
   }
   .main-content {
     padding-right: 22px;
@@ -2230,8 +2174,7 @@ kbd {
     align-items: stretch;
     box-shadow: 0 -8px 24px rgba(20, 40, 42, 0.12);
   }
-  .sidebar .brand,
-  .mini-streak {
+  .sidebar .brand {
     display: none;
   }
   .main-nav {
@@ -2256,15 +2199,6 @@ kbd {
   .nav-item span,
   .settings-link span {
     display: block;
-  }
-  .sidebar-bottom {
-    display: flex;
-    align-items: stretch;
-    gap: 4px;
-    margin: 0;
-  }
-  .sidebar-bottom .settings-link {
-    min-width: 44px;
   }
   .main-content {
     width: 100%;

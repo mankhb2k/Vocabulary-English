@@ -284,11 +284,6 @@ function shuffleLibrary() {
   state.libraryRandomOrder = shuffledCards(state.allCards).map(libraryCardId);
   const select = $('#library-sort');
   if (select) select.value = 'random';
-  const button = $('#library-shuffle');
-  if (button) {
-    button.classList.remove('is-spinning');
-    requestAnimationFrame(() => button.classList.add('is-spinning'));
-  }
   renderLibrary();
 }
 
