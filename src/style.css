@@ -117,7 +117,7 @@ input:focus-visible,
   border-radius: 10px;
   padding: 12px 13px;
   background: transparent;
-  color: #aab8d2;
+  color: #eaf2ff;
   text-align: left;
   font-size: 13px;
   font-weight: 600;
@@ -176,7 +176,7 @@ input:focus-visible,
 }
 .mini-streak span {
   margin-top: 3px;
-  color: #9aabca;
+  color: #c7dcff;
   font-size: 10px;
 }
 .settings-link {
