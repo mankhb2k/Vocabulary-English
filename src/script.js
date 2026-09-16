@@ -581,7 +581,10 @@ function formatExampleSentences(value) {
 
 function setAiChatStatus(message = '', type = '') {
   const element = document.querySelector('#ai-chat-status');
-  if (!element) return;
+  if (!element) {
+    if (message && type === 'error') toast(message);
+    return;
+  }
   element.textContent = message;
   element.className = `ai-chat-status${type ? ` is-${type}` : ''}`;
 }

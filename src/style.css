@@ -1797,15 +1797,6 @@ kbd {
   cursor: wait;
   opacity: 0.6;
 }
-.ai-chat-status {
-  min-height: 14px;
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: var(--font-size-sm);
-}
-.ai-chat-status.is-error {
-  color: var(--color-danger);
-}
 .ai-chat-context {
   margin: 5px 0 0;
   color: var(--muted);
@@ -1999,17 +1990,6 @@ kbd {
 .simple-chat-send:disabled {
   cursor: wait;
   opacity: 0.55;
-}
-.simple-chat-disclaimer {
-  margin: 8px 0 0;
-  color: var(--muted);
-  text-align: center;
-  font-size: var(--font-size-xxs);
-}
-.simple-chat-composer .ai-chat-status {
-  margin: 4px 0 0;
-  color: var(--muted);
-  text-align: center;
 }
 .simple-chat-composer .ai-chat-context {
   color: var(--muted);
@@ -2383,15 +2363,15 @@ kbd {
     max-width: 88%;
   }
   .simple-chat-send {
-    width: 30px;
-    height: 30px;
-    font-size: 15px;
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
   }
   .simple-chat-composer .ai-chat-form {
     padding: 3px 6px 3px 12px;
   }
   .simple-chat-composer .ai-chat-form input {
-    height: 30px;
+    height: 38px;
     padding: 0;
   }
   .ai-spark {

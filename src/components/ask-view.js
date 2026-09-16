@@ -17,8 +17,6 @@ export function AskView() {
               <input id="ai-chat-input" name="message" type="text" placeholder="Ask anything" maxlength="20000" autocomplete="off" required />
               <button class="simple-chat-send" id="ai-chat-submit" type="submit" aria-label="Send message">&uarr;</button>
             </form>
-            <p class="simple-chat-disclaimer">English Cards AI can make mistakes. Check important information.</p>
-            <p class="ai-chat-status" id="ai-chat-status" role="status"></p>
             <p class="ai-chat-context" id="ai-chat-context"></p>
           </div>
         </section>
