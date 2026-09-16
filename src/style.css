@@ -1396,6 +1396,7 @@ kbd {
 .ai-spark {
   display: grid;
   place-items: center;
+  flex: 0 0 36px;
   width: 36px;
   height: 36px;
   border-radius: var(--radius-lg);
@@ -1675,6 +1676,7 @@ kbd {
   place-items: center;
   width: 16px;
   height: 16px;
+  flex: 0 0 16px;
   border-radius: 50%;
   color: var(--color-text-inverse);
   background: var(--color-success-text);
@@ -2393,6 +2395,7 @@ kbd {
     padding: 0;
   }
   .ai-spark {
+    flex-basis: 42px;
     width: 42px;
     height: 42px;
     font-size: var(--font-size-lg);
