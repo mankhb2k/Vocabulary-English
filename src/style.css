@@ -1812,7 +1812,8 @@ kbd {
 .ask-chat-shell {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
-  min-height: calc(100vh - 60px);
+  min-height: 100dvh;
+  height: 100dvh;
 }
 .chat-sessions {
   min-width: 0;
@@ -1888,9 +1889,12 @@ kbd {
   min-width: 0;
 }
 .simple-chat-page {
-  min-height: calc(100vh - 106px);
+  position: relative;
+  min-height: 100dvh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 #view-ask {
   max-width: none;
@@ -1898,14 +1902,21 @@ kbd {
 }
 .simple-chat-messages {
   width: min(100%, 860px);
-  min-height: calc(100vh - 280px);
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
   max-height: none;
   margin: 0 auto;
-  padding: 0;
+  padding: 28px 0 var(--chat-bottom-space);
   display: grid;
   align-content: end;
   gap: 24px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--color-primary-muted) transparent;
+  scrollbar-width: thin;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - var(--chat-fade-height)), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - var(--chat-fade-height)), transparent 100%);
 }
 .simple-chat-messages .ai-chat-message {
   max-width: 78%;
@@ -2244,11 +2255,12 @@ kbd {
     padding-top: 0;
   }
   .simple-chat-page {
-    min-height: calc(100vh - 100px);
+    min-height: 100dvh;
+    height: 100dvh;
   }
   .simple-chat-messages {
-    min-height: calc(100vh - 250px);
-    padding: 0;
+    min-height: 0;
+    padding: 24px 0 var(--chat-bottom-space);
   }
   .simple-chat-messages .ai-chat-message {
     max-width: 88%;

@@ -7,12 +7,11 @@
   --font-family-sans: "Inter", system-ui, sans-serif;
   --font-size-body: 13px;
   --font-size-xxs: 9px;
-  --font-size-xs: 8px;
-  --font-size-sm: 10px;
-  --font-size-meta: 11px;
-  --font-size-md: 12px;
-  --font-size-lg: 14px;
-  --font-size-xl: 16px;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -37,6 +36,8 @@
   --space-13: 38px;
   --space-14: 40px;
   --space-15: 52px;
+  --chat-fade-height: 128px;
+  --chat-bottom-space: 176px;
 
   /* Shape and effects */
   --radius-sm: 5px;
