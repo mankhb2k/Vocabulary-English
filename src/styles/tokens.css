@@ -5,7 +5,7 @@
 
   /* Typography */
   --font-family-sans: "Inter", system-ui, sans-serif;
-  --font-size-body: 13px;
+  --font-size-body: var(--font-size-md);
   --font-size-xxs: 9px;
   --font-size-xs: 11px;
   --font-size-sm: 12px;
