@@ -1073,11 +1073,11 @@ kbd {
   justify-content: space-between;
   margin-top: 18px;
   color: var(--muted);
-  font-size: var(--font-size-xxs);
+  font-size: var(--font-size-xs);
 }
 .library-card-link {
   color: var(--navy);
-  font-size: var(--font-size-meta);
+  font-size: var(--font-size-sm);
   font-weight: 700;
 }
 .vocabulary-detail {
