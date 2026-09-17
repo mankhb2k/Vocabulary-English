@@ -424,16 +424,29 @@ function setFormStatus(message = '', type = '') {
 function resetImagePreview() {
   const input = $('#vocab-image');
   const preview = $('#image-preview');
+  const name = $('#image-preview-name');
   input.value = '';
   preview.hidden = true;
   $('#image-preview-img').removeAttribute('src');
-  $('#image-preview-name').textContent = '';
+  name.textContent = '';
+  name.removeAttribute('title');
+}
+
+function getDisplayFileName(fileName, maxLength = 28) {
+  if (fileName.length <= maxLength) return fileName;
+  const extensionStart = fileName.lastIndexOf('.');
+  const extension = extensionStart > 0 ? fileName.slice(extensionStart) : '';
+  const base = extensionStart > 0 ? fileName.slice(0, extensionStart) : fileName;
+  const availableBaseLength = Math.max(8, maxLength - extension.length - 3);
+  return `${base.slice(0, availableBaseLength)}...${extension}`;
 }
 
 function previewImage(file) {
   if (!file) return resetImagePreview();
+  const name = $('#image-preview-name');
   $('#image-preview-img').src = URL.createObjectURL(file);
-  $('#image-preview-name').textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+  name.textContent = `${getDisplayFileName(file.name)} · ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+  name.title = file.name;
   $('#image-preview').hidden = false;
 }
 

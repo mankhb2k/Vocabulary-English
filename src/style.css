@@ -1498,6 +1498,7 @@ kbd {
   margin-top: 38px;
 }
 .vocab-form {
+  min-width: 0;
   padding: 25px;
   border: 1px solid var(--line);
   border-radius: var(--radius-2xl);
@@ -1620,6 +1621,7 @@ kbd {
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  overflow: hidden;
   margin-top: 10px;
   padding: 8px;
   border: 1px solid var(--line);
