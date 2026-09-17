@@ -9,10 +9,6 @@
   background: var(--white);
 }
 
-.c-surface--elevated {
-  box-shadow: var(--shadow);
-}
-
 .c-button {
   border: 0;
   font: inherit;
@@ -40,12 +36,6 @@
   background: var(--paper-deep);
 }
 
-.c-status {
-  min-height: 16px;
-  color: var(--muted);
-  font-size: var(--font-size-sm);
-}
-
 .c-control {
   font: inherit;
 }
@@ -63,29 +53,11 @@
 }
 
 .view[hidden],
-.search-panel[hidden],
 .image-preview[hidden] {
   display: none;
 }
 
-.component-icon,
 .nav-item svg,
-.settings-link svg,
-.text-button svg,
-.star-button svg,
-.pronunciation button svg,
-.round-arrow svg,
 .search-input-wrap svg {
   flex: 0 0 auto;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .flashcard,
-  .nav-item,
-  .answer-button,
-  .primary-button,
-  .filter-chip,
-  .topic-tab {
-    transition: none;
-  }
 }
