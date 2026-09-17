@@ -67,13 +67,14 @@ function providerRequestBody(model, messages, maxTokens, temperature) {
 
 const SYSTEM_PROMPT = `You create English vocabulary cards for a learner.
 Follow the English Vocabulary Skill contract exactly.
-Return one JSON object only, with these keys: word, definition, pronunciation, examples, topic, familyRoot.
+Return one JSON object only, with these keys: word, definition, pronunciation, examples, topic, rootSuggestion, familyRoot.
 Use English only. A word may be a single word, phrasal verb, collocation, or useful vocabulary phrase, but never a full sentence as the card title.
 The definition must be a clear English learner-friendly definition. Each example must be a natural English sentence.
 If the item has more than one common part of speech, explain each form separately in the single definition string with clear labels such as "Verb:", "Noun:", "Adjective:", or "Adverb:". Put each labeled form on its own line using a newline character, with no numbering or bullets. Do not merge different forms into one vague definition, and include only forms that are genuinely common for the requested item.
 Always provide at least three non-empty, natural example sentences in the examples array. Each sentence must demonstrate the requested word or phrase in context. Never return an empty examples array and never use one sentence repeated three times. The application will display the examples as a numbered list, one sentence per line.
 Choose topic from greetings, work, travel, or other.
-Use familyRoot only when it exactly matches one of the existing vocabulary items supplied by the application; otherwise use an empty string.
+rootSuggestion is the most useful standalone English base word for the word family, even when it is not in the existing vocabulary list. For example, evaluate commonly belongs to the value family, so use "value" rather than the bound root form "valu". Leave rootSuggestion empty when the relationship is uncertain.
+Use familyRoot only when it exactly matches one of the existing vocabulary items supplied by the application; otherwise use an empty string. If rootSuggestion matches an existing item, use that same word for familyRoot.
 Do not include markdown, translations, extra keys, or commentary.`;
 
 export async function onRequestPost({ request, env }) {
@@ -154,8 +155,13 @@ export async function onRequestPost({ request, env }) {
   `).bind(word).first();
   if (generatedDuplicate) return json({ error: `"${generatedDuplicate.word}" is already in your vocabulary.` }, 409);
 
-  const suggestedRoot = normalizeWord(generated.familyRoot);
-  const familyRoot = existingLookup.get(suggestedRoot.toLowerCase()) || '';
+  const rootSuggestion = normalizeWord(generated.rootSuggestion || generated.familyRoot);
+  const suggestedRoots = [generated.familyRoot, generated.rootSuggestion]
+    .map((value) => normalizeWord(value).toLowerCase())
+    .filter(Boolean);
+  const familyRoot = suggestedRoots
+    .map((value) => existingLookup.get(value) || '')
+    .find(Boolean) || '';
   return json({
     item: {
       word,
@@ -164,6 +170,7 @@ export async function onRequestPost({ request, env }) {
       examples,
       example: examples.map((sentence, index) => `${index + 1}. ${sentence}`).join('\n'),
       topic: topic(generated.topic),
+      rootSuggestion: rootSuggestion === word ? '' : rootSuggestion,
       familyRoot: familyRoot === word ? '' : familyRoot,
     },
   });

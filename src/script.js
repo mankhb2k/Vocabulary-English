@@ -331,7 +331,11 @@ function renderAiDraft(item = state.aiDraft) {
   $('#ai-draft-definition').textContent = item.definition;
   $('#ai-draft-pronunciation').textContent = item.pronunciation || 'Pronunciation not provided';
   $('#ai-draft-topic').textContent = item.topic || 'other';
-  $('#ai-draft-family').textContent = item.familyRoot ? `Family root: ${item.familyRoot}` : 'No family link suggested';
+  $('#ai-draft-family').textContent = item.familyRoot
+    ? `Family root: ${item.familyRoot}`
+    : item.rootSuggestion
+      ? `Root suggestion: ${item.rootSuggestion} (add the root card first to link it)`
+      : 'No confident root suggestion';
   $('#ai-draft-example').textContent = `“${item.example}”`;
 }
 

@@ -22,11 +22,12 @@ Each vocabulary item is one card. Return or save this shape:
     "Regular practice can help learners become more resilient."
   ],
   "topic": "work",
+  "rootSuggestion": "resilience",
   "familyRoot": ""
 }
 ```
 
-Required fields are `word`, `definition`, and at least three non-empty `examples`. `pronunciation`, `topic`, and `familyRoot` are optional but should be generated when they are useful.
+Required fields are `word`, `definition`, and at least three non-empty `examples`. `pronunciation`, `topic`, `rootSuggestion`, and `familyRoot` are optional but should be generated when they are useful.
 
 ## Content rules
 
@@ -41,6 +42,7 @@ Required fields are `word`, `definition`, and at least three non-empty `examples
 
 ## Word families
 
+- `rootSuggestion` is the most useful standalone English base word for the family, even when it is not already in the vocabulary. For example, `evaluate` commonly maps to `value`, not the bound root form `valu`.
 - `familyRoot` must be the exact existing vocabulary item that the new item belongs to, ignoring case.
 - Leave `familyRoot` empty when there is no confident existing family root.
 - A family link is a relation between two existing cards; it must not create a duplicate root card.

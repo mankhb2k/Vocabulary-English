@@ -75,7 +75,7 @@ export function AddView() {
             <label class="form-field form-field-wide">
               <span>Word family root</span>
               <input id="vocab-family-root" name="familyRoot" type="text" list="family-root-options" placeholder="For example: help" maxlength="120" />
-              <small>Optional. Link this item to an existing word family root.</small>
+              <small>Optional. Link this item to an existing root. AI suggestions appear above when available.</small>
               <datalist id="family-root-options"></datalist>
             </label>
             <label class="form-field form-field-wide">
