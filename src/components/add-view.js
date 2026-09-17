@@ -41,13 +41,18 @@ export function AddView() {
             <p class="ai-family-status" id="ai-family-status"></p>
             <div class="ai-family-buttons">
               <button class="secondary-button c-button" id="ai-create-root" type="button" hidden>Generate root card</button>
-              <button class="primary-button c-button" id="ai-save-family" type="button" hidden>Save family <span>&rarr;</span></button>
+              <button class="primary-button c-button" id="ai-save-root-word" type="button" hidden>Save root word <span>&rarr;</span></button>
             </div>
           </div>
           <div class="ai-root-draft" id="ai-root-draft" hidden>
             <span class="section-label">ROOT DRAFT</span>
             <h4 id="ai-root-draft-word"></h4>
             <p id="ai-root-draft-definition"></p>
+            <div class="ai-root-draft-meta">
+              <span id="ai-root-draft-pronunciation"></span>
+              <span id="ai-root-draft-topic"></span>
+            </div>
+            <p class="ai-root-draft-example" id="ai-root-draft-example"></p>
           </div>
         </div>
       </section>

@@ -1525,6 +1525,23 @@ kbd {
   font-size: var(--font-size-md);
   line-height: 1.45;
 }
+.ai-root-draft-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.ai-root-draft-meta span {
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  background: var(--paper);
+  font-size: var(--font-size-sm);
+}
+.ai-root-draft-example {
+  margin-top: 12px !important;
+  white-space: pre-line;
+}
 .vocab-form-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
