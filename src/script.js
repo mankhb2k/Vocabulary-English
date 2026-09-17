@@ -31,6 +31,7 @@ const state = {
   searchQuery: '',
   selectedCard: null,
   aiDraft: null,
+  aiRootDraft: null,
   editingVocabulary: null,
   chatSessions: [],
   activeChatSessionId: null,
@@ -327,7 +328,10 @@ function renderAiDraft(item = state.aiDraft) {
   if (!preview) return;
   state.aiDraft = item;
   preview.hidden = !item;
-  if (!item) return;
+  if (!item) {
+    renderAiRootDraft(null);
+    return;
+  }
   $('#ai-draft-word').textContent = item.word;
   $('#ai-draft-definition').textContent = item.definition;
   $('#ai-draft-pronunciation').textContent = item.pronunciation || 'Pronunciation not provided';
@@ -340,6 +344,86 @@ function renderAiDraft(item = state.aiDraft) {
         ? `Root suggestion: ${item.rootSuggestion} (add the root card first to link it)`
         : 'No confident root suggestion';
   $('#ai-draft-example').textContent = `“${item.example}”`;
+  const actions = $('#ai-family-actions');
+  const status = $('#ai-family-status');
+  const createRoot = $('#ai-create-root');
+  const saveFamily = $('#ai-save-family');
+  const needsRootDraft = Boolean(item.rootSuggestion && !item.familyRoot && item.rootSuggestion.toLowerCase() !== item.word.toLowerCase());
+  actions.hidden = !needsRootDraft && !item.familyRoot && !state.aiRootDraft;
+  createRoot.hidden = !needsRootDraft || Boolean(state.aiRootDraft);
+  saveFamily.hidden = !item.familyRoot && !state.aiRootDraft;
+  status.textContent = item.familyRoot
+    ? `Existing root found: ${item.familyRoot}. Save this word family when ready.`
+    : state.aiRootDraft
+      ? `Root draft ready: ${state.aiRootDraft.word}. Save both cards as a family.`
+      : needsRootDraft
+        ? `Root card “${item.rootSuggestion}” is not in your vocabulary yet.`
+        : '';
+}
+
+function renderAiRootDraft(item = state.aiRootDraft) {
+  const preview = $('#ai-root-draft');
+  if (!preview) return;
+  state.aiRootDraft = item;
+  preview.hidden = !item;
+  if (!item) return;
+  $('#ai-root-draft-word').textContent = item.word;
+  $('#ai-root-draft-definition').textContent = item.definition;
+}
+
+async function generateAiRootDraft() {
+  const rootWord = state.aiDraft?.rootSuggestion;
+  const button = $('#ai-create-root');
+  if (!rootWord || !button) return;
+  button.disabled = true;
+  setAiStatus(`Generating the root card “${rootWord}”…`);
+  try {
+    const response = await fetch('/api/ai/vocabulary', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ prompt: rootWord }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to generate the root card.');
+    renderAiRootDraft(payload.item);
+    renderAiDraft(state.aiDraft);
+    setAiStatus('Root draft ready. Save both cards as a family when ready.', 'success');
+  } catch (error) {
+    setAiStatus(error.message || 'Unable to generate the root card.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function saveAiFamily() {
+  const child = state.aiDraft;
+  const root = state.aiRootDraft;
+  const familyRoot = child?.familyRoot || root?.word;
+  const button = $('#ai-save-family');
+  if (!child || !familyRoot || (!child.familyRoot && !root)) {
+    setAiStatus('Generate the missing root card before saving this family.', 'error');
+    return;
+  }
+  button.disabled = true;
+  setAiStatus('Saving the vocabulary family…');
+  try {
+    const response = await fetch('/api/vocabulary-family', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ item: { ...child, familyRoot }, root: child.familyRoot ? null : root }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to save the vocabulary family.');
+    state.aiDraft = null;
+    state.aiRootDraft = null;
+    renderAiDraft(null);
+    setAiStatus('Vocabulary family saved successfully.', 'success');
+    await loadCustomVocabulary();
+  } catch (error) {
+    setAiStatus(error.message || 'Unable to save the vocabulary family.', 'error');
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function generateAiDraft(event) {
@@ -357,6 +441,8 @@ async function generateAiDraft(event) {
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || 'Unable to generate the vocabulary draft.');
+    state.aiRootDraft = null;
+    renderAiRootDraft(null);
     renderAiDraft(payload.item);
     setAiStatus('Draft ready. Review it, then use it in the vocabulary form.', 'success');
   } catch (error) {
@@ -573,6 +659,8 @@ function initEvents() {
   $('#vocabulary-form').addEventListener('submit', submitVocabulary);
   $('#vocab-image').addEventListener('change', (event) => previewImage(event.target.files[0]));
   $('#clear-image').addEventListener('click', resetImagePreview);
+  $('#ai-create-root').addEventListener('click', generateAiRootDraft);
+  $('#ai-save-family').addEventListener('click', saveAiFamily);
 }
 
 async function init() {
