@@ -32,6 +32,7 @@ const state = {
   selectedCard: null,
   aiDraft: null,
   aiRootDraft: null,
+  wordIndex: null,
   editingVocabulary: null,
   chatSessions: [],
   activeChatSessionId: null,
@@ -323,6 +324,65 @@ function setAiStatus(message = '', type = '') {
   element.className = `ai-status${type ? ` is-${type}` : ''}`;
 }
 
+function normalizeLookupWord(value) {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+async function loadWordIndex() {
+  if (state.wordIndex) return state.wordIndex;
+  const response = await fetch('/word-index.json', { cache: 'force-cache' });
+  if (!response.ok) throw new Error('The vocabulary dictionary could not be loaded.');
+  const words = await response.json();
+  if (!Array.isArray(words)) throw new Error('The vocabulary dictionary is invalid.');
+  state.wordIndex = new Set(words.map(normalizeLookupWord).filter(Boolean));
+  return state.wordIndex;
+}
+
+function editDistanceWithin(left, right, limit = 2) {
+  if (Math.abs(left.length - right.length) > limit) return limit + 1;
+  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let row = 1; row <= left.length; row += 1) {
+    const current = [row];
+    let smallest = current[0];
+    for (let column = 1; column <= right.length; column += 1) {
+      const cost = left[row - 1] === right[column - 1] ? 0 : 1;
+      const value = Math.min(
+        previous[column] + 1,
+        current[column - 1] + 1,
+        previous[column - 1] + cost,
+      );
+      current.push(value);
+      smallest = Math.min(smallest, value);
+    }
+    if (smallest > limit) return limit + 1;
+    previous = current;
+  }
+  return previous[right.length];
+}
+
+function findWordSuggestions(input, words) {
+  const suggestions = [];
+  for (const word of words) {
+    if (Math.abs(word.length - input.length) > 2) continue;
+    const distance = editDistanceWithin(input, word);
+    if (distance <= 2) suggestions.push({ word, distance });
+  }
+  return suggestions
+    .sort((left, right) => left.distance - right.distance || left.word.length - right.word.length || left.word.localeCompare(right.word))
+    .slice(0, 5)
+    .map((item) => item.word);
+}
+
+async function validateAiPrompt(prompt) {
+  const dictionary = await loadWordIndex();
+  const normalized = normalizeLookupWord(prompt);
+  if (dictionary.has(normalized)) return true;
+  const suggestions = findWordSuggestions(normalized, dictionary);
+  const suggestionText = suggestions.length ? ` Did you mean: ${suggestions.join(', ')}?` : '';
+  setAiStatus(`This word was not found in the dictionary.${suggestionText}`, 'error');
+  return false;
+}
+
 function renderAiDraft(item = state.aiDraft) {
   const preview = $('#ai-draft-preview');
   if (!preview) return;
@@ -438,8 +498,11 @@ async function generateAiDraft(event) {
   const prompt = $('#ai-word-prompt').value.trim();
   if (!prompt) return;
   button.disabled = true;
-  setAiStatus('Generating a vocabulary draft…');
+  setAiStatus('Checking the dictionary…');
   try {
+    renderAiDraft(null);
+    if (!(await validateAiPrompt(prompt))) return;
+    setAiStatus('Generating a vocabulary draft…');
     const response = await fetch('/api/ai/vocabulary', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
