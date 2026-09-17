@@ -836,6 +836,11 @@ h1 {
   margin-top: 12px !important;
   white-space: pre-line;
 }
+.ai-root-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
 .vocab-form-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
