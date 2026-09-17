@@ -393,7 +393,7 @@ function renderAiDraft(item = state.aiDraft) {
     return;
   }
   $('#ai-draft-word').textContent = item.word;
-  $('#ai-draft-definition').textContent = item.definition;
+  $('#ai-draft-definition').innerHTML = formatDefinition(item.definition);
   $('#ai-draft-pronunciation').textContent = item.pronunciation || 'Pronunciation not provided';
   $('#ai-draft-topic').textContent = item.topic || 'other';
   $('#ai-draft-family').textContent = item.isFamilyRoot
@@ -428,7 +428,7 @@ function renderAiRootDraft(item = state.aiRootDraft) {
   preview.hidden = !item;
   if (!item) return;
   $('#ai-root-draft-word').textContent = item.word;
-  $('#ai-root-draft-definition').textContent = item.definition;
+  $('#ai-root-draft-definition').innerHTML = formatDefinition(item.definition);
   $('#ai-root-draft-pronunciation').textContent = item.pronunciation || 'Pronunciation not provided';
   $('#ai-root-draft-topic').textContent = item.topic || 'other';
   $('#ai-root-draft-example').textContent = `“${item.example}”`;
