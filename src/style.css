@@ -92,7 +92,19 @@ input:focus-visible {
   gap: var(--space-3);
   margin-top: 76px;
 }
-.nav-item,
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) 13px;
+  background: transparent;
+  color: var(--color-sidebar-text);
+  text-align: left;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+}
 .nav-item svg {
   width: 18px;
   height: 18px;
