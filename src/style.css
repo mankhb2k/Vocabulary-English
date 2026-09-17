@@ -525,6 +525,15 @@ h1 {
   line-height: 1.6;
   white-space: pre-line;
 }
+.definition-line {
+  display: block;
+}
+.definition-line + .definition-line {
+  margin-top: 8px;
+}
+.definition-line strong {
+  font-weight: 800;
+}
 .detail-notes {
   color: var(--muted);
   font-size: var(--font-size-md);

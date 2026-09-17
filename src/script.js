@@ -170,7 +170,7 @@ function renderVocabularyDetail(card) {
   $('#detail-pronunciation').textContent = card.pronunciation || 'Press the speaker to listen';
   const editButton = $('#detail-edit');
   editButton.hidden = !card.english;
-  $('#detail-definition').textContent = card.definition || 'An English word used in everyday communication.';
+  $('#detail-definition').innerHTML = formatDefinition(card.definition || 'An English word used in everyday communication.');
   $('#detail-examples').innerHTML = cardExamples(card).map((example) => `<li>${escapeHtml(example)}</li>`).join('') || '<li>Practise this word in a natural sentence.</li>';
   $('#detail-notes').textContent = card.notes || '';
   $('#detail-notes-section').hidden = !card.notes;
@@ -661,6 +661,22 @@ function showView(viewName, { syncHistory = true } = {}) {
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
+}
+
+function formatDefinition(value) {
+  const labels = 'Noun|Verb|Adjective|Adverb|Pronoun|Preposition|Conjunction|Interjection|Determiner|Phrase|Phrasal verb';
+  const lines = String(value || '')
+    .replace(/\r\n/g, '\n')
+    .replace(new RegExp(`\\s+(?=(${labels}):)`, 'gi'), '\n')
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return lines.map((line) => {
+    const match = line.match(new RegExp(`^(${labels}):\\s*(.*)$`, 'i'));
+    if (!match) return `<span class="definition-line">${escapeHtml(line)}</span>`;
+    return `<span class="definition-line"><strong>${escapeHtml(match[1])}:</strong> ${escapeHtml(match[2])}</span>`;
+  }).join('');
 }
 
 function speakWord(word) {
