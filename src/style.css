@@ -1564,6 +1564,28 @@ kbd {
   word-break: break-word;
   white-space: pre-wrap;
 }
+.root-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  color: var(--ink);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.root-toggle input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+.root-toggle span {
+  color: var(--ink);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {

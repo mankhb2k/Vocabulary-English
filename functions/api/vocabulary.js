@@ -41,6 +41,7 @@ function toClientItem(row) {
     imageUrl: `/api/vocabulary-image?key=${encodeURIComponent(row.image_key || 'placeholder-1.png')}`,
     createdAt: row.created_at,
     familyRoot: row.family_root || '',
+    isFamilyRoot: Boolean(row.is_family_root),
   };
 }
 
@@ -50,6 +51,11 @@ export async function onRequestGet({ env, request }) {
   const sourceFilter = scope === 'all' ? "entry.source IN ('user', 'system')" : "entry.source = 'user'";
   const result = await env.DB.prepare(`
     SELECT entry.id, entry.word, entry.definition, entry.pronunciation, entry.example, entry.topic, entry.image_key, entry.created_at, entry.usage_note, entry.source,
+      CASE WHEN entry.is_family_root = 1 OR EXISTS (
+        SELECT 1 FROM word_relations AS root_relation
+        WHERE root_relation.source_word_id = entry.id
+          AND root_relation.relation_type IN ('family', 'suffix', 'prefix')
+      ) THEN 1 ELSE 0 END AS is_family_root,
       (
         SELECT root.word
         FROM word_relations AS relation
@@ -82,6 +88,7 @@ export async function onRequestPost({ request, env }) {
   const pronunciation = textField(form, 'pronunciation', 120);
   const example = normalizeExamples(textField(form, 'example', 1500));
   const familyRoot = textField(form, 'familyRoot', 120);
+  const isFamilyRoot = form.get('isFamilyRoot') === 'true';
   const topic = ['greetings', 'work', 'travel', 'other'].includes(form.get('topic')) ? form.get('topic') : 'other';
   const file = form.get('image');
   const replaceExisting = form.get('replaceExisting') === 'true';
@@ -128,16 +135,17 @@ export async function onRequestPost({ request, env }) {
   let inserted = false;
   try {
     const row = await env.DB.prepare(`
-      INSERT INTO vocabulary_entries (id, word, definition, pronunciation, example, topic, image_key)
-      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-      RETURNING id, word, definition, pronunciation, example, topic, image_key, created_at
-    `).bind(id, word, definition, pronunciation, example.join('\n'), topic, key).first();
+      INSERT INTO vocabulary_entries (id, word, definition, pronunciation, example, topic, image_key, is_family_root)
+      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+      RETURNING id, word, definition, pronunciation, example, topic, image_key, created_at, is_family_root
+    `).bind(id, word, definition, pronunciation, example.join('\n'), topic, key, isFamilyRoot ? 1 : 0).first();
     inserted = true;
     if (familyRootRow) {
       await env.DB.prepare(`
         INSERT INTO word_relations (id, source_word_id, target_word_id, relation_type, affix)
         VALUES (?1, ?2, ?3, 'family', '')
       `).bind(crypto.randomUUID(), familyRootRow.id, row.id).run();
+      await env.DB.prepare('UPDATE vocabulary_entries SET is_family_root = 1 WHERE id = ?1').bind(familyRootRow.id).run();
     }
     return json({ ok: true, item: toClientItem(row) }, 201);
   } catch (error) {
@@ -163,6 +171,7 @@ export async function onRequestPut({ request, env }) {
   const pronunciation = textField(form, 'pronunciation', 120);
   const example = normalizeExamples(textField(form, 'example', 1500));
   const familyRoot = textField(form, 'familyRoot', 120);
+  const isFamilyRoot = form.get('isFamilyRoot') === 'true';
   const topic = ['greetings', 'work', 'travel', 'other'].includes(form.get('topic')) ? form.get('topic') : 'other';
   const file = form.get('image');
   const hasFile = file instanceof File && file.size > 0;
@@ -215,10 +224,10 @@ export async function onRequestPut({ request, env }) {
   try {
     const row = await env.DB.prepare(`
       UPDATE vocabulary_entries
-      SET word = ?1, definition = ?2, pronunciation = ?3, example = ?4, topic = ?5, image_key = ?6
-      WHERE id = ?7
-      RETURNING id, word, definition, pronunciation, example, topic, image_key, created_at
-    `).bind(word, definition, pronunciation, example.join('\n'), topic, imageKey, id).first();
+      SET word = ?1, definition = ?2, pronunciation = ?3, example = ?4, topic = ?5, image_key = ?6, is_family_root = ?7
+      WHERE id = ?8
+      RETURNING id, word, definition, pronunciation, example, topic, image_key, created_at, is_family_root
+    `).bind(word, definition, pronunciation, example.join('\n'), topic, imageKey, isFamilyRoot ? 1 : 0, id).first();
 
     await env.DB.prepare('DELETE FROM word_relations WHERE source_word_id = ?1 OR target_word_id = ?1').bind(id).run();
     if (familyRootRow) {
@@ -226,6 +235,7 @@ export async function onRequestPut({ request, env }) {
         INSERT INTO word_relations (id, source_word_id, target_word_id, relation_type, affix)
         VALUES (?1, ?2, ?3, 'family', '')
       `).bind(crypto.randomUUID(), familyRootRow.id, id).run();
+      await env.DB.prepare('UPDATE vocabulary_entries SET is_family_root = 1 WHERE id = ?1').bind(familyRootRow.id).run();
     }
 
     return json({ ok: true, item: toClientItem(row) });

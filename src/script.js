@@ -95,11 +95,12 @@ function databaseVocabularyCard(item) {
     definition: item.definition || 'A word added to your personal vocabulary.',
     notes: item.notes || (isUserCard ? 'A custom card from your personal vocabulary.' : 'Listen to the pronunciation and practise the word in context.'),
     topic: item.topic || 'other',
-    category: isUserCard ? 'MY VOCABULARY' : (isFamilyCard ? 'WORD FAMILY' : 'CORE VOCABULARY'),
+    category: item.isFamilyRoot ? 'WORD FAMILY ROOT' : (isUserCard ? 'MY VOCABULARY' : (isFamilyCard ? 'WORD FAMILY' : 'CORE VOCABULARY')),
     pronunciation: item.pronunciation || '',
     examples,
     example: examples.join('\n'),
     familyId: item.familyRoot || '',
+    isFamilyRoot: Boolean(item.isFamilyRoot),
     imageUrl: item.imageUrl,
     isCustom: isUserCard,
   };
@@ -139,8 +140,8 @@ function renderDetailFamily(card, relatedCards) {
   const root = $('#detail-family-root');
   if (!section || !list || !root) return;
   const uniqueCards = [...new Map(relatedCards.filter((item) => item.english !== card.english).map((item) => [item.english, item])).values()];
-  section.hidden = !uniqueCards.length;
-  root.textContent = card.familyId ? `Root: ${card.familyId}` : '';
+  section.hidden = !uniqueCards.length && !card.isFamilyRoot;
+  root.textContent = card.isFamilyRoot ? 'This card is a family root' : card.familyId ? `Root: ${card.familyId}` : '';
   list.innerHTML = uniqueCards.map((item) => `<button class="detail-family-word c-button" type="button" aria-label="Open ${escapeHtml(item.english)}"><strong>${escapeHtml(item.english)}</strong></button>`).join('');
   $$('.detail-family-word', list).forEach((button, index) => button.addEventListener('click', () => openCardDetails(uniqueCards[index])));
 }
@@ -331,11 +332,13 @@ function renderAiDraft(item = state.aiDraft) {
   $('#ai-draft-definition').textContent = item.definition;
   $('#ai-draft-pronunciation').textContent = item.pronunciation || 'Pronunciation not provided';
   $('#ai-draft-topic').textContent = item.topic || 'other';
-  $('#ai-draft-family').textContent = item.familyRoot
-    ? `Family root: ${item.familyRoot}`
-    : item.rootSuggestion
-      ? `Root suggestion: ${item.rootSuggestion} (add the root card first to link it)`
-      : 'No confident root suggestion';
+  $('#ai-draft-family').textContent = item.isFamilyRoot
+    ? `Family root card: ${item.word}`
+    : item.familyRoot
+      ? `Family root: ${item.familyRoot}`
+      : item.rootSuggestion
+        ? `Root suggestion: ${item.rootSuggestion} (add the root card first to link it)`
+        : 'No confident root suggestion';
   $('#ai-draft-example').textContent = `“${item.example}”`;
 }
 
@@ -372,6 +375,7 @@ function applyAiDraft() {
   $('#vocab-pronunciation').value = draft.pronunciation || '';
   $('#vocab-topic').value = draft.topic || 'other';
   $('#vocab-family-root').value = draft.familyRoot || '';
+  $('#vocab-is-family-root').checked = Boolean(draft.isFamilyRoot);
   $('#vocab-example').value = formatExampleSentences(draft.examples?.length ? draft.examples : draft.example);
   setFormStatus('AI draft copied into the form. Review it and save the card.', 'success');
   $('#vocab-word').focus();
@@ -405,6 +409,7 @@ function startEditingVocabulary(card) {
   $('#vocab-pronunciation').value = card.pronunciation || '';
   $('#vocab-topic').value = card.topic || 'other';
   $('#vocab-family-root').value = card.familyId || '';
+  $('#vocab-is-family-root').checked = Boolean(card.isFamilyRoot);
   $('#vocab-example').value = formatExampleSentences(cardExamples(card));
   resetImagePreview();
   setVocabularyFormMode(true);

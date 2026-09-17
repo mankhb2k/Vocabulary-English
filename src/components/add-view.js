@@ -76,6 +76,10 @@ export function AddView() {
               <span>Word family root</span>
               <input id="vocab-family-root" name="familyRoot" type="text" list="family-root-options" placeholder="For example: help" maxlength="120" />
               <small>Optional. Link this item to an existing root. AI suggestions appear above when available.</small>
+              <div class="root-toggle">
+                <input id="vocab-is-family-root" name="isFamilyRoot" type="checkbox" value="true" />
+                <span>Use this card as a word family root</span>
+              </div>
               <datalist id="family-root-options"></datalist>
             </label>
             <label class="form-field form-field-wide">
