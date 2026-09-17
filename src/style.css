@@ -106,7 +106,6 @@ input:focus-visible,
   text-align: left;
   font-size: var(--font-size-body);
   font-weight: 600;
-  transition: 0.2s ease;
 }
 .nav-item svg,
 .settings-link svg {
@@ -755,7 +754,6 @@ kbd {
 }
 .answer-button:hover {
   border-color: var(--mint-strong);
-  transform: translateY(-1px);
 }
 .answer-button .answer-icon {
   display: grid;
@@ -1789,7 +1787,6 @@ kbd {
 }
 .primary-button:hover {
   background: var(--navy-dark);
-  transform: translateY(-1px);
 }
 .primary-button:disabled {
   cursor: wait;
