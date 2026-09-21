@@ -103,6 +103,33 @@ test('keeps a valid familyRoot for a word that is not itself a family root', asy
   });
 });
 
+test('keeps an unlisted related root as a rootSuggestion', async () => {
+  const env = {
+    DB: mockDb({ existingWords: ['value'] }),
+    AI_API_URL: 'https://example.test/ai',
+    AI_API_KEY: 'test-key',
+    AI_MODEL: 'test-model',
+  };
+  const generated = {
+    word: 'wrangler',
+    definition: 'Noun: a person who wrangles.',
+    examples: ['The wrangler checked the horses.', 'A wrangler works on the ranch.', 'The wrangler prepared the cattle for the journey.'],
+    topic: 'work',
+    isFamilyRoot: false,
+    rootSuggestion: 'wrangle',
+    familyRoot: 'wrangle',
+  };
+
+  await withMockedFetch(mockUpstream(generated), async () => {
+    const response = await onRequestPost({ request: request('wrangler'), env });
+    const payload = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(payload.item.rootSuggestion, 'wrangle');
+    assert.equal(payload.item.familyRoot, '');
+  });
+});
+
 test('rejects a prompt that already exists in the vocabulary', async () => {
   const env = {
     DB: mockDb({ duplicateWord: 'capable' }),
