@@ -63,6 +63,31 @@ function sharesStem(wordA, wordB, stemLength = 4) {
   return cleanA.includes(stemB) || cleanB.includes(stemA);
 }
 
+// Common, reliable English derivational suffixes, longest/most specific first. Used only as a
+// fallback when the AI itself fails to name a root that shares a stem with the word (e.g. it
+// suggested an unrelated word, or left rootSuggestion empty) — so "capability" still resolves to
+// "capable" even if the AI answered "value".
+const SUFFIX_RULES = [
+  [/bility$/, 'ble'],
+  [/iness$/, 'y'],
+  [/ness$/, ''],
+  [/ment$/, ''],
+  [/ily$/, 'y'],
+  [/ly$/, ''],
+  [/ful$/, ''],
+  [/less$/, ''],
+];
+
+function deriveRootCandidate(word) {
+  const clean = String(word || '').toLowerCase().replace(/[^a-z]/g, '');
+  for (const [pattern, replacement] of SUFFIX_RULES) {
+    if (!pattern.test(clean)) continue;
+    const candidate = clean.replace(pattern, replacement);
+    if (candidate && candidate.length >= 3 && candidate !== clean) return candidate;
+  }
+  return '';
+}
+
 function providerRequestBody(model, messages, maxTokens, temperature) {
   const body = { model, messages };
   if (/^gpt-5(?:[.-]|$)/i.test(model)) {
@@ -170,8 +195,9 @@ export async function onRequestPost({ request, env }) {
 
   const isFamilyRoot = generated.isFamilyRoot === true;
   const rootSuggestionRaw = normalizeWord(generated.rootSuggestion || generated.familyRoot);
-  const rootSuggestion = rootSuggestionRaw && sharesStem(word, rootSuggestionRaw) ? rootSuggestionRaw : '';
-  const suggestedRoots = [generated.familyRoot, generated.rootSuggestion]
+  const rootSuggestionFromAi = rootSuggestionRaw && sharesStem(word, rootSuggestionRaw) ? rootSuggestionRaw : '';
+  const rootSuggestion = rootSuggestionFromAi || deriveRootCandidate(word);
+  const suggestedRoots = [generated.familyRoot, generated.rootSuggestion, rootSuggestion]
     .map((value) => normalizeWord(value).toLowerCase())
     .filter((value) => value && sharesStem(word, value));
   const familyRoot = suggestedRoots

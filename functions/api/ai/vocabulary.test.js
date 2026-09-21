@@ -103,7 +103,7 @@ test('keeps a valid familyRoot for a word that is not itself a family root', asy
   });
 });
 
-test('drops a familyRoot/rootSuggestion that only shares meaning, not spelling, with the word', async () => {
+test('falls back to a spelling-derived root when the AI names an unrelated word', async () => {
   const env = {
     DB: mockDb({ existingWords: ['value'] }),
     AI_API_URL: 'https://example.test/ai',
@@ -117,7 +117,8 @@ test('drops a familyRoot/rootSuggestion that only shares meaning, not spelling, 
     topic: 'work',
     isFamilyRoot: false,
     // The AI hallucinated a semantically-related but unrelated root ("value" is not
-    // spelled anything like "capability"/"capable").
+    // spelled anything like "capability"/"capable"). The app should still surface the
+    // real, spelling-derived root ("capable") instead of giving up entirely.
     rootSuggestion: 'value',
     familyRoot: 'value',
   };
@@ -128,7 +129,33 @@ test('drops a familyRoot/rootSuggestion that only shares meaning, not spelling, 
 
     assert.equal(response.status, 200);
     assert.equal(payload.item.familyRoot, '');
-    assert.equal(payload.item.rootSuggestion, '');
+    assert.equal(payload.item.rootSuggestion, 'capable');
+  });
+});
+
+test('links familyRoot through the derived root when it already exists in the vocabulary', async () => {
+  const env = {
+    DB: mockDb({ existingWords: ['capable'] }),
+    AI_API_URL: 'https://example.test/ai',
+    AI_API_KEY: 'test-key',
+    AI_MODEL: 'test-model',
+  };
+  const generated = {
+    word: 'capability',
+    definition: 'Noun: the ability or power to do something.',
+    examples: ['She has the capability to lead.', 'The system has this capability.', 'His capability grew over time.'],
+    topic: 'work',
+    isFamilyRoot: false,
+    rootSuggestion: 'value',
+    familyRoot: 'value',
+  };
+
+  await withMockedFetch(mockUpstream(generated), async () => {
+    const response = await onRequestPost({ request: request('capability'), env });
+    const payload = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(payload.item.familyRoot, 'capable');
   });
 });
 
