@@ -52,6 +52,17 @@ function topic(value) {
   return ['greetings', 'work', 'travel', 'other'].includes(value) ? value : 'other';
 }
 
+// A word family shares a written stem (e.g. "capability" / "capable"). This catches the AI
+// suggesting a root that is merely related in meaning, not spelling (e.g. "capability" / "value").
+function sharesStem(wordA, wordB, stemLength = 4) {
+  const cleanA = String(wordA || '').toLowerCase().replace(/[^a-z]/g, '');
+  const cleanB = String(wordB || '').toLowerCase().replace(/[^a-z]/g, '');
+  if (!cleanA || !cleanB) return false;
+  const stemA = cleanA.slice(0, Math.min(stemLength, cleanA.length));
+  const stemB = cleanB.slice(0, Math.min(stemLength, cleanB.length));
+  return cleanA.includes(stemB) || cleanB.includes(stemA);
+}
+
 function providerRequestBody(model, messages, maxTokens, temperature) {
   const body = { model, messages };
   if (/^gpt-5(?:[.-]|$)/i.test(model)) {
@@ -73,7 +84,7 @@ The definition must be a clear English learner-friendly definition. Each example
 If the item has more than one common part of speech, explain each form separately in the single definition string with clear labels such as "Verb:", "Noun:", "Adjective:", or "Adverb:". Put each labeled form on its own line using a newline character, with no numbering or bullets. Do not merge different forms into one vague definition, and include only forms that are genuinely common for the requested item.
 Always provide at least three non-empty, natural example sentences in the examples array. Each sentence must demonstrate the requested word or phrase in context. Never return an empty examples array and never use one sentence repeated three times. The application will display the examples as a numbered list, one sentence per line.
 Choose topic from greetings, work, travel, or other.
-rootSuggestion is the most useful standalone English base word for the word family, even when it is not in the existing vocabulary list. For example, evaluate commonly belongs to the value family, so use "value" rather than the bound root form "valu". Leave rootSuggestion empty when the relationship is uncertain.
+rootSuggestion is the most useful standalone English base word for the word family, even when it is not in the existing vocabulary list. The root must share the same written stem as the requested item, before any prefix or suffix (for example, evaluate shares the stem "valu-" with value, so use "value" rather than the bound root form "valu"; capability shares the stem "capab-" with capable, so use "capable", not an unrelated word like "value" that only shares a general meaning). Never suggest a root based on meaning alone when the spelling does not match. Leave rootSuggestion empty when the relationship is uncertain.
 Set isFamilyRoot to true when the requested item is itself a useful standalone base word that can serve as the root of a word family; otherwise set it to false. This is a suggestion for the learner to review.
 When isFamilyRoot is true, the item is its own root: leave both rootSuggestion and familyRoot empty, even if a related word exists in the vocabulary list.
 Use familyRoot only when it exactly matches one of the existing vocabulary items supplied by the application; otherwise use an empty string. If rootSuggestion matches an existing item, use that same word for familyRoot.
@@ -158,10 +169,11 @@ export async function onRequestPost({ request, env }) {
   if (generatedDuplicate) return json({ error: `"${generatedDuplicate.word}" is already in your vocabulary.` }, 409);
 
   const isFamilyRoot = generated.isFamilyRoot === true;
-  const rootSuggestion = normalizeWord(generated.rootSuggestion || generated.familyRoot);
+  const rootSuggestionRaw = normalizeWord(generated.rootSuggestion || generated.familyRoot);
+  const rootSuggestion = rootSuggestionRaw && sharesStem(word, rootSuggestionRaw) ? rootSuggestionRaw : '';
   const suggestedRoots = [generated.familyRoot, generated.rootSuggestion]
     .map((value) => normalizeWord(value).toLowerCase())
-    .filter(Boolean);
+    .filter((value) => value && sharesStem(word, value));
   const familyRoot = suggestedRoots
     .map((value) => existingLookup.get(value) || '')
     .find(Boolean) || '';
