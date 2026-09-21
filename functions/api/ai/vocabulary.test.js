@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { onRequestPost } from './vocabulary.js';
+import { onRequestPost, deriveRootCandidate } from './vocabulary.js';
 
 function mockDb({ existingWords = [], duplicateWord = null } = {}) {
   return {
@@ -157,6 +157,25 @@ test('links familyRoot through the derived root when it already exists in the vo
     assert.equal(response.status, 200);
     assert.equal(payload.item.familyRoot, 'capable');
   });
+});
+
+test('derives the correct spelling-based root for 10 different words', () => {
+  const cases = [
+    ['capability', 'capable'],       // -bility -> -ble
+    ['possibility', 'possible'],     // -bility -> -ble
+    ['responsibility', 'responsible'], // -bility -> -ble
+    ['happiness', 'happy'],          // -iness -> -y
+    ['kindness', 'kind'],            // -ness stripped
+    ['development', 'develop'],      // -ment stripped
+    ['agreement', 'agree'],          // -ment stripped
+    ['quickly', 'quick'],            // -ly stripped
+    ['helpful', 'help'],             // -ful stripped
+    ['careless', 'care'],            // -less stripped
+  ];
+
+  for (const [word, expectedRoot] of cases) {
+    assert.equal(deriveRootCandidate(word), expectedRoot, `${word} should derive to "${expectedRoot}"`);
+  }
 });
 
 test('rejects a prompt that already exists in the vocabulary', async () => {

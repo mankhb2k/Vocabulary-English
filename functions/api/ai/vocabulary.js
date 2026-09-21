@@ -88,6 +88,9 @@ function deriveRootCandidate(word) {
   return '';
 }
 
+// Exported for direct unit testing of the root-suggestion heuristics.
+export { sharesStem, deriveRootCandidate };
+
 function providerRequestBody(model, messages, maxTokens, temperature) {
   const body = { model, messages };
   if (/^gpt-5(?:[.-]|$)/i.test(model)) {
