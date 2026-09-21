@@ -75,6 +75,7 @@ Always provide at least three non-empty, natural example sentences in the exampl
 Choose topic from greetings, work, travel, or other.
 rootSuggestion is the most useful standalone English base word for the word family, even when it is not in the existing vocabulary list. For example, evaluate commonly belongs to the value family, so use "value" rather than the bound root form "valu". Leave rootSuggestion empty when the relationship is uncertain.
 Set isFamilyRoot to true when the requested item is itself a useful standalone base word that can serve as the root of a word family; otherwise set it to false. This is a suggestion for the learner to review.
+When isFamilyRoot is true, the item is its own root: leave both rootSuggestion and familyRoot empty, even if a related word exists in the vocabulary list.
 Use familyRoot only when it exactly matches one of the existing vocabulary items supplied by the application; otherwise use an empty string. If rootSuggestion matches an existing item, use that same word for familyRoot.
 Do not include markdown, translations, extra keys, or commentary.`;
 
@@ -156,6 +157,7 @@ export async function onRequestPost({ request, env }) {
   `).bind(word).first();
   if (generatedDuplicate) return json({ error: `"${generatedDuplicate.word}" is already in your vocabulary.` }, 409);
 
+  const isFamilyRoot = generated.isFamilyRoot === true;
   const rootSuggestion = normalizeWord(generated.rootSuggestion || generated.familyRoot);
   const suggestedRoots = [generated.familyRoot, generated.rootSuggestion]
     .map((value) => normalizeWord(value).toLowerCase())
@@ -171,9 +173,10 @@ export async function onRequestPost({ request, env }) {
       examples,
       example: examples.map((sentence, index) => `${index + 1}. ${sentence}`).join('\n'),
       topic: topic(generated.topic),
-      rootSuggestion: rootSuggestion === word ? '' : rootSuggestion,
-      isFamilyRoot: generated.isFamilyRoot === true,
-      familyRoot: familyRoot === word ? '' : familyRoot,
+      // A word that is itself a family root cannot also descend from another root.
+      rootSuggestion: isFamilyRoot || rootSuggestion === word ? '' : rootSuggestion,
+      isFamilyRoot,
+      familyRoot: isFamilyRoot || familyRoot === word ? '' : familyRoot,
     },
   });
 }
