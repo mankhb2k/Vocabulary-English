@@ -130,6 +130,48 @@ test('keeps an unlisted related root as a rootSuggestion', async () => {
   });
 });
 
+test('infers common word-family roots when the AI leaves the root fields empty', async () => {
+  const cases = [
+    ['capability', 'capable'],
+    ['possibility', 'possible'],
+    ['responsibility', 'responsible'],
+    ['happiness', 'happy'],
+    ['kindness', 'kind'],
+    ['development', 'develop'],
+    ['agreement', 'agree'],
+    ['quickly', 'quick'],
+    ['helpful', 'help'],
+    ['careless', 'care'],
+  ];
+
+  for (const [word, expectedRoot] of cases) {
+    const env = {
+      DB: mockDb(),
+      AI_API_URL: 'https://example.test/ai',
+      AI_API_KEY: 'test-key',
+      AI_MODEL: 'test-model',
+    };
+    const generated = {
+      word,
+      definition: 'A learner-friendly definition.',
+      examples: [`This is an example of ${word}.`, `The ${word} was discussed today.`, `We studied ${word} in class.`],
+      topic: 'work',
+      isFamilyRoot: false,
+      rootSuggestion: '',
+      familyRoot: '',
+    };
+
+    await withMockedFetch(mockUpstream(generated), async () => {
+      const response = await onRequestPost({ request: request(word), env });
+      const payload = await response.json();
+
+      assert.equal(response.status, 200, word);
+      assert.equal(payload.item.rootSuggestion, expectedRoot, word);
+      assert.equal(payload.item.familyRoot, '', word);
+    });
+  }
+});
+
 test('rejects a prompt that already exists in the vocabulary', async () => {
   const env = {
     DB: mockDb({ duplicateWord: 'capable' }),

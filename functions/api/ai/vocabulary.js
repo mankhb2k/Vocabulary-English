@@ -12,6 +12,25 @@ function normalizeWord(value) {
   return text(value, 120).replace(/\s+/g, ' ');
 }
 
+function inferRootSuggestion(word) {
+  const rules = [
+    [/ability$/, 'able'],
+    [/ibility$/, 'ible'],
+    [/iness$/, 'y'],
+    [/ness$/, ''],
+    [/ment$/, ''],
+    [/less$/, ''],
+    [/ful$/, ''],
+    [/ly$/, ''],
+  ];
+  for (const [pattern, replacement] of rules) {
+    if (!pattern.test(word)) continue;
+    const candidate = word.replace(pattern, replacement);
+    if (candidate.length >= 3 && candidate !== word) return candidate;
+  }
+  return '';
+}
+
 function normalizeExamples(value) {
   const values = Array.isArray(value) ? value : [value];
   return values
@@ -158,10 +177,12 @@ export async function onRequestPost({ request, env }) {
   if (generatedDuplicate) return json({ error: `"${generatedDuplicate.word}" is already in your vocabulary.` }, 409);
 
   const isFamilyRoot = generated.isFamilyRoot === true;
-  const rootSuggestion = normalizeWord(generated.rootSuggestion || generated.familyRoot);
+  const aiRootSuggestion = normalizeWord(generated.rootSuggestion || generated.familyRoot);
+  const rootSuggestion = aiRootSuggestion || inferRootSuggestion(word.toLowerCase());
   const suggestedRoots = [generated.familyRoot, generated.rootSuggestion]
     .map((value) => normalizeWord(value).toLowerCase())
     .filter(Boolean);
+  if (rootSuggestion) suggestedRoots.push(rootSuggestion.toLowerCase());
   const familyRoot = suggestedRoots
     .map((value) => existingLookup.get(value) || '')
     .find(Boolean) || '';
