@@ -1,9 +1,9 @@
 """
 Convert MD vocabulary files to JSON.
 Usage:
-    python convert_md_to_json.py              # Convert all files
-    python convert_md_to_json.py vocab        # Convert vocabulary MD files only
-    python convert_md_to_json.py chunk-en-vi  # Convert chunk-en-vi.md only
+    python scripts/convert_md_to_json.py              # Convert all files
+    python scripts/convert_md_to_json.py vocab        # Convert vocabulary MD files only
+    python scripts/convert_md_to_json.py chunk-en-vi  # Convert chunk-en-vi.md only
 
 Output:
     Vocabulary-topics.md  → json/Vocabulary-topics.json
@@ -16,7 +16,7 @@ import re
 import os
 import sys
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 JSON_DIR = os.path.join(BASE_DIR, "json")
 CHUNK_MD = "chunk-en-vi.md"

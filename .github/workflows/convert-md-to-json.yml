@@ -25,7 +25,7 @@ jobs:
 
       - name: Run converter
         run: |
-          python convert_md_to_json.py
+          python scripts/convert_md_to_json.py
 
       - name: Commit generated JSON files
         if: github.event_name == 'push'

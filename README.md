@@ -24,34 +24,34 @@ The collection is intended to support practical daily communication. The size is
 ### How to work with the data
 
 - Edit the Markdown source files first.
-- **Validate new data before merging** with `python validate_data.py` (see below).
-- Run `python convert_md_to_json.py` to regenerate the JSON files.
-- Run `python check_unique_chunks.py docs/chunk-en-vi.md` to check for duplicate chunk entries.
+- **Validate new data before merging** with `python scripts/validate_data.py` (see below).
+- Run `python scripts/convert_md_to_json.py` to regenerate the JSON files.
+- Run `python scripts/check_unique_chunks.py docs/chunk-en-vi.md` to check for duplicate chunk entries.
 
 ### Validate data before adding to MD
 
-The [validate_data.py](validate_data.py) script checks data **before** you copy it into `chunk-en-vi.md`:
+The [validate_data.py](scripts/validate_data.py) script checks data **before** you copy it into `chunk-en-vi.md`:
 
 ```bash
 # 1) Validate a draft .md file (format + duplicates against target MD)
-python validate_data.py draft drafts/example-chunks.md --against docs/chunk-en-vi.md
+python scripts/validate_data.py draft drafts/example-chunks.md --against docs/chunk-en-vi.md
 
 # 2) Validate a draft .json file and print an MD snippet on pass
-python validate_data.py json drafts/example-chunks.json --against docs/chunk-en-vi.md --render
+python scripts/validate_data.py json drafts/example-chunks.json --against docs/chunk-en-vi.md --render
 
 # 3) Validate the full MD file (structure, chunk counts, duplicates)
-python validate_data.py md docs/chunk-en-vi.md
+python scripts/validate_data.py md docs/chunk-en-vi.md
 
 # 4) List phrasal verbs in CSV that are not yet in MD
-python validate_data.py csv common-phrasals-verbs.csv --against docs/chunk-en-vi.md
+python scripts/validate_data.py csv common-phrasals-verbs.csv --against docs/chunk-en-vi.md
 ```
 
 Suggested workflow when adding new content:
 
 1. Create a draft file in `drafts/` (`.md` or `.json`).
-2. Run `validate_data.py draft` or `validate_data.py json`.
+2. Run `scripts/validate_data.py draft` or `scripts/validate_data.py json`.
 3. If the result is `PASS`, copy the content into `docs/chunk-en-vi.md`.
-4. Run `validate_data.py md` and `convert_md_to_json.py`.
+4. Run `scripts/validate_data.py md` and `scripts/convert_md_to_json.py`.
 
 Draft JSON schema:
 
@@ -102,34 +102,34 @@ Bộ dữ liệu này được thiết kế để hỗ trợ học tiếng Anh g
 ### Cách làm việc với dữ liệu
 
 - Chỉnh sửa file Markdown nguồn trước.
-- **Kiểm tra trước khi gộp dữ liệu mới** bằng `python validate_data.py` (xem bên dưới).
-- Chạy `python convert_md_to_json.py` để sinh lại file JSON.
-- Chạy `python check_unique_chunks.py docs/chunk-en-vi.md` để kiểm tra xem có dòng chunk nào bị trùng không.
+- **Kiểm tra trước khi gộp dữ liệu mới** bằng `python scripts/validate_data.py` (xem bên dưới).
+- Chạy `python scripts/convert_md_to_json.py` để sinh lại file JSON.
+- Chạy `python scripts/check_unique_chunks.py docs/chunk-en-vi.md` để kiểm tra xem có dòng chunk nào bị trùng không.
 
 ### Validate dữ liệu trước khi đưa vào MD
 
-Script [validate_data.py](validate_data.py) giúp kiểm tra dữ liệu **trước** khi copy vào `chunk-en-vi.md`:
+Script [validate_data.py](scripts/validate_data.py) giúp kiểm tra dữ liệu **trước** khi copy vào `chunk-en-vi.md`:
 
 ```bash
 # 1) Kiểm tra file nháp .md (format + trùng với MD đích)
-python validate_data.py draft drafts/example-chunks.md --against docs/chunk-en-vi.md
+python scripts/validate_data.py draft drafts/example-chunks.md --against docs/chunk-en-vi.md
 
 # 2) Kiểm tra file nháp .json và in ra MD snippet nếu pass
-python validate_data.py json drafts/example-chunks.json --against docs/chunk-en-vi.md --render
+python scripts/validate_data.py json drafts/example-chunks.json --against docs/chunk-en-vi.md --render
 
 # 3) Kiểm tra toàn bộ file MD (cấu trúc, số cụm, trùng lặp)
-python validate_data.py md docs/chunk-en-vi.md
+python scripts/validate_data.py md docs/chunk-en-vi.md
 
 # 4) Xem phrasal verbs trong CSV chưa có trong MD
-python validate_data.py csv common-phrasals-verbs.csv --against docs/chunk-en-vi.md
+python scripts/validate_data.py csv common-phrasals-verbs.csv --against docs/chunk-en-vi.md
 ```
 
 Quy trình đề xuất khi thêm nội dung mới:
 
 1. Tạo file nháp trong thư mục `drafts/` (`.md` hoặc `.json`).
-2. Chạy `validate_data.py draft` hoặc `validate_data.py json`.
+2. Chạy `scripts/validate_data.py draft` hoặc `scripts/validate_data.py json`.
 3. Nếu `PASS`, copy nội dung vào `docs/chunk-en-vi.md`.
-4. Chạy `validate_data.py md` và `convert_md_to_json.py`.
+4. Chạy `scripts/validate_data.py md` và `scripts/convert_md_to_json.py`.
 
 File JSON nháp theo schema:
 
@@ -177,7 +177,7 @@ File này được sinh tự động từ `Vocabulary-topics.md` + Oxford CEFR:
 
 ```bash
 python scripts/build_vocabulary_levels.py
-python convert_md_to_json.py vocab
+python scripts/convert_md_to_json.py vocab
 ```
 
 Cấu trúc:

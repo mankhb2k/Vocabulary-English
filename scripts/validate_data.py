@@ -3,16 +3,16 @@ Validate vocabulary/chunk data before or after editing Markdown source files.
 
 Usage:
     # Kiểm tra toàn bộ file MD (cấu trúc, số cụm, trùng lặp)
-    python validate_data.py md docs/chunk-en-vi.md
+    python scripts/validate_data.py md docs/chunk-en-vi.md
 
     # Kiểm tra file nháp TRƯỚC KHI gộp vào MD
-    python validate_data.py draft drafts/new-chunks.md --against docs/chunk-en-vi.md
+    python scripts/validate_data.py draft drafts/new-chunks.md --against docs/chunk-en-vi.md
 
     # Kiểm tra file JSON nháp
-    python validate_data.py json drafts/new-chunks.json --against docs/chunk-en-vi.md
+    python scripts/validate_data.py json drafts/new-chunks.json --against docs/chunk-en-vi.md
 
     # Kiểm tra phrasal verbs từ CSV chưa có trong MD
-    python validate_data.py csv common-phrasals-verbs.csv --against docs/chunk-en-vi.md
+    python scripts/validate_data.py csv common-phrasals-verbs.csv --against docs/chunk-en-vi.md
 
 Exit code: 0 = pass, 1 = có lỗi
 """
