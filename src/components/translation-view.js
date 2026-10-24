@@ -2,22 +2,24 @@ export function TranslationView() {
   return `
     <div class="view" id="view-translate">
       <section class="translation-chat-shell">
-        <div class="translation-voice-menu">
-          <button class="translation-voice-toggle c-button" id="translation-voice-toggle" type="button" aria-label="Choose US English voice" aria-controls="translation-voice-panel" aria-expanded="false" title="US English voice">
-            <i data-lucide="volume-2" aria-hidden="true"></i><span>US</span>
-          </button>
-          <div class="translation-voice-panel" id="translation-voice-panel" hidden>
-            <label for="translation-voice-select">US English voice</label>
-            <select id="translation-voice-select" aria-label="US English voice">
-              <option value="">Auto (US English)</option>
-            </select>
-            <button class="translation-voice-preview c-button" id="translation-voice-preview" type="button">Preview voice</button>
-            <p>Voices available on this device</p>
+        <div class="translation-top-actions">
+          <div class="translation-voice-menu">
+            <button class="translation-voice-toggle c-button" id="translation-voice-toggle" type="button" aria-label="Choose US English voice" aria-controls="translation-voice-panel" aria-expanded="false" title="US English voice">
+              <i data-lucide="volume-2" aria-hidden="true"></i><span>US</span>
+            </button>
+            <div class="translation-voice-panel" id="translation-voice-panel" hidden>
+              <label for="translation-voice-select">US English voice</label>
+              <select id="translation-voice-select" aria-label="US English voice">
+                <option value="">Auto (US English)</option>
+              </select>
+              <button class="translation-voice-preview c-button" id="translation-voice-preview" type="button">Preview voice</button>
+              <p>Voices available on this device</p>
+            </div>
           </div>
+          <button class="translation-history-toggle c-button" id="translation-history-toggle" type="button" aria-label="Open translation history" aria-controls="translation-history-panel" aria-expanded="false">
+            <i data-lucide="panel-left" aria-hidden="true"></i>
+          </button>
         </div>
-        <button class="translation-history-toggle c-button" id="translation-history-toggle" type="button" aria-label="Open translation history" aria-controls="translation-history-panel" aria-expanded="false">
-          <i data-lucide="panel-left" aria-hidden="true"></i>
-        </button>
         <div class="translation-messages" id="translation-list" aria-live="polite"></div>
         <div class="translation-composer">
           <button class="translation-new c-button" id="translation-new" type="button" hidden>

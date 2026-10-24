@@ -9,7 +9,6 @@ import {
   MessageSquareText,
   PanelLeft,
   Send,
-  Trash2,
   Volume2,
 } from 'lucide';
 
@@ -406,7 +405,6 @@ function renderTranslationHistory({ scrollToBottom = true, preserveScroll = null
       <div class="translation-message-actions">
         <button class="translation-action-button c-button" type="button" data-copy-translation="${id}" aria-label="Copy English translation" title="Copy English"><i data-lucide="copy" aria-hidden="true"></i></button>
         <button class="translation-action-button c-button" type="button" data-speak-translation="${id}" aria-label="Read English aloud" title="Read aloud"><i data-lucide="volume-2" aria-hidden="true"></i></button>
-        ${item.isMock ? '' : `<button class="translation-action-button translation-delete c-button" type="button" data-delete-translation="${id}" aria-label="Delete translation" title="Delete"><i data-lucide="trash-2" aria-hidden="true"></i></button>`}
       </div>
     </article>`;
   });
@@ -422,7 +420,7 @@ function renderTranslationHistory({ scrollToBottom = true, preserveScroll = null
     return;
   }
   list.innerHTML = entries.join('');
-  createIcons({ icons: { Copy, Volume2, Trash2 } });
+  createIcons({ icons: { Copy, Volume2 } });
   if (preserveScroll) list.scrollTop = preserveScroll.top + (list.scrollHeight - previousHeight);
   else if (scrollToBottom) list.scrollTop = list.scrollHeight;
 }
@@ -783,26 +781,6 @@ async function handleTranslationHistoryAction(event) {
     if (!item) return;
     speakEnglish(item.translatedText);
     return;
-  }
-
-  const deleteButton = event.target.closest('[data-delete-translation]');
-  if (!deleteButton) return;
-  deleteButton.disabled = true;
-  try {
-    const response = await fetch('/api/translations', {
-      method: 'DELETE',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ id: deleteButton.dataset.deleteTranslation }),
-    });
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || 'Unable to delete this translation.');
-    state.translationItems = state.translationItems.filter((item) => item.id !== payload.id);
-    renderTranslationHistory();
-    if (!$('#translation-history-panel').hidden) loadTranslationDays();
-    toast('Translation deleted.');
-  } catch (error) {
-    toast(error.message || 'Unable to delete this translation.');
-    deleteButton.disabled = false;
   }
 }
 

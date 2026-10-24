@@ -610,11 +610,17 @@ h1 {
   font-size: var(--font-size-xs);
   white-space: nowrap;
 }
-.translation-voice-menu {
+.translation-top-actions {
   position: absolute;
-  top: 14px;
-  right: 56px;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + 12px);
   z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.translation-voice-menu {
+  position: relative;
 }
 .translation-voice-toggle {
   display: inline-flex;
@@ -644,7 +650,7 @@ h1 {
 .translation-voice-panel {
   position: absolute;
   top: 50px;
-  right: 0;
+  right: calc(-100% - 8px);
   display: grid;
   gap: 10px;
   width: min(290px, calc(100vw - 28px));
@@ -688,10 +694,6 @@ h1 {
   font-size: var(--font-size-xs);
 }
 .translation-history-toggle {
-  position: absolute;
-  top: 14px;
-  right: 6px;
-  z-index: 22;
   display: grid;
   place-items: center;
   width: 42px;
@@ -1192,9 +1194,6 @@ h1 {
 .translation-message-actions button:hover,
 .translation-user-meta button:hover {
   color: var(--navy-dark);
-}
-.translation-message-actions .translation-delete:hover {
-  color: #b42318;
 }
 .translation-composer {
   position: fixed;
@@ -2168,10 +2167,6 @@ h1 {
   .translation-chat-shell {
     height: calc(100dvh - 76px);
     min-height: 460px;
-  }
-  .translation-history-toggle {
-    top: calc(env(safe-area-inset-top) + 12px);
-    right: 6px;
   }
   .translation-history-panel {
     width: min(340px, calc(100vw - 44px));
