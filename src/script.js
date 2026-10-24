@@ -1,4 +1,17 @@
 import { renderApp } from './components/app.js';
+import { createTranslationSamples } from './mock/translation-samples.js';
+import {
+  BookPlus,
+  Copy,
+  createIcons,
+  Languages,
+  Library,
+  MessageSquareText,
+  PanelLeft,
+  Send,
+  Trash2,
+  Volume2,
+} from 'lucide';
 
 const fallbackCards = []; /* Legacy card data moved to D1.
   { english: 'resilient', definition: 'Able to recover quickly from difficulties.', notes: 'Often used to describe a person, team, or system that adapts well to problems.', topic: 'work', category: 'CORE VOCABULARY', pronunciation: '/rɪˈzɪliənt/', example: 'She is resilient and never gives up.' },
@@ -22,7 +35,6 @@ const wordFamilyExamples = []; /* Legacy family data moved to D1.
 
 const state = {
   allCards: [],
-  reviewed: Number(localStorage.getItem('englishCardsReviewed') || 3),
   favorites: JSON.parse(localStorage.getItem('englishCardsFavorites') || '[]'),
   vocabularyCards: [],
   libraryTopic: 'all',
@@ -37,11 +49,73 @@ const state = {
   chatSessions: [],
   activeChatSessionId: null,
   aiChatMessages: [],
+  translationDate: '',
+  translationItems: [],
+  translationSearch: '',
+  translationRequestId: 0,
+  translationPending: '',
+  translationDaysRequestId: 0,
+  translationDayGroups: [],
+  translationCalendarMonth: '',
+  translationSelectedDays: [],
+  translationDraftSelectedDays: [],
+  translationHistoryMode: false,
+  translationNextCursor: null,
+  translationHasMore: false,
+  translationLoadingOlder: false,
+  translationUsVoices: [],
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const PLACEHOLDER_IMAGE = '/api/vocabulary-image?key=placeholder-1.png';
+const translationDemoItems = import.meta.env.DEV ? createTranslationSamples() : [];
+const US_VOICE_STORAGE_KEY = 'englishCardsUsVoice';
+
+function getUsVoices() {
+  if (!('speechSynthesis' in window)) return [];
+  return window.speechSynthesis.getVoices().filter((voice) => voice.lang.toLowerCase().replace('_', '-') === 'en-us');
+}
+
+function getPreferredUsVoice() {
+  const voices = state.translationUsVoices.length ? state.translationUsVoices : getUsVoices();
+  const savedVoiceUri = localStorage.getItem(US_VOICE_STORAGE_KEY);
+  if (savedVoiceUri) {
+    const savedVoice = voices.find((voice) => voice.voiceURI === savedVoiceUri);
+    if (savedVoice) return savedVoice;
+  }
+  return voices.find((voice) => voice.default) || voices[0] || null;
+}
+
+function refreshUsVoiceOptions() {
+  const select = $('#translation-voice-select');
+  if (!select || !('speechSynthesis' in window)) return;
+  const voices = getUsVoices();
+  state.translationUsVoices = voices;
+  const savedVoiceUri = localStorage.getItem(US_VOICE_STORAGE_KEY) || '';
+  select.replaceChildren(new Option('Auto (US English)', ''));
+  voices.forEach((voice) => {
+    const option = new Option(`${voice.name} (${voice.lang})${voice.default ? ' — default' : ''}`, voice.voiceURI);
+    select.add(option);
+  });
+  select.value = voices.some((voice) => voice.voiceURI === savedVoiceUri) ? savedVoiceUri : '';
+  select.disabled = voices.length === 0;
+  select.options[0].textContent = voices.length ? 'Auto (US English)' : 'No US voice found';
+}
+
+function speakEnglish(text, { rate = 1 } = {}) {
+  if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+    toast('Speech playback is not supported in this browser.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = rate;
+  const voice = getPreferredUsVoice();
+  if (voice) utterance.voice = voice;
+  window.speechSynthesis.speak(utterance);
+}
 
 function cardKey(card) { return card.english; }
 
@@ -290,12 +364,446 @@ function shuffleLibrary() {
   renderLibrary();
 }
 
-function renderChart() {
-  const chart = $('#week-chart');
-  if (!chart) return;
-  const values = [4, 6, 3, 8, 5, 3, Math.min(state.reviewed, 10)];
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  chart.innerHTML = values.map((value, index) => `<div class="chart-day"><div class="chart-bar ${index === values.length - 1 ? 'is-today' : ''}" style="height:${Math.max(value * 10, 7)}%" title="${value} cards"></div><small>${days[index]}</small></div>`).join('');
+function localDateValue(date = new Date()) {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 10);
+}
+
+function localDateRange(dateValue) {
+  const [year, month, day] = dateValue.split('-').map(Number);
+  const start = new Date(year, month - 1, day);
+  const end = new Date(year, month - 1, day + 1);
+  return { from: start.toISOString(), to: end.toISOString() };
+}
+
+function translationDate(dateValue) {
+  const timestamp = new Date(`${String(dateValue || '').replace(' ', 'T')}Z`);
+  return Number.isNaN(timestamp.getTime()) ? new Date() : timestamp;
+}
+
+function renderTranslationHistory({ scrollToBottom = true, preserveScroll = null } = {}) {
+  const list = $('#translation-list');
+  if (!list) return;
+  const previousHeight = preserveScroll ? list.scrollHeight : 0;
+  const query = state.translationSearch.trim().toLocaleLowerCase();
+  const items = state.translationItems
+    .filter((item) => !query || `${item.sourceText} ${item.translatedText}`.toLocaleLowerCase().includes(query))
+    .sort((left, right) => translationDate(left.createdAt) - translationDate(right.createdAt));
+  $('#translation-count').textContent = `${items.length} ${items.length === 1 ? 'translation' : 'translations'}`;
+
+  let previousDay = '';
+  const entries = items.map((item) => {
+    const time = translationDate(item.createdAt);
+    const day = localDateValue(time);
+    const dateDivider = day === previousDay ? '' : `<div class="translation-day-divider"><span>${escapeHtml(time.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }))}</span></div>`;
+    previousDay = day;
+    const id = escapeHtml(item.id);
+    return `${dateDivider}<article class="translation-turn">
+      <div class="translation-user-row"><div class="translation-user-bubble">${escapeHtml(item.sourceText)}</div></div>
+      <div class="translation-user-meta"><time>${escapeHtml(time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))}</time><button class="c-button" type="button" data-copy-source="${id}">Copy</button></div>
+      <div class="translation-ai-row"><span class="translation-ai-mark" aria-hidden="true">✦</span><span>English translation</span>${item.isMock ? '<span class="translation-demo-badge">DEMO</span>' : ''}</div>
+      <div class="translation-ai-bubble">${escapeHtml(item.translatedText)}</div>
+      <div class="translation-message-actions">
+        <button class="translation-action-button c-button" type="button" data-copy-translation="${id}" aria-label="Copy English translation" title="Copy English"><i data-lucide="copy" aria-hidden="true"></i></button>
+        <button class="translation-action-button c-button" type="button" data-speak-translation="${id}" aria-label="Read English aloud" title="Read aloud"><i data-lucide="volume-2" aria-hidden="true"></i></button>
+        ${item.isMock ? '' : `<button class="translation-action-button translation-delete c-button" type="button" data-delete-translation="${id}" aria-label="Delete translation" title="Delete"><i data-lucide="trash-2" aria-hidden="true"></i></button>`}
+      </div>
+    </article>`;
+  });
+  if (state.translationPending) {
+    entries.push(`<article class="translation-turn is-pending">
+      <div class="translation-user-row"><div class="translation-user-bubble">${escapeHtml(state.translationPending)}</div></div>
+      <div class="translation-ai-row"><span class="translation-ai-mark" aria-hidden="true">✦</span><span>English translation</span></div>
+      <div class="translation-ai-bubble">Translating…</div>
+    </article>`);
+  }
+  if (!entries.length) {
+    list.innerHTML = `<div class="translation-empty">${query ? 'No saved messages match your search.' : 'Your translations will appear here. Send a Vietnamese sentence to get started.'}</div>`;
+    return;
+  }
+  list.innerHTML = entries.join('');
+  createIcons({ icons: { Copy, Volume2, Trash2 } });
+  if (preserveScroll) list.scrollTop = preserveScroll.top + (list.scrollHeight - previousHeight);
+  else if (scrollToBottom) list.scrollTop = list.scrollHeight;
+}
+
+function setTranslationHistoryMode(isHistory) {
+  state.translationHistoryMode = isHistory;
+  $('.translation-composer').classList.toggle('is-history', isHistory);
+  $('#translation-form').hidden = isHistory;
+  $('#translation-new').hidden = !isHistory;
+}
+
+function setTranslationStatus(message = '', type = '') {
+  const element = $('#translation-status');
+  element.textContent = message;
+  element.className = `translation-status${type ? ` is-${type}` : ''}`;
+}
+
+function renderTranslationDays() {
+  const list = $('#translation-day-list');
+  if (!list) return;
+  const query = state.translationSearch.trim().toLocaleLowerCase();
+  const groups = state.translationDayGroups
+    .filter((day) => !state.translationSelectedDays.length || state.translationSelectedDays.includes(day.day))
+    .filter((day) => !query || `${day.latest_source || ''} ${day.latest_translation || ''}`.toLocaleLowerCase().includes(query));
+  if (!groups.length) {
+    $('#translation-count').textContent = '0 translations';
+    const emptyMessage = query ? 'No chats match your search.' : (state.translationSelectedDays.length ? 'No chats saved for the selected days.' : 'No chats saved yet.');
+    list.innerHTML = `<p class="translation-day-empty">${emptyMessage}</p>`;
+    return;
+  }
+  const total = groups.reduce((count, day) => count + Number(day.count || 0), 0);
+  $('#translation-count').textContent = `${total} ${total === 1 ? 'translation' : 'translations'}`;
+  list.innerHTML = groups.map((day) => {
+    const date = new Date(`${day.day}T12:00:00`);
+    const dateLabel = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const count = Number(day.count || 0);
+    return `<button class="translation-day-item c-button" type="button" data-translation-chat-day="${escapeHtml(day.day)}">
+      <span class="translation-day-heading"><strong>${escapeHtml(dateLabel)}</strong><small>${count} ${count === 1 ? 'translation' : 'translations'}${day.isMock ? ' · DEMO' : ''}</small></span>
+      <span class="translation-day-preview"><span>${escapeHtml(day.latest_source || '')}</span><span>${escapeHtml(day.latest_translation || '')}</span></span>
+    </button>`;
+  }).join('');
+}
+
+function includeTranslationDemos(items, dateValue = '') {
+  const combined = new Map(items.map((item) => [item.id, item]));
+  for (const item of translationDemoItems) {
+    if (!dateValue || localDateValue(translationDate(item.createdAt)) === dateValue) combined.set(item.id, item);
+  }
+  return [...combined.values()];
+}
+
+async function loadTranslationDays() {
+  const list = $('#translation-day-list');
+  const requestId = ++state.translationDaysRequestId;
+  list.innerHTML = '<p class="translation-day-empty">Loading history…</p>';
+  try {
+    const params = new URLSearchParams({ group: 'days', offsetMinutes: String(new Date().getTimezoneOffset()) });
+    const response = await fetch(`/api/translations?${params}`);
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to load translation history.');
+    if (requestId !== state.translationDaysRequestId) return;
+    state.translationDayGroups = mergeTranslationDayGroups(Array.isArray(payload.days) ? payload.days : []);
+    renderTranslationDayFilter();
+    renderTranslationDays();
+  } catch (error) {
+    if (requestId !== state.translationDaysRequestId) return;
+    if (translationDemoItems.length) {
+      state.translationDayGroups = mergeTranslationDayGroups([]);
+      renderTranslationDayFilter();
+      renderTranslationDays();
+    } else {
+      list.innerHTML = `<p class="translation-day-empty">${escapeHtml(error.message || 'Unable to load translation history.')}</p>`;
+    }
+  }
+}
+
+function mergeTranslationDayGroups(groups) {
+  const merged = new Map(groups.map((day) => [day.day, { ...day, count: Number(day.count || 0), isMock: false }]));
+  for (const item of translationDemoItems) {
+    const dayKey = localDateValue(translationDate(item.createdAt));
+    const current = merged.get(dayKey) || {
+      day: dayKey,
+      count: 0,
+      latest_at: item.createdAt,
+      latest_source: item.sourceText,
+      latest_translation: item.translatedText,
+      isMock: false,
+    };
+    current.count += 1;
+    if (translationDate(item.createdAt) >= translationDate(current.latest_at)) {
+      current.latest_at = item.createdAt;
+      current.latest_source = item.sourceText;
+      current.latest_translation = item.translatedText;
+    }
+    current.isMock = true;
+    merged.set(dayKey, current);
+  }
+  return [...merged.values()].sort((left, right) => right.day.localeCompare(left.day));
+}
+
+function renderTranslationDayFilter() {
+  if (state.translationDate !== 'all' && !state.translationDayGroups.some((day) => day.day === state.translationDate)) {
+    state.translationDate = 'all';
+  }
+  const availableDates = new Set(state.translationDayGroups.map((day) => day.day));
+  state.translationSelectedDays = state.translationSelectedDays.filter((day) => availableDates.has(day));
+  state.translationDraftSelectedDays = state.translationDraftSelectedDays.filter((day) => availableDates.has(day));
+  if (!state.translationCalendarMonth) state.translationCalendarMonth = localDateValue().slice(0, 7);
+  const [year, month] = state.translationCalendarMonth.split('-').map(Number);
+  const monthSelect = $('#translation-calendar-month');
+  const yearSelect = $('#translation-calendar-year');
+  const monthNames = Array.from({ length: 12 }, (_, index) => new Date(2020, index, 1).toLocaleDateString('en-US', { month: 'long' }));
+  monthSelect.innerHTML = monthNames.map((name, index) => `<option value="${index + 1}">${name}</option>`).join('');
+
+  const currentYear = new Date().getFullYear();
+  const yearsInData = state.translationDayGroups.map((day) => Number(day.day.slice(0, 4)));
+  const firstYear = Math.min(currentYear - 5, year, ...yearsInData);
+  const lastYear = Math.max(currentYear + 1, year, ...yearsInData);
+  yearSelect.innerHTML = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index)
+    .map((value) => `<option value="${value}">${value}</option>`).join('');
+  monthSelect.value = String(month);
+  yearSelect.value = String(year);
+
+  const selectedDate = state.translationSelectedDays.length
+    ? `${state.translationSelectedDays.length} ${state.translationSelectedDays.length === 1 ? 'day' : 'days'} selected`
+    : 'All dates';
+  $('#translation-date-trigger').textContent = selectedDate;
+  $('#translation-date-trigger').setAttribute('aria-label', `History filter: ${selectedDate}`);
+  renderTranslationCalendar();
+}
+
+function renderTranslationCalendar() {
+  const [year, month] = state.translationCalendarMonth.split('-').map(Number);
+  const firstWeekday = new Date(year, month - 1, 1).getDay();
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const cellCount = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
+  const availableDates = new Set(state.translationDayGroups.map((day) => day.day));
+  const cells = [];
+
+  for (let index = 0; index < cellCount; index += 1) {
+    const dayNumber = index - firstWeekday + 1;
+    if (dayNumber < 1 || dayNumber > daysInMonth) {
+      const adjacentDay = dayNumber < 1
+        ? new Date(year, month - 1, dayNumber).getDate()
+        : new Date(year, month, dayNumber - daysInMonth).getDate();
+      cells.push(`<span class="translation-calendar-day is-outside" aria-hidden="true">${adjacentDay}</span>`);
+      continue;
+    }
+
+    const dateValue = `${year}-${String(month).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+    const hasData = availableDates.has(dateValue);
+    const selected = state.translationDraftSelectedDays.includes(dateValue);
+    cells.push(`<button class="translation-calendar-day${hasData ? ' has-data' : ''}${selected ? ' is-selected' : ''}" type="button" data-calendar-day="${dateValue}"${hasData ? '' : ' disabled'} aria-label="${dateValue}${hasData ? ', has saved translations' : ', no saved translations'}" aria-pressed="${selected}">${dayNumber}${selected ? '<span class="translation-calendar-check" aria-hidden="true">✓</span>' : hasData ? '<span></span>' : ''}</button>`);
+  }
+
+  $('#translation-calendar-days').innerHTML = cells.join('');
+  const selectedCount = state.translationDraftSelectedDays.length;
+  $('#translation-calendar-selected-count').textContent = selectedCount ? `${selectedCount} selected` : 'All dates';
+}
+
+function setTranslationCalendarOpen(isOpen) {
+  state.translationDraftSelectedDays = [...state.translationSelectedDays];
+  $('#translation-calendar').hidden = !isOpen;
+  $('#translation-date-trigger').setAttribute('aria-expanded', String(isOpen));
+  if (isOpen) renderTranslationCalendar();
+}
+
+function setTranslationHistoryOpen(isOpen) {
+  const panel = $('#translation-history-panel');
+  const backdrop = $('#translation-history-backdrop');
+  const toggle = $('#translation-history-toggle');
+  panel.hidden = !isOpen;
+  backdrop.hidden = !isOpen;
+  toggle.setAttribute('aria-expanded', String(isOpen));
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+  if (isOpen) loadTranslationDays();
+}
+
+async function loadTranslationHistory() {
+  const dateValue = state.translationDate !== 'all' ? state.translationDate : localDateValue();
+  state.translationDate = dateValue;
+  const requestId = ++state.translationRequestId;
+  const { from, to } = localDateRange(dateValue);
+  const list = $('#translation-list');
+  list.innerHTML = '<div class="translation-empty c-surface">Loading saved translations…</div>';
+  try {
+    const params = new URLSearchParams({ from, to, limit: '500' });
+    const response = await fetch(`/api/translations?${params}`);
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to load translation history.');
+    if (requestId !== state.translationRequestId) return;
+    state.translationItems = includeTranslationDemos(Array.isArray(payload.items) ? payload.items : [], dateValue);
+    renderTranslationHistory();
+    if (!$('#translation-history-panel').hidden) loadTranslationDays();
+  } catch (error) {
+    if (requestId !== state.translationRequestId) return;
+    if (translationDemoItems.length) {
+      state.translationItems = translationDemoItems.filter((item) => localDateValue(translationDate(item.createdAt)) === dateValue);
+      renderTranslationHistory();
+    } else {
+      state.translationItems = [];
+      list.innerHTML = `<div class="translation-empty c-surface">${escapeHtml(error.message || 'Unable to load translation history.')}</div>`;
+      $('#translation-count').textContent = '';
+    }
+  }
+}
+
+async function loadAllTranslationHistory({ reset = true } = {}) {
+  if (!reset && (state.translationLoadingOlder || !state.translationHasMore || state.translationHistoryMode)) return;
+  const requestId = reset ? ++state.translationRequestId : state.translationRequestId;
+  const preserveScroll = reset ? null : { top: $('#translation-list').scrollTop };
+  if (reset) {
+    state.translationItems = [];
+    state.translationNextCursor = null;
+    state.translationHasMore = false;
+    state.translationLoadingOlder = false;
+    renderTranslationHistory();
+  } else {
+    state.translationLoadingOlder = true;
+  }
+
+  try {
+    const params = new URLSearchParams({ limit: '30' });
+    if (state.translationNextCursor) {
+      params.set('before', state.translationNextCursor.createdAt);
+      params.set('beforeId', state.translationNextCursor.id);
+    }
+    const response = await fetch(`/api/translations?${params}`);
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to load translation history.');
+    if (requestId !== state.translationRequestId) return;
+
+    const incoming = Array.isArray(payload.items) ? payload.items : [];
+    const merged = new Map(state.translationItems.map((item) => [item.id, item]));
+    incoming.forEach((item) => merged.set(item.id, item));
+    state.translationItems = includeTranslationDemos([...merged.values()]);
+    state.translationHasMore = Boolean(payload.hasMore);
+    state.translationNextCursor = payload.nextCursor || null;
+    renderTranslationHistory({ scrollToBottom: reset, preserveScroll });
+  } catch (error) {
+    if (requestId !== state.translationRequestId) return;
+    if (translationDemoItems.length && reset) {
+      state.translationItems = [...translationDemoItems];
+      state.translationHasMore = false;
+      state.translationNextCursor = null;
+      renderTranslationHistory();
+    } else if (reset) {
+      $('#translation-list').innerHTML = `<div class="translation-empty c-surface">${escapeHtml(error.message || 'Unable to load translation history.')}</div>`;
+      $('#translation-count').textContent = '';
+    }
+  } finally {
+    if (requestId === state.translationRequestId) state.translationLoadingOlder = false;
+  }
+}
+
+async function generateTranslation(event) {
+  event.preventDefault();
+  const sourceInput = $('#translation-source');
+  const button = $('#translation-generate');
+  const sourceText = sourceInput.value.trim();
+  if (!sourceText) return;
+
+  button.disabled = true;
+  state.translationSearch = '';
+  $('#translation-search').value = '';
+  state.translationPending = sourceText;
+  renderTranslationHistory();
+  setTranslationStatus('Translating and saving…');
+  sourceInput.disabled = true;
+  try {
+    const response = await fetch('/api/translations', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sourceText }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to translate this sentence.');
+
+    sourceInput.value = '';
+    $('#translation-character-count').textContent = '0';
+    state.translationPending = '';
+    await loadAllTranslationHistory();
+    if (!$('#translation-history-panel').hidden) loadTranslationDays();
+    setTranslationStatus('Translation saved to your history.', 'success');
+  } catch (error) {
+    if (translationDemoItems.length) {
+      const mockItem = {
+        id: `demo-${crypto.randomUUID()}`,
+        sourceText,
+        translatedText: `Mock English translation for preview: ${sourceText}`,
+        createdAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        isMock: true,
+      };
+      translationDemoItems.unshift(mockItem);
+      state.translationItems = [mockItem, ...state.translationItems];
+      state.translationPending = '';
+      sourceInput.value = '';
+      $('#translation-character-count').textContent = '0';
+      renderTranslationHistory();
+      if (!$('#translation-history-panel').hidden) loadTranslationDays();
+      setTranslationStatus('Development demo only — this sample was not sent to AI or saved to D1.', 'success');
+    } else {
+      state.translationPending = '';
+      await loadAllTranslationHistory();
+      if (!$('#translation-history-panel').hidden) loadTranslationDays();
+      setTranslationStatus(error.message || 'Something went wrong while translating.', 'error');
+    }
+  } finally {
+    sourceInput.disabled = false;
+    button.disabled = false;
+  }
+}
+
+async function handleTranslationHistoryAction(event) {
+  const chatDayButton = event.target.closest('[data-translation-chat-day]');
+  if (chatDayButton) {
+    state.translationSearch = '';
+    $('#translation-search').value = '';
+    state.translationDate = chatDayButton.dataset.translationChatDay;
+    state.translationCalendarMonth = state.translationDate.slice(0, 7);
+    renderTranslationDayFilter();
+    setTranslationCalendarOpen(false);
+    setTranslationHistoryMode(true);
+    setTranslationHistoryOpen(false);
+    await loadTranslationHistory();
+    return;
+  }
+
+  const sourceButton = event.target.closest('[data-copy-source]');
+  if (sourceButton) {
+    const item = state.translationItems.find((entry) => entry.id === sourceButton.dataset.copySource);
+    if (!item) return;
+    try {
+      await navigator.clipboard.writeText(item.sourceText);
+      toast('Vietnamese message copied.');
+    } catch {
+      toast('Unable to copy this message.');
+    }
+    return;
+  }
+
+  const copyButton = event.target.closest('[data-copy-translation]');
+  if (copyButton) {
+    const item = state.translationItems.find((entry) => entry.id === copyButton.dataset.copyTranslation);
+    if (!item) return;
+    try {
+      await navigator.clipboard.writeText(item.translatedText);
+      toast('English translation copied.');
+    } catch {
+      toast('Unable to copy this translation.');
+    }
+    return;
+  }
+
+  const speakButton = event.target.closest('[data-speak-translation]');
+  if (speakButton) {
+    const item = state.translationItems.find((entry) => entry.id === speakButton.dataset.speakTranslation);
+    if (!item) return;
+    speakEnglish(item.translatedText);
+    return;
+  }
+
+  const deleteButton = event.target.closest('[data-delete-translation]');
+  if (!deleteButton) return;
+  deleteButton.disabled = true;
+  try {
+    const response = await fetch('/api/translations', {
+      method: 'DELETE',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id: deleteButton.dataset.deleteTranslation }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Unable to delete this translation.');
+    state.translationItems = state.translationItems.filter((item) => item.id !== payload.id);
+    renderTranslationHistory();
+    if (!$('#translation-history-panel').hidden) loadTranslationDays();
+    toast('Translation deleted.');
+  } catch (error) {
+    toast(error.message || 'Unable to delete this translation.');
+    deleteButton.disabled = false;
+  }
 }
 
 function renderCustomVocabulary() {
@@ -575,7 +1083,6 @@ function startEditingVocabulary(card) {
 
 function renderAll() {
   renderLibrary();
-  renderChart();
   renderFamilyRootOptions();
 }
 
@@ -649,13 +1156,23 @@ async function submitVocabulary(event) {
 }
 
 function showView(viewName, { syncHistory = true } = {}) {
+  if (viewName === 'stats') viewName = 'translate';
   if (state.selectedCard) closeVocabularyDetail();
   setChatSessionsOpen(false);
   if (syncHistory) setAppRoute(viewName, null, true);
   $$('.view').forEach((view) => view.classList.toggle('is-visible', view.id === `view-${viewName}`));
   $$('.nav-item').forEach((button) => button.classList.toggle('is-active', button.dataset.view === viewName));
   if (viewName === 'library') renderLibrary();
-  if (viewName === 'stats') renderChart();
+  if (viewName === 'translate') {
+    if (state.translationHistoryMode) {
+      loadTranslationHistory();
+    } else if (state.translationItems.length) {
+      const messages = $('#translation-list');
+      messages.scrollTop = messages.scrollHeight;
+    } else {
+      loadAllTranslationHistory();
+    }
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -680,12 +1197,7 @@ function formatDefinition(value) {
 }
 
 function speakWord(word) {
-  if (!('speechSynthesis' in window)) return toast('Your browser does not support pronunciation playback.');
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(word);
-  utterance.lang = 'en-US';
-  utterance.rate = .86;
-  window.speechSynthesis.speak(utterance);
+  speakEnglish(word, { rate: .86 });
 }
 
 let toastTimer;
@@ -713,6 +1225,112 @@ function initEvents() {
     showView(button.dataset.view);
   }));
   $('#ai-vocabulary-form').addEventListener('submit', generateAiDraft);
+  $('#translation-form').addEventListener('submit', generateTranslation);
+  $('#translation-source').addEventListener('input', (event) => {
+    $('#translation-character-count').textContent = event.target.value.length.toLocaleString('en-US');
+  });
+  $('#translation-date-trigger').addEventListener('click', () => {
+    setTranslationCalendarOpen($('#translation-calendar').hidden);
+  });
+  $('#translation-calendar-all').addEventListener('click', () => {
+    state.translationDraftSelectedDays = [];
+    renderTranslationCalendar();
+  });
+  $('#translation-calendar').addEventListener('click', (event) => {
+    // Day clicks rerender the grid, detaching the original target before the
+    // document-level outside-click handler runs. Keep calendar clicks inside.
+    event.stopPropagation();
+    const dayButton = event.target.closest('[data-calendar-day]');
+    if (dayButton) {
+      const selectedDays = new Set(state.translationDraftSelectedDays);
+      if (selectedDays.has(dayButton.dataset.calendarDay)) selectedDays.delete(dayButton.dataset.calendarDay);
+      else selectedDays.add(dayButton.dataset.calendarDay);
+      state.translationDraftSelectedDays = [...selectedDays].sort();
+      renderTranslationCalendar();
+      return;
+    }
+    const stepButton = event.target.closest('[data-calendar-step]');
+    if (!stepButton) return;
+    const [year, month] = state.translationCalendarMonth.split('-').map(Number);
+    const nextMonth = new Date(year, month - 1 + Number(stepButton.dataset.calendarStep), 1);
+    state.translationCalendarMonth = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}`;
+    renderTranslationDayFilter();
+  });
+  const updateCalendarMonth = () => {
+    state.translationCalendarMonth = `${$('#translation-calendar-year').value}-${String($('#translation-calendar-month').value).padStart(2, '0')}`;
+    renderTranslationCalendar();
+  };
+  $('#translation-calendar-month').addEventListener('change', updateCalendarMonth);
+  $('#translation-calendar-year').addEventListener('change', updateCalendarMonth);
+  $('#translation-calendar-cancel').addEventListener('click', () => setTranslationCalendarOpen(false));
+  $('#translation-calendar-apply').addEventListener('click', () => {
+    state.translationSelectedDays = [...state.translationDraftSelectedDays];
+    renderTranslationDayFilter();
+    renderTranslationDays();
+    setTranslationCalendarOpen(false);
+  });
+  $('#translation-new').addEventListener('click', async () => {
+    setTranslationHistoryMode(false);
+    state.translationDate = 'all';
+    state.translationSelectedDays = [];
+    state.translationDraftSelectedDays = [];
+    state.translationCalendarMonth = localDateValue().slice(0, 7);
+    state.translationSearch = '';
+    $('#translation-search').value = '';
+    renderTranslationDayFilter();
+    setTranslationStatus('');
+    await loadAllTranslationHistory();
+    $('#translation-source').focus();
+  });
+  $('#translation-history-toggle').addEventListener('click', () => {
+    setTranslationHistoryOpen($('#translation-history-panel').hidden);
+  });
+  $('#translation-voice-toggle').addEventListener('click', () => {
+    const panel = $('#translation-voice-panel');
+    const isOpening = panel.hidden;
+    panel.hidden = !isOpening;
+    $('#translation-voice-toggle').setAttribute('aria-expanded', String(isOpening));
+    if (isOpening) refreshUsVoiceOptions();
+  });
+  $('#translation-voice-select').addEventListener('change', (event) => {
+    if (event.target.value) localStorage.setItem(US_VOICE_STORAGE_KEY, event.target.value);
+    else localStorage.removeItem(US_VOICE_STORAGE_KEY);
+  });
+  $('#translation-voice-preview').addEventListener('click', () => {
+    speakEnglish('This is a sample of the selected US English voice.');
+  });
+  $('#translation-history-close').addEventListener('click', () => setTranslationHistoryOpen(false));
+  $('#translation-history-backdrop').addEventListener('click', () => setTranslationHistoryOpen(false));
+  $('#translation-search').addEventListener('input', (event) => {
+    state.translationSearch = event.target.value;
+    renderTranslationHistory();
+    renderTranslationDays();
+  });
+  $('#translation-list').addEventListener('click', handleTranslationHistoryAction);
+  $('#translation-list').addEventListener('scroll', () => {
+    if (state.translationListScrollFrame) cancelAnimationFrame(state.translationListScrollFrame);
+    state.translationListScrollFrame = requestAnimationFrame(() => {
+      const list = $('#translation-list');
+      if (!state.translationHistoryMode && list.scrollTop < 80) loadAllTranslationHistory({ reset: false });
+    });
+  }, { passive: true });
+  $('#translation-day-list').addEventListener('click', handleTranslationHistoryAction);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !$('#translation-calendar').hidden) {
+      setTranslationCalendarOpen(false);
+      return;
+    }
+    if (event.key === 'Escape' && !$('#translation-history-panel').hidden) setTranslationHistoryOpen(false);
+  });
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.translation-voice-menu')) {
+      $('#translation-voice-panel').hidden = true;
+      $('#translation-voice-toggle').setAttribute('aria-expanded', 'false');
+    }
+    if (!event.target.closest('.translation-date-filter') && !$('#translation-calendar').hidden) {
+      setTranslationCalendarOpen(false);
+    }
+  });
   $('#ai-apply-draft').addEventListener('click', applyAiDraft);
   $$('.filter-chip').forEach((button) => button.addEventListener('click', () => {
     state.libraryTopic = button.dataset.libraryTopic;
@@ -750,7 +1368,22 @@ function initEvents() {
 
 async function init() {
   renderApp(document.querySelector('#app'));
+  createIcons({ icons: { Library, Languages, BookPlus, MessageSquareText, Send, PanelLeft, Volume2 } });
+  state.translationDate = 'all';
+  state.translationSelectedDays = [];
+  state.translationDraftSelectedDays = [];
+  state.translationCalendarMonth = localDateValue().slice(0, 7);
+  renderTranslationDayFilter();
+  setTranslationHistoryMode(false);
+  $('#translation-source').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      $('#translation-form').requestSubmit();
+    }
+  });
   initEvents();
+  refreshUsVoiceOptions();
+  if ('speechSynthesis' in window) window.speechSynthesis.addEventListener('voiceschanged', refreshUsVoiceOptions);
   renderAll();
   await loadCustomVocabulary();
   initHistory();
