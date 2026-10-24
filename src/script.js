@@ -706,7 +706,7 @@ async function generateTranslation(event) {
     state.translationPending = '';
     await loadAllTranslationHistory();
     if (!$('#translation-history-panel').hidden) loadTranslationDays();
-    setTranslationStatus('Translation saved to your history.', 'success');
+    setTranslationStatus('');
   } catch (error) {
     if (translationDemoItems.length) {
       const mockItem = {
