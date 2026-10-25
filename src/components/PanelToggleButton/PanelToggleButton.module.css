@@ -1,0 +1,33 @@
+
+.panelToggleButton {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--color-on-primary-container);
+  background: var(--color-primary-container);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+.panelToggleButton:hover {
+  border-color: var(--color-primary-muted);
+  background: #c6dcfb;
+  box-shadow: var(--shadow-md);
+}
+.panelToggleButton svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+@media (max-width: 360px) {
+  .panelToggleButton {
+    width: 40px;
+    height: 40px;
+  }
+}

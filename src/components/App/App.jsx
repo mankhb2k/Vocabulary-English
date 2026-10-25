@@ -1,9 +1,11 @@
+import styles from './App.module.css';
+import { cx } from '../../lib/cx.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Sidebar } from './Sidebar.jsx';
-import { LibraryView } from './LibraryView.jsx';
-import { TranslationView } from './TranslationView.jsx';
-import { AddView } from './AddView.jsx';
-import { AskView } from './AskView.jsx';
+import { Sidebar } from '../Sidebar/Sidebar.jsx';
+import { LibraryView } from '../LibraryView/LibraryView.jsx';
+import { TranslationView } from '../TranslationView/TranslationView.jsx';
+import { AddView } from '../AddView/AddView.jsx';
+import { AskView } from '../AskView/AskView.jsx';
 
 function readRoute() {
   const hash = decodeURIComponent(window.location.hash.slice(1));
@@ -46,14 +48,14 @@ export function App() {
     navigate('add');
   }, [navigate]);
 
-  return <div className="app-shell">
+  return <div className={cx(styles, "app-shell")}>
       <Sidebar view={route.view} onNavigate={(view) => { if (view === 'add') setEditingCard(null); navigate(view); }}/>
-    <main className="main-content">
+    <main className={cx(styles, "main-content")}>
       <LibraryView active={route.view === 'library'} cardWord={route.card} refreshKey={refreshKey} onNavigate={navigate} onEdit={editCard} onToast={notify}/>
       <TranslationView active={route.view === 'translate'} onToast={notify}/>
       <AddView active={route.view === 'add'} editingCard={editingCard} onVocabularyChanged={() => setRefreshKey((value) => value + 1)} onSaved={() => { setEditingCard(null); setRefreshKey((value) => value + 1); navigate('library'); }} onToast={notify}/>
       <AskView active={route.view === 'ask'} onToast={notify}/>
     </main>
-    <div className={`toast${toast ? ' is-visible' : ''}`} role="status" aria-live="polite">{toast}</div>
+    <div className={cx(styles, `toast${toast ? ' is-visible' : ''}`)} role="status" aria-live="polite">{toast}</div>
   </div>;
 }

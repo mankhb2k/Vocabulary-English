@@ -1,0 +1,849 @@
+
+.translationView {
+  max-width: none;
+  width: calc(100% + var(--content-gutter) + var(--content-gutter));
+  margin-right: calc(0px - var(--content-gutter));
+  margin-left: calc(0px - var(--content-gutter));
+  padding-top: 0;
+}
+.translationChatShell {
+  --history-width: 0px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-height: 100dvh;
+  overflow: visible;
+}
+.translationChatShell.isHistoryOpen {
+  --history-width: 320px;
+  grid-template-columns: minmax(0, 1fr) var(--history-width);
+}
+.translationMain {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+.translationHistoryToggle {
+  display: grid;
+}
+.translationCount {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+.translationTopActions {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + var(--history-width) + 12px);
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.translationVoiceMenu {
+  position: relative;
+}
+.translationVoiceToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 48px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+.translationVoiceToggle:hover {
+  border-color: var(--color-primary-muted);
+  background: var(--color-primary-container);
+}
+.translationVoiceToggle svg {
+  width: 19px;
+  height: 19px;
+}
+.translationVoiceToggle span {
+  font-size: 10px;
+  font-weight: 800;
+}
+.translationVoicePanel {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  display: grid;
+  gap: 10px;
+  width: min(290px, calc(100vw - 28px));
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+}
+.translationVoicePanel[hidden] {
+  display: none;
+}
+.translationVoicePanel label {
+  color: var(--ink);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+.translationVoicePanel select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  background: var(--white);
+  font: inherit;
+}
+.translationVoicePreview {
+  min-height: 40px;
+  border-radius: var(--radius-pill);
+  color: var(--white);
+  background: var(--navy);
+  font-weight: 700;
+}
+.translationVoicePreview:hover {
+  background: var(--navy-dark);
+}
+.translationVoicePanel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+.translationHistorySidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 18;
+  display: none;
+  width: 320px;
+  height: 100dvh;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  border-left: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--paper-deep);
+}
+.translationHistorySidebar.isOpen {
+  display: flex;
+}
+.translationHistoryPanelHeading {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.translationHistoryPanelHeading > div {
+  min-width: 0;
+}
+.translationHistoryPanelHeading strong {
+  font-size: var(--font-size-md);
+}
+.translationHistoryPanelHeading button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--muted);
+  background: transparent;
+  font-size: 23px;
+  line-height: 1;
+}
+.translationHistoryPanelHeading button:hover {
+  color: var(--ink);
+  background: var(--paper);
+}
+.translationHistoryFilters {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.translationDayList {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  overflow-y: auto;
+}
+.translationDateFilter {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+.translationCalendarTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 8px 11px;
+  color: var(--ink);
+  background: var(--white);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-align: left;
+}
+.translationCalendarTrigger:hover {
+  border-color: var(--color-primary);
+}
+.translationCalendar[hidden] {
+  display: none;
+}
+.translationCalendar {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 55;
+  width: min(100%, 380px);
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+.translationCalendarHeader {
+  display: grid;
+  grid-template-columns: auto 30px minmax(0, 1fr) minmax(54px, auto) 30px;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 12px;
+}
+.translationCalendarAll {
+  display: grid;
+  place-items: center;
+  min-height: 34px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+}
+.translationCalendarStep {
+  display: grid;
+  place-items: center;
+  min-height: 34px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+}
+.translationCalendarAll {
+  padding: 0 8px;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+.translationCalendarStep {
+  font-size: 25px;
+  line-height: 1;
+}
+.translationCalendarAll:hover {
+  background: var(--color-primary-pale);
+}
+.translationCalendarStep:hover {
+  background: var(--color-primary-pale);
+}
+.translationCalendarHeader select {
+  min-width: 0;
+  min-height: 34px;
+  border: 0;
+  border-radius: 7px;
+  padding: 0 4px;
+  color: var(--ink);
+  background: var(--white);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+.translationCalendarWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+.translationCalendarDays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+.translationCalendarWeekdays {
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-align: center;
+}
+.translationCalendarWeekdays span {
+  padding: 5px 0;
+}
+.translationCalendarDay {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 9px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+.translationCalendarDay.isOutside {
+  color: var(--line);
+}
+.translationCalendarDay:disabled {
+  cursor: default;
+  color: #c5c9d0;
+}
+.translationCalendarDay.hasData {
+  color: var(--ink);
+  font-weight: 600;
+}
+.translationCalendarDay.hasData:hover {
+  background: var(--color-primary-pale);
+}
+.translationCalendarDay.hasData > span:not(.translationCalendarCheck) {
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+.translationCalendarDay.isSelected {
+  color: var(--white);
+  background: var(--color-primary);
+}
+.translationCalendarDay.isSelected > span {
+  background: var(--white);
+}
+.translationCalendarDay .translationCalendarCheck {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  color: var(--white);
+  background: transparent;
+  font-size: 9px;
+  font-weight: 800;
+}
+.translationCalendarDay.isSelected > .translationCalendarCheck {
+  background: transparent;
+}
+.translationCalendarFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+.translationCalendarSelectedCount {
+  align-self: center;
+  margin-right: auto;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+.translationCalendarFooter button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--white);
+  background: var(--color-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+.translationCalendarFooter button:hover {
+  background: var(--color-primary-hover);
+}
+.translationCalendarFooter .translationCalendarCancel {
+  color: var(--muted);
+  background: transparent;
+}
+.translationCalendarFooter .translationCalendarCancel:hover {
+  background: var(--color-primary-pale);
+}
+.translationSearchFilter input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--white);
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+.translationSearchFilter input:focus {
+  border-color: var(--mint-strong);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+.translationSearchFilter {
+  display: block;
+}
+.translationDayList {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.translationDayItem {
+  display: grid;
+  width: 100%;
+  gap: 7px;
+  padding: 13px 16px;
+  border: 0;
+  border-bottom: 1px solid rgba(60, 64, 67, 0.08);
+  border-radius: 12px;
+  color: var(--ink);
+  background: transparent;
+  text-align: left;
+  transition: background-color 160ms ease;
+}
+.translationDayItem:last-child {
+  border-bottom: 0;
+}
+.translationDayItem:hover {
+  background: rgba(60, 64, 67, 0.06);
+}
+.translationDayItem.isSelected {
+  color: var(--color-on-primary-container);
+  background: var(--color-primary-container);
+}
+.translationDayHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.translationDayHeading strong {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+.translationDayHeading small {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+.translationDayPreview {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+.translationDayPreview span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.translationDayPreview span:last-child {
+  color: var(--ink);
+}
+.translationDayEmpty {
+  margin: 0;
+  padding: 22px 16px;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+.translationMessages {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 28px;
+  width: min(100%, 900px);
+  min-height: auto;
+  margin: 0 auto;
+  padding: 78px 18px 190px;
+  overflow: visible;
+}
+.translationTurn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.translationDayDivider {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+.translationDayDivider::before {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--line);
+  content: '';
+}
+.translationDayDivider span {
+  position: relative;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--white);
+}
+.translationUserRow {
+  display: flex;
+  justify-content: flex-end;
+}
+.translationUserMeta {
+  display: flex;
+  justify-content: flex-end;
+}
+.translationUserBubble {
+  max-width: min(76%, 680px);
+  padding: 14px 18px;
+  border-radius: 24px 24px 6px 24px;
+  color: var(--color-on-primary-container);
+  background: var(--color-primary-container);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-size: var(--font-size-lg);
+  line-height: 1.55;
+}
+.translationUserMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+.translationMessageActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+.translationAiRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+.translationAiMark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--navy);
+  font-size: 14px;
+}
+.translationDemoBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  color: var(--color-accent-strong);
+  background: var(--color-accent-soft);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.translationAiBubble {
+  max-width: 90%;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-size: var(--font-size-lg);
+  line-height: 1.65;
+}
+.translationMessageActions {
+  justify-content: flex-start;
+}
+.translationMessageActions button {
+  border: 0;
+  padding: 4px 2px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+}
+.translationUserMeta button {
+  border: 0;
+  padding: 4px 2px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+}
+.translationMessageActions .translationActionButton {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--muted);
+}
+.translationMessageActions .translationActionButton svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.8;
+}
+.translationMessageActions .translationActionButton:hover {
+  color: var(--ink);
+  background: var(--surface-muted, #f0f2f5);
+}
+.translationMessageActions .translationActionButton.isCopied {
+  color: var(--color-success);
+  background: transparent;
+}
+.translationMessageActions .translationActionButton.isCopied:hover {
+  color: var(--color-success);
+  background: transparent;
+}
+.translationMessageActions button:hover {
+  color: var(--navy-dark);
+}
+.translationUserMeta button:hover {
+  color: var(--navy-dark);
+}
+.translationComposer {
+  position: fixed;
+  z-index: 19;
+  left: calc(var(--sidebar-width) + (100vw - var(--sidebar-width) - var(--history-width)) / 2);
+  bottom: 18px;
+  width: min(860px, calc(100vw - var(--sidebar-width) - var(--history-width) - 56px));
+  padding: 10px 12px 7px 18px;
+  transform: translateX(-50%);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+}
+.translationComposer.isHistory {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding: 10px 12px 7px 18px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+}
+.translationComposer.isHistory .translationComposeMeta {
+  display: flex;
+}
+.translationComposer.isHistory .translationNew {
+  align-self: flex-start;
+  margin: 0 0 8px;
+}
+.translationComposer.isHistory form {
+  display: flex;
+}
+.translationComposer form {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  margin: 0;
+}
+.translationComposer form[hidden] {
+  display: none;
+}
+.translationComposer .translationNew[hidden] {
+  display: none;
+}
+.translationNew {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  color: var(--white);
+  background: var(--color-primary);
+  font: inherit;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+.translationNew:hover {
+  background: var(--color-primary-hover);
+}
+.translationNew svg {
+  width: 19px;
+  height: 19px;
+}
+.translationComposer textarea {
+  flex: 1;
+  min-width: 0;
+  max-height: 150px;
+  resize: none;
+  overflow-y: auto;
+  border: 0;
+  padding: 9px 0;
+  outline: 0;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: var(--font-size-lg);
+  line-height: 1.5;
+}
+.translationComposer textarea:focus-visible {
+  outline: 0;
+}
+.translationSend {
+  display: grid;
+  flex: 0 0 42px;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--navy);
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+.translationSend:hover {
+  background: var(--navy-dark);
+}
+.translationSend:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+.translationSend svg {
+  width: 19px;
+  height: 19px;
+}
+.translationComposeMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 18px;
+}
+.translationHint {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: var(--font-size-xxs);
+}
+.translationStatus {
+  min-height: 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+.translationStatus:not(:empty) {
+  margin-top: 13px;
+}
+.translationStatus.isSuccess {
+  color: var(--color-success-text);
+}
+.translationStatus.isError {
+  color: #b42318;
+}
+.translationEmpty {
+  margin: auto;
+  padding: 28px 20px 180px;
+  color: var(--muted);
+  text-align: center;
+}
+@media (max-width: 590px) {
+  .translationView {
+    padding-top: 0;
+  }
+  .translationChatShell {
+    --history-width: 0px;
+    height: auto;
+    min-height: calc(100dvh - 76px);
+    display: block;
+    overflow: visible;
+  }
+  .translationChatShell.isHistoryOpen {
+    --history-width: 0px;
+  }
+  .translationMain {
+    min-height: calc(100dvh - 76px);
+  }
+  .translationHistorySidebar {
+    position: fixed;
+    inset: calc(env(safe-area-inset-top, 0px) + 62px) 14px auto auto;
+    z-index: 30;
+    display: none;
+    width: min(320px, calc(100vw - 28px));
+    height: auto;
+    min-height: 0;
+    max-height: calc(100dvh - 150px);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--white);
+    box-shadow: var(--shadow-lg);
+  }
+  .translationHistorySidebar.isOpen {
+    display: flex;
+  }
+  .translationMessages {
+    flex: 0 0 auto;
+    padding: 18px 14px 150px;
+    overflow: visible;
+  }
+  .translationUserBubble {
+    max-width: 88%;
+    font-size: 16px;
+  }
+  .translationAiBubble {
+    max-width: 100%;
+    font-size: 16px;
+  }
+  .translationComposer {
+    left: 50%;
+    bottom: calc(80px + env(safe-area-inset-bottom) + 16px);
+    width: calc(100vw - 24px);
+    padding: 8px 9px 5px 14px;
+  }
+  .translationComposer textarea {
+    max-height: 120px;
+    font-size: 16px;
+  }
+  .translationSend {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+  .translationEmpty {
+    padding-bottom: 150px;
+  }
+}

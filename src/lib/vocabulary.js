@@ -41,7 +41,12 @@ export function definitionLines(value) {
 
 export async function apiJson(url, options) {
   const response = await fetch(url, options);
-  const payload = await response.json();
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    throw new Error('The API returned HTML instead of JSON. Run the app with Cloudflare Pages dev to use local API functions.');
+  }
   if (!response.ok) throw new Error(payload.error || 'Something went wrong. Please try again.');
   return payload;
 }
