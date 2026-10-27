@@ -58,13 +58,13 @@ export function AskView({ active, onToast }) {
 
   const submit = async (event) => {
     event.preventDefault(); const content = message.trim(); if (!content || busy) return;
-    setMessage(''); setBusy(true); setContext(''); setMessages((current) => [...current, { role: 'user', content }, { role: 'assistant', content: 'Thinkingâ€¦', pending: true }]);
+    setMessage(''); setBusy(true); setContext(''); setMessages((current) => [...current, { role: 'user', content }, { role: 'assistant', content: 'Thinking…', pending: true }]);
     try {
       const payload = await apiJson('/api/ai/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sessionId: activeId, message: content }) });
       setMessages((current) => [...current.filter((item) => !item.pending), payload.message || { role: 'assistant', content: 'The AI returned an empty answer.' }]);
       if (payload.session) { setActiveId(payload.session.id); setSessions((current) => [payload.session, ...current.filter((item) => item.id !== payload.session.id)]); }
       const info = payload.context;
-      if (info) setContext(info.summaryUpdated ? `Context: ${info.estimatedTokens.toLocaleString('en-US')} / ${info.maxTokens.toLocaleString('en-US')} tokens Â· summarized ${info.summarizedMessages || 0} older messages` : info.summaryUsed ? `Context: ${info.estimatedTokens.toLocaleString('en-US')} / ${info.maxTokens.toLocaleString('en-US')} tokens Â· using saved summary` : `Context: ${info.estimatedTokens.toLocaleString('en-US')} / ${info.maxTokens.toLocaleString('en-US')} tokens`);
+      if (info) setContext(info.summaryUpdated ? `Context: ${info.estimatedTokens.toLocaleString('en-US')} / ${info.maxTokens.toLocaleString('en-US')} tokens · summarized ${info.summarizedMessages || 0} older messages` : info.summaryUsed ? `Context: ${info.estimatedTokens.toLocaleString('en-US')} / ${info.maxTokens.toLocaleString('en-US')} tokens · using saved summary` : `Context: ${info.estimatedTokens.toLocaleString('en-US')} / ${info.maxTokens.toLocaleString('en-US')} tokens`);
     } catch (error) { setMessages((current) => current.filter((item) => !item.pending)); onToast(error.message); }
     finally { setBusy(false); inputRef.current?.focus(); }
   };

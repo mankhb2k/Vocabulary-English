@@ -592,6 +592,35 @@
   font-size: var(--font-size-lg);
   line-height: 1.65;
 }
+.translationTyping {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 1.65em;
+}
+.translationTyping span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: translationTypingDot 1.2s ease-in-out infinite;
+}
+.translationTyping span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.translationTyping span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes translationTypingDot {
+  0%, 60%, 100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
 .translationMessageActions {
   justify-content: flex-start;
 }
@@ -647,7 +676,7 @@
   left: calc(var(--sidebar-width) + (100vw - var(--sidebar-width) - var(--history-width)) / 2);
   bottom: 18px;
   width: min(860px, calc(100vw - var(--sidebar-width) - var(--history-width) - 56px));
-  padding: 10px 12px 7px 18px;
+  padding: 8px 8px 8px 18px;
   transform: translateX(-50%);
   border: 1px solid var(--line);
   border-radius: 28px;
@@ -659,14 +688,11 @@
   align-items: stretch;
   justify-content: flex-start;
   flex-direction: column;
-  padding: 10px 12px 7px 18px;
+  padding: 8px 8px 8px 18px;
   border: 1px solid var(--line);
   border-radius: 28px;
   background: var(--white);
   box-shadow: var(--shadow-md);
-}
-.translationComposer.isHistory .translationComposeMeta {
-  display: flex;
 }
 .translationComposer.isHistory .translationNew {
   align-self: flex-start;
@@ -741,39 +767,12 @@
   background: var(--navy-dark);
 }
 .translationSend:disabled {
-  cursor: wait;
-  opacity: 0.55;
+  cursor: default;
+  opacity: 0.4;
 }
 .translationSend svg {
   width: 19px;
   height: 19px;
-}
-.translationComposeMeta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 18px;
-}
-.translationHint {
-  flex: 0 0 auto;
-  color: var(--muted);
-  font-size: var(--font-size-xxs);
-}
-.translationStatus {
-  min-height: 0;
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--font-size-xs);
-}
-.translationStatus:not(:empty) {
-  margin-top: 13px;
-}
-.translationStatus.isSuccess {
-  color: var(--color-success-text);
-}
-.translationStatus.isError {
-  color: #b42318;
 }
 .translationEmpty {
   margin: auto;
@@ -832,7 +831,7 @@
     left: 50%;
     bottom: calc(80px + env(safe-area-inset-bottom) + 16px);
     width: calc(100vw - 24px);
-    padding: 8px 9px 5px 14px;
+    padding: 6px 6px 6px 14px;
   }
   .translationComposer textarea {
     max-height: 120px;
