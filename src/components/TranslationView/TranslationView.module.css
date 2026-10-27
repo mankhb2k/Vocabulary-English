@@ -680,7 +680,7 @@
     var(--sidebar-width) +
       (100vw - var(--sidebar-width) - var(--history-width)) / 2
   );
-  bottom: 18px;
+  bottom: 30px;
   width: min(
     860px,
     calc(100vw - var(--sidebar-width) - var(--history-width) - 56px)
@@ -827,7 +827,7 @@
   }
   .translationMessages {
     flex: 0 0 auto;
-    padding: 18px 14px 150px;
+    padding: 18px 14px 80px;
     overflow: visible;
   }
   .translationUserBubble {
