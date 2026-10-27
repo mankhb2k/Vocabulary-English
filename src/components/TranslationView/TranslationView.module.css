@@ -1,4 +1,3 @@
-
 .translationView {
   max-width: none;
   width: calc(100% + var(--content-gutter) + var(--content-gutter));
@@ -60,7 +59,9 @@
   color: var(--ink);
   background: var(--white);
   box-shadow: var(--shadow-sm);
-  transition: background-color 160ms ease, box-shadow 160ms ease;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 .translationVoiceToggle:hover {
   border-color: var(--color-primary-muted);
@@ -486,7 +487,7 @@
   width: min(100%, 900px);
   min-height: auto;
   margin: 0 auto;
-  padding: 78px 18px 190px;
+  padding: 78px 18px 100px;
   overflow: visible;
 }
 .translationTurn {
@@ -511,7 +512,7 @@
   left: 0;
   height: 1px;
   background: var(--line);
-  content: '';
+  content: "";
 }
 .translationDayDivider span {
   position: relative;
@@ -612,7 +613,9 @@
   animation-delay: 0.3s;
 }
 @keyframes translationTypingDot {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     opacity: 0.35;
     transform: translateY(0);
   }
@@ -673,9 +676,15 @@
 .translationComposer {
   position: fixed;
   z-index: 19;
-  left: calc(var(--sidebar-width) + (100vw - var(--sidebar-width) - var(--history-width)) / 2);
+  left: calc(
+    var(--sidebar-width) +
+      (100vw - var(--sidebar-width) - var(--history-width)) / 2
+  );
   bottom: 18px;
-  width: min(860px, calc(100vw - var(--sidebar-width) - var(--history-width) - 56px));
+  width: min(
+    860px,
+    calc(100vw - var(--sidebar-width) - var(--history-width) - 56px)
+  );
   padding: 8px 8px 8px 18px;
   transform: translateX(-50%);
   border: 1px solid var(--line);
@@ -761,7 +770,9 @@
   border-radius: 50%;
   color: var(--white);
   background: var(--navy);
-  transition: background 0.15s ease, opacity 0.15s ease;
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
 }
 .translationSend:hover {
   background: var(--navy-dark);
