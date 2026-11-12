@@ -326,6 +326,7 @@ export function HardWordsView({ active }) {
                 {learned.includes(selectedWord.word) ? 'Learned' : 'Mark as learned'}
               </button>
               <h2>{selectedWord.word}</h2>
+              {selectedWord.pronounce && <p className={cx(styles, 'word-pronunciation')}>{selectedWord.pronounce}</p>}
               <div className={cx(styles, 'detail-meaning-row')}><p lang="vi">{selectedWord.meaning}</p><button className={cx(styles, 'speak-button c-button')} type="button" onClick={() => speak(selectedWord.word)} aria-label={`Hear ${selectedWord.word}`}><Volume2 size={18} aria-hidden="true" /></button></div>
               <span className={cx(styles, 'detail-group')}>{selectedWord.group}</span>
             </div>
@@ -347,6 +348,7 @@ export function HardWordsView({ active }) {
               <span className={cx(styles, 'word-type')}>{item.partOfSpeech}</span>
               {learned.includes(item.word) && <Check className={cx(styles, 'learned-check')} size={17} aria-label="Learned" />}
               <strong>{item.word}</strong>
+              {item.pronounce && <span className={cx(styles, 'word-pronunciation')}>{item.pronounce}</span>}
               <span lang="vi" className={cx(styles, 'word-meaning')}>{item.meaning}</span>
               <span className={cx(styles, 'word-group')}>{item.group}</span>
             </button>)}
@@ -377,6 +379,7 @@ export function HardWordsView({ active }) {
           <div className={cx(styles, 'practice-progress')}><span style={{ width: `${((quizIndex + (quizAnswer ? 1 : 0)) / quizDeck.length) * 100}%` }} /></div>
           <p className={cx(styles, 'eyebrow')}>{quizMode === 'meaning' ? 'CHOOSE THE WORD' : quizMode === 'fill' ? 'COMPLETE THE SENTENCE' : quizMode === 'spelling' ? 'LISTEN AND SPELL' : 'WORD RELATIONSHIPS'}</p>
           <h2>{quizMode === 'meaning' ? currentQuestion.prompt : quizMode === 'relations' ? currentQuestion.prompt : quizMode === 'fill' ? currentQuestion.prompt : quizMode === 'pronunciation' ? currentQuestion.item.word : currentQuestion.item.meaning}</h2>
+          {quizMode === 'pronunciation' && currentQuestion.item.pronounce && <p className={cx(styles, 'practice-pronunciation')}>{currentQuestion.item.pronounce}</p>}
           {quizMode === 'meaning' && <p lang="vi" className={cx(styles, 'practice-group')}>{currentQuestion.item.group}</p>}
           {quizMode === 'relations' && <p className={cx(styles, 'practice-group')}>Select every correct answer.</p>}
           {quizMode === 'pronunciation' && <div className={cx(styles, 'pronunciation-controls')}>

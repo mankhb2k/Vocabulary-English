@@ -9,7 +9,7 @@ export async function onRequestGet({ env }) {
 
   const [wordRows, exampleRows, relationRows] = await Promise.all([
     env.DB.prepare(`
-      SELECT word, part_of_speech, group_name, meaning_vi
+      SELECT word, part_of_speech, group_name, meaning_vi, pronounce
       FROM hard_words
       ORDER BY word COLLATE NOCASE
     `).all(),
@@ -30,6 +30,7 @@ export async function onRequestGet({ env }) {
     partOfSpeech: row.part_of_speech,
     group: row.group_name,
     meaning: row.meaning_vi,
+    pronounce: row.pronounce || '',
     examples: [],
     synonyms: [],
     antonyms: [],

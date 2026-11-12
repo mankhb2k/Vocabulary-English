@@ -1,0 +1,1 @@
+ALTER TABLE hard_words ADD COLUMN pronounce TEXT NOT NULL DEFAULT '';

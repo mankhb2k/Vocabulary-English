@@ -177,6 +177,16 @@
   font-size: var(--font-size-lg);
   line-height: 1.2;
 }
+.wordPronunciation,
+.practicePronunciation {
+  color: var(--muted);
+  font-family: var(--font-family-vietnamese);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.025em;
+}
+.hardWordCard .wordPronunciation {
+  margin: 0 0 3px;
+}
 .wordMeaning {
   color: var(--ink);
   font-size: var(--font-size-sm);
@@ -240,6 +250,10 @@
   font-size: clamp(32px, 5vw, 48px);
   letter-spacing: -1.5px;
   line-height: 1.1;
+}
+.detailHeading .wordPronunciation {
+  margin: -1px 0 10px;
+  font-size: var(--font-size-md);
 }
 .learnedButton {
   position: absolute;
@@ -493,6 +507,10 @@
   font-size: clamp(26px, 4vw, 36px);
   letter-spacing: -0.7px;
   line-height: 1.2;
+}
+.practicePronunciation {
+  margin: -2px 0 10px;
+  font-size: var(--font-size-md);
 }
 .practiceGroup {
   margin: 0;
