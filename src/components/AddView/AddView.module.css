@@ -245,7 +245,7 @@
   font-size: var(--font-size-md);
   resize: vertical;
 }
-.formField select {
+.formField [role='combobox'] {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -299,7 +299,7 @@
   border-color: var(--mint-strong);
   background: var(--white);
 }
-.formField select:focus {
+.formField [role='combobox']:focus-visible {
   border-color: var(--mint-strong);
   background: var(--white);
 }
@@ -470,7 +470,7 @@
   .formField input {
     font-size: var(--font-size-lg);
   }
-  .formField select {
+  .formField [role='combobox'] {
     font-size: var(--font-size-lg);
   }
   .formField textarea {

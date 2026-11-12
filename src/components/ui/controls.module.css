@@ -110,6 +110,38 @@
   font-size: var(--font-size-md);
   line-height: 1.4;
 }
+.selectRoot {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+.select > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.select > svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+  transition: transform 140ms ease;
+}
+.select[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
+.select:disabled {
+  color: var(--muted);
+  background: var(--surface-variant);
+  cursor: not-allowed;
+}
 .select:focus-visible,
 .input:focus-visible {
   border-color: var(--color-primary);
@@ -120,6 +152,50 @@
 .input:disabled {
   color: var(--muted);
   background: var(--surface-variant);
+  cursor: not-allowed;
+}
+.selectListbox {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 5px);
+  left: 0;
+  display: grid;
+  width: max(100%, 150px);
+  max-height: min(280px, 45vh);
+  padding: 5px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+.selectOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-align: left;
+  cursor: pointer;
+}
+.selectOption:hover,
+.selectOption[data-active='true'] {
+  background: var(--color-primary-pale);
+}
+.selectOption[aria-selected='true'] {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+.selectOption:disabled {
+  color: var(--muted);
   cursor: not-allowed;
 }
 .textarea {

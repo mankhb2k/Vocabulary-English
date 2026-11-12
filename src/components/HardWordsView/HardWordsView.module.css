@@ -75,7 +75,7 @@
   color: var(--muted);
 }
 .hardWordsSearch input,
-.hardWordsSelectWrap select {
+.hardWordsSelectWrap [role='combobox'] {
   width: 100%;
   min-height: 42px;
   border: 1px solid var(--line);
@@ -93,16 +93,8 @@
   flex: 0 1 220px;
   min-width: 145px;
 }
-.hardWordsSelectWrap select {
-  appearance: none;
+.hardWordsSelectWrap [role='combobox'] {
   padding: 9px 34px 9px 12px;
-}
-.hardWordsSelectWrap svg {
-  position: absolute;
-  top: 13px;
-  right: 12px;
-  pointer-events: none;
-  color: var(--muted);
 }
 .hardWordsSortTools {
   display: flex;

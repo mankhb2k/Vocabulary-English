@@ -2,7 +2,7 @@ import styles from './HardWordsView.module.css';
 import { Button, Input, Select } from '../ui/index.js';
 import { cx } from '../../lib/cx.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, BookOpenCheck, Check, ChevronDown, Mic, RotateCcw, Search, Shuffle, Square, Volume2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpenCheck, Check, Mic, RotateCcw, Search, Shuffle, Square, Volume2 } from 'lucide-react';
 import { apiJson } from '../../lib/vocabulary.js';
 
 const learnedStorageKey = 'englishCardsHardWordsLearned';
@@ -322,7 +322,6 @@ export function HardWordsView({ active }) {
               <option value="all">All groups</option>
               {groups.map((item) => <option key={item} value={item}>{item}</option>)}
             </Select>
-            <ChevronDown size={16} aria-hidden="true" />
           </label>
           <label className={cx(styles, 'hard-words-select-wrap')}>
             <span className={cx(styles, 'sr-only')}>Filter by part of speech</span>
@@ -330,7 +329,6 @@ export function HardWordsView({ active }) {
               <option value="all">All word types</option>
               {partsOfSpeech.map((item) => <option key={item} value={item}>{item}</option>)}
             </Select>
-            <ChevronDown size={16} aria-hidden="true" />
           </label>
           <div className={cx(styles, 'hard-words-sort-tools')}>
             <label className={cx(styles, 'hard-words-sort-label')} htmlFor="hard-words-sort">Sort by</label>
@@ -340,7 +338,6 @@ export function HardWordsView({ active }) {
                 <option value="random">Random</option>
                 <option value="az">A–Z</option>
               </Select>
-              <ChevronDown size={16} aria-hidden="true" />
             </label>
             <Button className={cx(styles, 'hard-words-shuffle c-button')} type="button" onClick={shuffleWords} aria-label="Shuffle words" title="Shuffle words"><Shuffle size={16} aria-hidden="true" /></Button>
           </div>

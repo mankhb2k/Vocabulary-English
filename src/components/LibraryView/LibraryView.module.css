@@ -83,6 +83,9 @@
 }
 .librarySort {
   width: auto;
+}
+.librarySort [role='combobox'] {
+  width: auto;
   min-height: 32px;
   padding: 0 28px 0 10px;
   border: 1px solid var(--line);
@@ -91,7 +94,7 @@
   background: var(--white);
   font-size: var(--font-size-sm);
 }
-.libraryTools .librarySort {
+.libraryTools .librarySort [role='combobox'] {
   width: auto;
   min-height: 32px;
 }
@@ -452,6 +455,9 @@
   .librarySort {
     font-size: var(--font-size-lg);
   }
+  .librarySort [role='combobox'] {
+    font-size: var(--font-size-lg);
+  }
   .libraryToolbar {
     align-items: start;
     flex-direction: column;
@@ -461,13 +467,13 @@
     width: 100%;
     justify-content: flex-end;
   }
-  .librarySort {
+  .librarySort [role='combobox'] {
     min-height: var(--mobile-touch-target);
   }
   .libraryShuffle {
     min-height: var(--mobile-touch-target);
   }
-  .librarySort {
+  .librarySort [role='combobox'] {
     min-width: 104px;
     padding-right: 32px;
     font-size: var(--font-size-lg);
