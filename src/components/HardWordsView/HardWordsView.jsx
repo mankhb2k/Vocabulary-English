@@ -35,6 +35,10 @@ function fillCandidate(item) {
   return example ? { item, sentence: example.english.replace(expression, '_____') } : null;
 }
 
+function hasAvailableRelation(item, learnedWords) {
+  return ['synonyms', 'antonyms'].some((type) => item[type]?.some((word) => !learnedWords.has(String(word).trim().toLocaleLowerCase())));
+}
+
 function speak(text) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
@@ -53,6 +57,7 @@ export function HardWordsView({ active }) {
   const [randomOrder, setRandomOrder] = useState([]);
   const [group, setGroup] = useState('all');
   const [part, setPart] = useState('all');
+  const [learnedFilter, setLearnedFilter] = useState('all');
   const [selectedWord, setSelectedWord] = useState(null);
   const [learned, setLearned] = useState(() => {
     try {
@@ -101,18 +106,25 @@ export function HardWordsView({ active }) {
 
   const groups = useMemo(() => [...new Set(words.map((item) => item.group))], [words]);
   const partsOfSpeech = useMemo(() => [...new Set(words.map((item) => item.partOfSpeech))], [words]);
+  const learnedWords = useMemo(() => new Set(learned.map((word) => word.toLocaleLowerCase())), [learned]);
+  const unlearnedWords = useMemo(() => words.filter((item) => !learnedWords.has(item.word.toLocaleLowerCase())), [words, learnedWords]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
     const result = words.filter((item) => (group === 'all' || item.group === group)
       && (part === 'all' || item.partOfSpeech === part)
+      && (learnedFilter === 'all' || (learnedFilter === 'learned' ? learnedWords.has(item.word.toLocaleLowerCase()) : !learnedWords.has(item.word.toLocaleLowerCase())))
       && (!needle || `${item.word} ${item.meaning} ${item.group} ${item.partOfSpeech}`.toLocaleLowerCase().includes(needle)));
     if (sort === 'az') return result.sort((a, b) => a.word.localeCompare(b.word, undefined, { sensitivity: 'base' }));
     const lookup = new Map(result.map((item) => [item.word.toLocaleLowerCase(), item]));
     const ordered = randomOrder.map((word) => lookup.get(word)).filter(Boolean);
     const included = new Set(ordered.map((item) => item.word.toLocaleLowerCase()));
     return ordered.concat(result.filter((item) => !included.has(item.word.toLocaleLowerCase())));
-  }, [words, group, part, query, sort, randomOrder]);
+  }, [words, group, part, learnedFilter, learnedWords, query, sort, randomOrder]);
+
+  const practiceWords = useMemo(() => filtered.filter((item) => !learnedWords.has(item.word.toLocaleLowerCase())), [filtered, learnedWords]);
+  const fillPracticeWords = useMemo(() => practiceWords.map(fillCandidate).filter(Boolean), [practiceWords]);
+  const relationPracticeWords = useMemo(() => practiceWords.filter((item) => hasAvailableRelation(item, learnedWords)), [practiceWords, learnedWords]);
 
   const shuffleWords = () => {
     setRandomOrder(shuffle(words.map((item) => item.word.toLocaleLowerCase())));
@@ -126,11 +138,12 @@ export function HardWordsView({ active }) {
       setSelectedWord(null);
       return;
     }
-    let candidates = filtered;
+    let candidates = practiceWords;
     if (mode === 'fill') {
-      candidates = filtered.map(fillCandidate).filter(Boolean);
+      candidates = fillPracticeWords;
     }
-    if (mode === 'relations') candidates = filtered.filter((item) => item.synonyms?.length || item.antonyms?.length);
+    if (mode === 'relations') candidates = relationPracticeWords;
+    if (!candidates.length) return;
     const historyKey = `englishCardsHardWordsRecent:${mode}`;
     let recent = [];
     try {
@@ -145,16 +158,17 @@ export function HardWordsView({ active }) {
     const chosenCandidates = [...freshCandidates, ...recentCandidates].slice(0, questionCount);
     const deck = chosenCandidates.map((candidate) => {
       const item = candidate.item || candidate;
-      if (mode === 'meaning') return { item, answer: item.word, prompt: item.meaning, options: shuffle([item.word, ...shuffle(words.filter((word) => word.word !== item.word)).slice(0, 3).map((word) => word.word)]) };
-      if (mode === 'fill') return { item, answer: item.word, prompt: candidate.sentence, options: shuffle([item.word, ...shuffle(words.filter((word) => word.word !== item.word)).slice(0, 3).map((word) => word.word)]) };
+      if (mode === 'meaning') return { item, answer: item.word, prompt: item.meaning, options: shuffle([item.word, ...shuffle(unlearnedWords.filter((word) => word.word !== item.word)).slice(0, 3).map((word) => word.word)]) };
+      if (mode === 'fill') return { item, answer: item.word, prompt: candidate.sentence, options: shuffle([item.word, ...shuffle(unlearnedWords.filter((word) => word.word !== item.word)).slice(0, 3).map((word) => word.word)]) };
       if (mode === 'pronunciation') return { item, answer: item.word, prompt: 'Say this word clearly.' };
       if (mode === 'spelling') return { item, answer: item.word, prompt: 'Listen, then type the word you hear.' };
-      const relationType = Math.random() < 0.5 && item.synonyms?.length ? 'synonyms' : item.antonyms?.length ? 'antonyms' : 'synonyms';
-      const answer = [...new Set(item[relationType].map((value) => value.trim()))];
+      const availableRelations = ['synonyms', 'antonyms'].filter((type) => item[type]?.some((value) => !learnedWords.has(value.trim().toLocaleLowerCase())));
+      const relationType = availableRelations[Math.floor(Math.random() * availableRelations.length)];
+      const answer = [...new Set(item[relationType].map((value) => value.trim()).filter((value) => !learnedWords.has(value.toLocaleLowerCase())))];
       const correctSet = new Set(answer.map((value) => value.toLocaleLowerCase()));
-      const distractors = [...new Set(shuffle(words.flatMap((word) => word[relationType] || []))
+      const distractors = [...new Set(shuffle(unlearnedWords.flatMap((word) => word[relationType] || []))
         .map((value) => value.trim())
-        .filter((value) => value && !correctSet.has(value.toLocaleLowerCase())))].slice(0, 4);
+        .filter((value) => value && !learnedWords.has(value.toLocaleLowerCase()) && !correctSet.has(value.toLocaleLowerCase())))].slice(0, 4);
       return {
         item,
         answer,
@@ -266,7 +280,10 @@ export function HardWordsView({ active }) {
   };
 
   const toggleLearned = (word) => {
-    const next = learned.includes(word) ? learned.filter((item) => item !== word) : [...learned, word];
+    const normalizedWord = word.toLocaleLowerCase();
+    const next = learnedWords.has(normalizedWord)
+      ? learned.filter((item) => item.toLocaleLowerCase() !== normalizedWord)
+      : [...learned, word];
     setLearned(next);
     localStorage.setItem(learnedStorageKey, JSON.stringify(next));
   };
@@ -330,6 +347,14 @@ export function HardWordsView({ active }) {
               {partsOfSpeech.map((item) => <option key={item} value={item}>{item}</option>)}
             </Select>
           </label>
+          <label className={cx(styles, 'hard-words-select-wrap learned-filter-wrap')}>
+            <span className={cx(styles, 'sr-only')}>Filter by learning status</span>
+            <Select value={learnedFilter} onChange={(event) => setLearnedFilter(event.target.value)}>
+              <option value="all">All learning status</option>
+              <option value="unlearned">Not learned</option>
+              <option value="learned">Learned</option>
+            </Select>
+          </label>
           <div className={cx(styles, 'hard-words-sort-tools')}>
             <label className={cx(styles, 'hard-words-sort-label')} htmlFor="hard-words-sort">Sort by</label>
             <label className={cx(styles, 'hard-words-select-wrap hard-words-sort-wrap')}>
@@ -341,7 +366,7 @@ export function HardWordsView({ active }) {
             </label>
             <Button className={cx(styles, 'hard-words-shuffle c-button')} type="button" onClick={shuffleWords} aria-label="Shuffle words" title="Shuffle words"><Shuffle size={16} aria-hidden="true" /></Button>
           </div>
-          <Button className={cx(styles, 'practice-button c-button')} type="button" onClick={() => startPractice()} disabled={!filtered.length}>
+          <Button className={cx(styles, 'practice-button c-button')} type="button" onClick={() => startPractice()} disabled={!practiceWords.length}>
             <BookOpenCheck size={17} aria-hidden="true" /> Practice
           </Button>
           </div>
@@ -352,9 +377,9 @@ export function HardWordsView({ active }) {
           <article className={cx(styles, 'detail-card c-surface')}>
             <div className={cx(styles, 'detail-heading')}>
               <span className={cx(styles, 'word-type')}>{selectedWord.partOfSpeech}</span>
-              <Button className={cx(styles, `learned-button c-button${learned.includes(selectedWord.word) ? ' is-learned' : ''}`)} type="button" onClick={() => toggleLearned(selectedWord.word)} aria-pressed={learned.includes(selectedWord.word)}>
-                {learned.includes(selectedWord.word) ? <Check size={16} aria-hidden="true" /> : <BookOpenCheck size={16} aria-hidden="true" />}
-                {learned.includes(selectedWord.word) ? 'Learned' : 'Mark as learned'}
+              <Button className={cx(styles, `learned-button c-button${learnedWords.has(selectedWord.word.toLocaleLowerCase()) ? ' is-learned' : ''}`)} type="button" onClick={() => toggleLearned(selectedWord.word)} aria-pressed={learnedWords.has(selectedWord.word.toLocaleLowerCase())}>
+                {learnedWords.has(selectedWord.word.toLocaleLowerCase()) ? <Check size={16} aria-hidden="true" /> : <BookOpenCheck size={16} aria-hidden="true" />}
+                {learnedWords.has(selectedWord.word.toLocaleLowerCase()) ? 'Unmark learned' : 'Mark as learned'}
               </Button>
               <h2>{selectedWord.word}</h2>
               {selectedWord.pronounce && <p className={cx(styles, 'word-pronunciation')}>{selectedWord.pronounce}</p>}
@@ -375,15 +400,20 @@ export function HardWordsView({ active }) {
           <div className={cx(styles, 'results-bar')}><span>{loadingWords ? 'Loading words…' : `${filtered.length.toLocaleString('en-US')} ${filtered.length === 1 ? 'word' : 'words'}`}</span><span>Choose a word to see its meaning and examples</span></div>
           <div className={cx(styles, 'hard-words-grid')}>
             {wordsError && <div className={cx(styles, 'empty-state')} role="alert">{wordsError}</div>}
-            {filtered.map((item) => <Button key={item.word} className={cx(styles, 'hard-word-card c-button')} type="button" onClick={() => setSelectedWord(item)}>
-              <span className={cx(styles, 'word-type')}>{item.partOfSpeech}</span>
-              {learned.includes(item.word) && <Check className={cx(styles, 'learned-check')} size={17} aria-label="Learned" />}
-              <strong>{item.word}</strong>
-              {item.pronounce && <span className={cx(styles, 'word-pronunciation')}>{item.pronounce}</span>}
-              <span lang="vi" className={cx(styles, 'word-meaning')}>{item.meaning}</span>
-              <span className={cx(styles, 'word-group')}>{item.group}</span>
-            </Button>)}
-            {!loadingWords && !wordsError && !filtered.length && <div className={cx(styles, 'empty-state')}>No words match your search. Try another word or group.</div>}
+            {filtered.map((item) => {
+              const isLearned = learnedWords.has(item.word.toLocaleLowerCase());
+              return <div key={item.word} className={cx(styles, 'hard-word-item')}>
+                <Button className={cx(styles, `hard-word-card c-button${isLearned ? ' is-learned' : ''}`)} type="button" onClick={() => setSelectedWord(item)}>
+                  <span className={cx(styles, 'word-type')}>{item.partOfSpeech}</span>
+                  <strong>{item.word}</strong>
+                  {item.pronounce && <span className={cx(styles, 'word-pronunciation')}>{item.pronounce}</span>}
+                  <span lang="vi" className={cx(styles, 'word-meaning')}>{item.meaning}</span>
+                  <span className={cx(styles, 'word-group')}>{item.group}</span>
+                </Button>
+                {isLearned && <Button className={cx(styles, 'learned-card-unmark c-button')} type="button" onClick={() => toggleLearned(item.word)} aria-label={`Unmark ${item.word} as learned`}>Unmark</Button>}
+              </div>;
+            })}
+            {!loadingWords && !wordsError && !filtered.length && <div className={cx(styles, 'empty-state')}>{learnedFilter === 'learned' ? 'No learned words match these filters yet.' : 'No words match your search. Try another word or group.'}</div>}
           </div>
         </>}
       </> : <section className={cx(styles, 'practice-view')} aria-live="polite">
@@ -391,13 +421,14 @@ export function HardWordsView({ active }) {
         {!quizMode ? <div className={cx(styles, 'practice-card c-surface')}>
           <p className={cx(styles, 'eyebrow')}>PRACTICE</p>
           <h2>Choose a practice style</h2>
-          <p>Pick a short set based on the words currently shown by your filters. Questions are shuffled and prioritize words you have not seen recently.</p>
+          <p>Practice only uses unlearned words that match your filters. Questions are shuffled and prioritize words you have not seen recently.</p>
           <div className={cx(styles, 'practice-mode-grid')}>
-            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('meaning')}><strong>Meaning</strong><span>Choose the English word that matches the Vietnamese meaning.</span></Button>
-            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('fill')} disabled={!filtered.some((item) => fillCandidate(item))}><strong>Fill in the blank</strong><span>Complete a real sentence with the right word.</span></Button>
-            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('spelling')}><strong>Listen and spell</strong><span>Listen to the pronunciation, then type the word.</span></Button>
-            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('pronunciation')}><strong>Pronunciation coach</strong><span>Say each word into your microphone and get feedback from GPT-5.4 mini.</span></Button>
-            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('relations')} disabled={!filtered.some((item) => item.synonyms?.length || item.antonyms?.length)}><strong>Synonyms and antonyms</strong><span>Select all matching synonyms or antonyms.</span></Button>
+            {!practiceWords.length && <p className={cx(styles, 'no-practice-words')} role="status">No unlearned words match these filters. Choose another filter or unmark a learned word.</p>}
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('meaning')} disabled={!practiceWords.length}><strong>Meaning</strong><span>Choose the English word that matches the Vietnamese meaning.</span></Button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('fill')} disabled={!fillPracticeWords.length}><strong>Fill in the blank</strong><span>Complete a real sentence with the right word.</span></Button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('spelling')} disabled={!practiceWords.length}><strong>Listen and spell</strong><span>Listen to the pronunciation, then type the word.</span></Button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('pronunciation')} disabled={!practiceWords.length}><strong>Pronunciation coach</strong><span>Say each word into your microphone and get feedback from GPT-5.4 mini.</span></Button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('relations')} disabled={!relationPracticeWords.length}><strong>Synonyms and antonyms</strong><span>Select all matching synonyms or antonyms.</span></Button>
           </div>
         </div> : quizFinished ? <div className={cx(styles, 'practice-card c-surface')}>
           <div className={cx(styles, 'practice-complete-icon')}><Check size={27} aria-hidden="true" /></div>

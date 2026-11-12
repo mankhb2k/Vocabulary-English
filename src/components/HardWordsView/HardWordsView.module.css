@@ -93,6 +93,9 @@
   flex: 0 1 220px;
   min-width: 145px;
 }
+.learnedFilterWrap {
+  flex-basis: 175px;
+}
 .hardWordsSelectWrap [role='combobox'] {
   padding: 9px 36px 9px 12px;
 }
@@ -166,9 +169,14 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
+.hardWordItem {
+  position: relative;
+  min-width: 0;
+}
 .hardWordCard {
   position: relative;
   display: flex;
+  width: 100%;
   min-height: 154px;
   flex-direction: column;
   align-items: flex-start;
@@ -199,6 +207,27 @@
   font-size: var(--font-size-lg);
   line-height: 1.2;
 }
+.hardWordCard.isLearned .wordType {
+  max-width: calc(100% - 66px);
+}
+.learnedCardUnmark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 0 7px;
+  border-radius: 7px;
+  color: var(--color-success);
+  background: var(--mint);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+.learnedCardUnmark:hover {
+  background: var(--mint-pale);
+}
 .wordPronunciation,
 .practicePronunciation {
   color: var(--muted);
@@ -223,12 +252,6 @@
   color: var(--muted);
   font-size: var(--font-size-xs);
   line-height: 1.35;
-}
-.learnedCheck {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  color: var(--color-success);
 }
 .emptyState {
   grid-column: 1 / -1;
@@ -625,6 +648,15 @@
 .practiceCard > p:not(.eyebrow) {
   color: var(--muted);
   line-height: 1.55;
+}
+.noPracticeWords {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 14px;
+  border-radius: 10px;
+  color: var(--muted);
+  background: var(--paper);
+  font-size: var(--font-size-sm);
 }
 .practiceCompleteActions {
   display: flex;
