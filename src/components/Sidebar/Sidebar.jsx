@@ -1,4 +1,5 @@
 import styles from './Sidebar.module.css';
+import { Button } from '../ui/index.js';
 import { cx } from '../../lib/cx.js';
 import { BookOpenText, Languages, Brain, SquarePlus } from 'lucide-react';
 const navItems = [
@@ -14,9 +15,9 @@ export function Sidebar({ view, onNavigate }) {
       <span className={cx(styles, "brand-mark")} aria-hidden="true"><span/><span/><span/></span><span>english<span className={cx(styles, "brand-dot")}>.</span></span>
     </a>
     <nav className={cx(styles, "main-nav")}>
-      {navItems.map(([id, label, Icon]) => <button key={id} className={cx(styles, `nav-item c-button${view === id ? ' is-active' : ''}`)} type="button" onClick={() => onNavigate(id)}>
+      {navItems.map(([id, label, Icon]) => <Button key={id} className={cx(styles, `nav-item c-button${view === id ? ' is-active' : ''}`)} type="button" onClick={() => onNavigate(id)}>
         <Icon size={22} strokeWidth={2} aria-hidden="true"/><span>{label}</span>
-      </button>)}
+      </Button>)}
     </nav>
   </aside>;
 }

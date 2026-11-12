@@ -1,4 +1,5 @@
 import styles from './HardWordsView.module.css';
+import { Button, Input, Select } from '../ui/index.js';
 import { cx } from '../../lib/cx.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, BookOpenCheck, Check, ChevronDown, Mic, RotateCcw, Search, Shuffle, Square, Volume2 } from 'lucide-react';
@@ -309,53 +310,53 @@ export function HardWordsView({ active }) {
           <label className={cx(styles, 'hard-words-search')}>
             <span className={cx(styles, 'sr-only')}>Search words and meanings</span>
             <Search size={18} aria-hidden="true" />
-            <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search a word or meaning" autoComplete="off" />
+            <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search a word or meaning" autoComplete="off" />
           </label>
           <label className={cx(styles, 'hard-words-select-wrap')}>
             <span className={cx(styles, 'sr-only')}>Filter by word group</span>
-            <select value={group} onChange={(event) => setGroup(event.target.value)}>
+            <Select value={group} onChange={(event) => setGroup(event.target.value)}>
               <option value="all">All groups</option>
               {groups.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
+            </Select>
             <ChevronDown size={16} aria-hidden="true" />
           </label>
           <label className={cx(styles, 'hard-words-select-wrap')}>
             <span className={cx(styles, 'sr-only')}>Filter by part of speech</span>
-            <select value={part} onChange={(event) => setPart(event.target.value)}>
+            <Select value={part} onChange={(event) => setPart(event.target.value)}>
               <option value="all">All word types</option>
               {partsOfSpeech.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
+            </Select>
             <ChevronDown size={16} aria-hidden="true" />
           </label>
           <div className={cx(styles, 'hard-words-sort-tools')}>
             <label className={cx(styles, 'hard-words-sort-label')} htmlFor="hard-words-sort">Sort by</label>
             <label className={cx(styles, 'hard-words-select-wrap hard-words-sort-wrap')}>
               <span className={cx(styles, 'sr-only')}>Sort hard words</span>
-              <select id="hard-words-sort" value={sort} onChange={(event) => setSort(event.target.value)}>
+              <Select id="hard-words-sort" value={sort} onChange={(event) => setSort(event.target.value)}>
                 <option value="random">Random</option>
                 <option value="az">A–Z</option>
-              </select>
+              </Select>
               <ChevronDown size={16} aria-hidden="true" />
             </label>
-            <button className={cx(styles, 'hard-words-shuffle c-button')} type="button" onClick={shuffleWords} aria-label="Shuffle words" title="Shuffle words"><Shuffle size={16} aria-hidden="true" /></button>
+            <Button className={cx(styles, 'hard-words-shuffle c-button')} type="button" onClick={shuffleWords} aria-label="Shuffle words" title="Shuffle words"><Shuffle size={16} aria-hidden="true" /></Button>
           </div>
-          <button className={cx(styles, 'practice-button c-button')} type="button" onClick={() => startPractice()} disabled={!filtered.length}>
+          <Button className={cx(styles, 'practice-button c-button')} type="button" onClick={() => startPractice()} disabled={!filtered.length}>
             <BookOpenCheck size={17} aria-hidden="true" /> Practice
-          </button>
+          </Button>
         </div>
 
         {selectedWord ? <section className={cx(styles, 'hard-word-detail')} aria-live="polite">
-          <button className={cx(styles, 'back-to-list c-button')} type="button" onClick={() => setSelectedWord(null)}><ArrowLeft size={16} aria-hidden="true" /> Back to words</button>
+          <Button className={cx(styles, 'back-to-list c-button')} type="button" onClick={() => setSelectedWord(null)}><ArrowLeft size={16} aria-hidden="true" /> Back to words</Button>
           <article className={cx(styles, 'detail-card c-surface')}>
             <div className={cx(styles, 'detail-heading')}>
               <span className={cx(styles, 'word-type')}>{selectedWord.partOfSpeech}</span>
-              <button className={cx(styles, `learned-button c-button${learned.includes(selectedWord.word) ? ' is-learned' : ''}`)} type="button" onClick={() => toggleLearned(selectedWord.word)} aria-pressed={learned.includes(selectedWord.word)}>
+              <Button className={cx(styles, `learned-button c-button${learned.includes(selectedWord.word) ? ' is-learned' : ''}`)} type="button" onClick={() => toggleLearned(selectedWord.word)} aria-pressed={learned.includes(selectedWord.word)}>
                 {learned.includes(selectedWord.word) ? <Check size={16} aria-hidden="true" /> : <BookOpenCheck size={16} aria-hidden="true" />}
                 {learned.includes(selectedWord.word) ? 'Learned' : 'Mark as learned'}
-              </button>
+              </Button>
               <h2>{selectedWord.word}</h2>
               {selectedWord.pronounce && <p className={cx(styles, 'word-pronunciation')}>{selectedWord.pronounce}</p>}
-              <div className={cx(styles, 'detail-meaning-row')}><p lang="vi">{selectedWord.meaning}</p><button className={cx(styles, 'speak-button c-button')} type="button" onClick={() => speak(selectedWord.word)} aria-label={`Hear ${selectedWord.word}`}><Volume2 size={18} aria-hidden="true" /></button></div>
+              <div className={cx(styles, 'detail-meaning-row')}><p lang="vi">{selectedWord.meaning}</p><Button className={cx(styles, 'speak-button c-button')} type="button" onClick={() => speak(selectedWord.word)} aria-label={`Hear ${selectedWord.word}`}><Volume2 size={18} aria-hidden="true" /></Button></div>
               <span className={cx(styles, 'detail-group')}>{selectedWord.group}</span>
             </div>
             <div className={cx(styles, 'detail-examples-wrap')}>
@@ -363,7 +364,7 @@ export function HardWordsView({ active }) {
               <ol className={cx(styles, 'detail-examples')}>
                 {selectedWord.examples.map((example, index) => <li key={`${selectedWord.word}-${index}`}>
                   <div><p lang="en">{example.english}</p>{example.vietnamese && <span lang="vi">{example.vietnamese}</span>}</div>
-                  <button className={cx(styles, 'example-speak c-button')} type="button" onClick={() => speak(example.english)} aria-label={`Hear example ${index + 1}`}><Volume2 size={16} aria-hidden="true" /></button>
+                  <Button className={cx(styles, 'example-speak c-button')} type="button" onClick={() => speak(example.english)} aria-label={`Hear example ${index + 1}`}><Volume2 size={16} aria-hidden="true" /></Button>
                 </li>)}
               </ol>
             </div>
@@ -372,36 +373,36 @@ export function HardWordsView({ active }) {
           <div className={cx(styles, 'results-bar')}><span>{loadingWords ? 'Loading words…' : `${filtered.length.toLocaleString('en-US')} ${filtered.length === 1 ? 'word' : 'words'}`}</span><span>Choose a word to see its meaning and examples</span></div>
           <div className={cx(styles, 'hard-words-grid')}>
             {wordsError && <div className={cx(styles, 'empty-state')} role="alert">{wordsError}</div>}
-            {filtered.map((item) => <button key={item.word} className={cx(styles, 'hard-word-card c-button')} type="button" onClick={() => setSelectedWord(item)}>
+            {filtered.map((item) => <Button key={item.word} className={cx(styles, 'hard-word-card c-button')} type="button" onClick={() => setSelectedWord(item)}>
               <span className={cx(styles, 'word-type')}>{item.partOfSpeech}</span>
               {learned.includes(item.word) && <Check className={cx(styles, 'learned-check')} size={17} aria-label="Learned" />}
               <strong>{item.word}</strong>
               {item.pronounce && <span className={cx(styles, 'word-pronunciation')}>{item.pronounce}</span>}
               <span lang="vi" className={cx(styles, 'word-meaning')}>{item.meaning}</span>
               <span className={cx(styles, 'word-group')}>{item.group}</span>
-            </button>)}
+            </Button>)}
             {!loadingWords && !wordsError && !filtered.length && <div className={cx(styles, 'empty-state')}>No words match your search. Try another word or group.</div>}
           </div>
         </>}
       </> : <section className={cx(styles, 'practice-view')} aria-live="polite">
-        <button className={cx(styles, 'back-to-list c-button')} type="button" onClick={leavePractice}><ArrowLeft size={16} aria-hidden="true" /> Back to words</button>
+        <Button className={cx(styles, 'back-to-list c-button')} type="button" onClick={leavePractice}><ArrowLeft size={16} aria-hidden="true" /> Back to words</Button>
         {!quizMode ? <div className={cx(styles, 'practice-card c-surface')}>
           <p className={cx(styles, 'eyebrow')}>PRACTICE</p>
           <h2>Choose a practice style</h2>
           <p>Pick a short set based on the words currently shown by your filters. Questions are shuffled and prioritize words you have not seen recently.</p>
           <div className={cx(styles, 'practice-mode-grid')}>
-            <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('meaning')}><strong>Meaning</strong><span>Choose the English word that matches the Vietnamese meaning.</span></button>
-            <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('fill')} disabled={!filtered.some((item) => fillCandidate(item))}><strong>Fill in the blank</strong><span>Complete a real sentence with the right word.</span></button>
-            <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('spelling')}><strong>Listen and spell</strong><span>Listen to the pronunciation, then type the word.</span></button>
-            <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('pronunciation')}><strong>Pronunciation coach</strong><span>Say each word into your microphone and get feedback from GPT-5.4 mini.</span></button>
-            <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('relations')} disabled={!filtered.some((item) => item.synonyms?.length || item.antonyms?.length)}><strong>Synonyms and antonyms</strong><span>Select all matching synonyms or antonyms.</span></button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('meaning')}><strong>Meaning</strong><span>Choose the English word that matches the Vietnamese meaning.</span></Button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('fill')} disabled={!filtered.some((item) => fillCandidate(item))}><strong>Fill in the blank</strong><span>Complete a real sentence with the right word.</span></Button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('spelling')}><strong>Listen and spell</strong><span>Listen to the pronunciation, then type the word.</span></Button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('pronunciation')}><strong>Pronunciation coach</strong><span>Say each word into your microphone and get feedback from GPT-5.4 mini.</span></Button>
+            <Button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('relations')} disabled={!filtered.some((item) => item.synonyms?.length || item.antonyms?.length)}><strong>Synonyms and antonyms</strong><span>Select all matching synonyms or antonyms.</span></Button>
           </div>
         </div> : quizFinished ? <div className={cx(styles, 'practice-card c-surface')}>
           <div className={cx(styles, 'practice-complete-icon')}><Check size={27} aria-hidden="true" /></div>
           <p className={cx(styles, 'eyebrow')}>PRACTICE COMPLETE</p>
           <h2>You got {score} out of {quizDeck.length}</h2>
           <p>Keep reviewing these words to make them easier to recall.</p>
-          <div className={cx(styles, 'practice-complete-actions')}><button className={cx(styles, 'practice-button c-button')} type="button" onClick={() => startPractice(quizMode)}><RotateCcw size={16} aria-hidden="true" /> Try again</button><button className={cx(styles, 'secondary-button c-button')} type="button" onClick={leavePractice}>Browse words</button></div>
+          <div className={cx(styles, 'practice-complete-actions')}><Button className={cx(styles, 'practice-button c-button')} type="button" onClick={() => startPractice(quizMode)}><RotateCcw size={16} aria-hidden="true" /> Try again</Button><Button className={cx(styles, 'secondary-button c-button')} type="button" onClick={leavePractice}>Browse words</Button></div>
         </div> : currentQuestion && <div className={cx(styles, 'practice-card c-surface')}>
           <div className={cx(styles, 'practice-topline')}><span>Question {quizIndex + 1} of {quizDeck.length}</span><span>Score {score}</span></div>
           <div className={cx(styles, 'practice-progress')}><span style={{ width: `${((quizIndex + (quizAnswer ? 1 : 0)) / quizDeck.length) * 100}%` }} /></div>
@@ -412,10 +413,10 @@ export function HardWordsView({ active }) {
           {quizMode === 'relations' && <p className={cx(styles, 'practice-group')}>Select every correct answer.</p>}
           {quizMode === 'pronunciation' && <div className={cx(styles, 'pronunciation-controls')}>
             <p>Listen once, then say the word clearly. Keep your recording short.</p>
-            <button className={cx(styles, 'secondary-button c-button')} type="button" onClick={() => speak(currentQuestion.item.word)} disabled={isRecording || checkingPronunciation}><Volume2 size={17} aria-hidden="true" /> Listen to the word</button>
+            <Button className={cx(styles, 'secondary-button c-button')} type="button" onClick={() => speak(currentQuestion.item.word)} disabled={isRecording || checkingPronunciation}><Volume2 size={17} aria-hidden="true" /> Listen to the word</Button>
             {isRecording
-              ? <button className={cx(styles, 'practice-button c-button')} type="button" onClick={stopPronunciationRecording}><Square size={16} aria-hidden="true" /> Stop and check</button>
-              : <button className={cx(styles, 'practice-button c-button')} type="button" onClick={startPronunciationRecording} disabled={Boolean(quizAnswer) || checkingPronunciation}><Mic size={17} aria-hidden="true" /> {checkingPronunciation ? 'Checking pronunciation…' : 'Record my pronunciation'}</button>}
+              ? <Button className={cx(styles, 'practice-button c-button')} type="button" onClick={stopPronunciationRecording}><Square size={16} aria-hidden="true" /> Stop and check</Button>
+              : <Button className={cx(styles, 'practice-button c-button')} type="button" onClick={startPronunciationRecording} disabled={Boolean(quizAnswer) || checkingPronunciation}><Mic size={17} aria-hidden="true" /> {checkingPronunciation ? 'Checking pronunciation…' : 'Record my pronunciation'}</Button>}
             {pronunciationError && <p className={cx(styles, 'pronunciation-error')} role="alert">{pronunciationError}</p>}
             {pronunciationResult && <div className={cx(styles, `pronunciation-result${pronunciationResult.passed ? ' is-correct' : ' is-wrong'}`)} role="status">
               <strong>{pronunciationResult.score}/100 · {pronunciationResult.passed ? 'Recognized' : 'Try again'}</strong>
@@ -426,11 +427,11 @@ export function HardWordsView({ active }) {
             </div>}
           </div>}
           {quizMode === 'spelling' && <div className={cx(styles, 'spelling-controls')}>
-            <button className={cx(styles, 'secondary-button c-button')} type="button" onClick={() => speak(currentQuestion.item.word)}><Volume2 size={17} aria-hidden="true" /> Play pronunciation</button>
+            <Button className={cx(styles, 'secondary-button c-button')} type="button" onClick={() => speak(currentQuestion.item.word)}><Volume2 size={17} aria-hidden="true" /> Play pronunciation</Button>
             <form onSubmit={(event) => { event.preventDefault(); if (typedValue.trim()) answerQuestion(typedValue); }}>
               <label className={cx(styles, 'sr-only')} htmlFor="spelling-answer">Type the word you hear</label>
-              <input id="spelling-answer" autoComplete="off" spellCheck="false" value={typedValue} onChange={(event) => setTypedValue(event.target.value)} disabled={Boolean(quizAnswer)} placeholder="Type the word you hear" />
-              <button className={cx(styles, 'practice-button c-button')} type="submit" disabled={Boolean(quizAnswer) || !typedValue.trim()}>Check</button>
+              <Input id="spelling-answer" autoComplete="off" spellCheck="false" value={typedValue} onChange={(event) => setTypedValue(event.target.value)} disabled={Boolean(quizAnswer)} placeholder="Type the word you hear" />
+              <Button className={cx(styles, 'practice-button c-button')} type="submit" disabled={Boolean(quizAnswer) || !typedValue.trim()}>Check</Button>
             </form>
           </div>}
           {(quizMode === 'meaning' || quizMode === 'fill' || quizMode === 'relations') && <div className={cx(styles, 'quiz-options')}>
@@ -440,18 +441,18 @@ export function HardWordsView({ active }) {
               const isAnswer = quizAnswer !== '' && (isMulti ? currentQuestion.answer.includes(option) : option === currentQuestion.answer);
               const isWrong = quizAnswer !== '' && (isMulti ? isSelected && !isAnswer : quizAnswer === option && option !== currentQuestion.answer);
               const isPendingSelection = isMulti && quizAnswer === '' && isSelected;
-              return <button key={option} className={cx(styles, `quiz-option c-button${isAnswer ? ' is-correct' : ''}${isWrong ? ' is-wrong' : ''}${isPendingSelection ? ' is-selected' : ''}`)} type="button" onClick={() => isMulti ? toggleOption(option) : answerQuestion(option)} disabled={quizAnswer !== ''} aria-pressed={isMulti ? isSelected : undefined}>
+              return <Button key={option} className={cx(styles, `quiz-option c-button${isAnswer ? ' is-correct' : ''}${isWrong ? ' is-wrong' : ''}${isPendingSelection ? ' is-selected' : ''}`)} type="button" onClick={() => isMulti ? toggleOption(option) : answerQuestion(option)} disabled={quizAnswer !== ''} aria-pressed={isMulti ? isSelected : undefined}>
                 <span>{option}</span>{isAnswer && <Check size={17} aria-hidden="true" />}
-              </button>;
+              </Button>;
             })}
           </div>}
-          {quizMode === 'relations' && quizAnswer === '' && <button className={cx(styles, 'practice-button continue-button c-button')} type="button" onClick={() => answerQuestion(selectedOptions)}>Check selected words</button>}
+          {quizMode === 'relations' && quizAnswer === '' && <Button className={cx(styles, 'practice-button continue-button c-button')} type="button" onClick={() => answerQuestion(selectedOptions)}>Check selected words</Button>}
           {quizAnswer && <div className={cx(styles, `answer-feedback${questionCorrect ? ' is-correct' : ' is-wrong'}`)} role="status">
             <strong>{questionCorrect ? 'Correct!' : `Correct answers: ${answerText}.`}</strong>
             {quizMode === 'fill' && <span lang="vi">{currentQuestion.item.meaning}</span>}
             {currentQuestion.item.examples[0]?.vietnamese && <span lang="vi">{currentQuestion.item.examples[0].vietnamese}</span>}
           </div>}
-          {quizAnswer && <button className={cx(styles, 'practice-button continue-button c-button')} type="button" onClick={nextQuestion}>{quizIndex + 1 === quizDeck.length ? 'See your score' : 'Next question'} <ArrowRight size={16} aria-hidden="true" /></button>}
+          {quizAnswer && <Button className={cx(styles, 'practice-button continue-button c-button')} type="button" onClick={nextQuestion}>{quizIndex + 1 === quizDeck.length ? 'See your score' : 'Next question'} <ArrowRight size={16} aria-hidden="true" /></Button>}
         </div>}
       </section>}
     </div>

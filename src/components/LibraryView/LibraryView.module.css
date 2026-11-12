@@ -82,6 +82,7 @@
   font-size: var(--font-size-sm);
 }
 .librarySort {
+  width: auto;
   min-height: 32px;
   padding: 0 28px 0 10px;
   border: 1px solid var(--line);
@@ -89,6 +90,10 @@
   color: var(--ink);
   background: var(--white);
   font-size: var(--font-size-sm);
+}
+.libraryTools .librarySort {
+  width: auto;
+  min-height: 32px;
 }
 .libraryShuffle {
   display: grid;

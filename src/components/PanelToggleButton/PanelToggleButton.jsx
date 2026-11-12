@@ -1,4 +1,5 @@
 import styles from './PanelToggleButton.module.css';
+import { Button } from '../ui/index.js';
 import { cx } from '../../lib/cx.js';
 import { PanelRightClose, PanelRightOpen } from 'lucide-react';
 
@@ -11,7 +12,7 @@ export function PanelToggleButton({
 }) {
   const Icon = expanded ? PanelRightClose : PanelRightOpen;
 
-  return <button
+  return <Button
     className={cx(styles, 'panel-toggle-button', className)}
     type="button"
     aria-label={label}
@@ -21,5 +22,5 @@ export function PanelToggleButton({
     onClick={onClick}
   >
     <Icon aria-hidden="true" size={21} strokeWidth={1.8} />
-  </button>;
+  </Button>;
 }
