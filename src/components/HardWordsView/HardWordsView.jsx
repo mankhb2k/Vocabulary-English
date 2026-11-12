@@ -1,7 +1,7 @@
 import styles from './HardWordsView.module.css';
 import { cx } from '../../lib/cx.js';
-import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, BookOpenCheck, Check, ChevronDown, RotateCcw, Search, Volume2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, BookOpenCheck, Check, ChevronDown, Mic, RotateCcw, Search, Square, Volume2 } from 'lucide-react';
 import { apiJson } from '../../lib/vocabulary.js';
 
 const learnedStorageKey = 'englishCardsHardWordsLearned';
@@ -66,6 +66,13 @@ export function HardWordsView({ active }) {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [typedValue, setTypedValue] = useState('');
   const [score, setScore] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const [checkingPronunciation, setCheckingPronunciation] = useState(false);
+  const [pronunciationResult, setPronunciationResult] = useState(null);
+  const [pronunciationError, setPronunciationError] = useState('');
+  const recorderRef = useRef(null);
+  const recordingStreamRef = useRef(null);
+  const recordingChunksRef = useRef([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,6 +85,11 @@ export function HardWordsView({ active }) {
       })
       .finally(() => { if (!cancelled) setLoadingWords(false); });
     return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => () => {
+    if (recorderRef.current?.state !== 'inactive') recorderRef.current?.stop();
+    recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
   }, []);
 
   const groups = useMemo(() => [...new Set(words.map((item) => item.group))], [words]);
@@ -118,6 +130,7 @@ export function HardWordsView({ active }) {
       const item = candidate.item || candidate;
       if (mode === 'meaning') return { item, answer: item.word, prompt: item.meaning, options: shuffle([item.word, ...shuffle(words.filter((word) => word.word !== item.word)).slice(0, 3).map((word) => word.word)]) };
       if (mode === 'fill') return { item, answer: item.word, prompt: candidate.sentence, options: shuffle([item.word, ...shuffle(words.filter((word) => word.word !== item.word)).slice(0, 3).map((word) => word.word)]) };
+      if (mode === 'pronunciation') return { item, answer: item.word, prompt: 'Say this word clearly.' };
       if (mode === 'spelling') return { item, answer: item.word, prompt: 'Listen, then type the word you hear.' };
       const relationType = Math.random() < 0.5 && item.synonyms?.length ? 'synonyms' : item.antonyms?.length ? 'antonyms' : 'synonyms';
       const answer = [...new Set(item[relationType].map((value) => value.trim()))];
@@ -141,6 +154,8 @@ export function HardWordsView({ active }) {
     setQuizAnswer('');
     setSelectedOptions([]);
     setTypedValue('');
+    setPronunciationResult(null);
+    setPronunciationError('');
     setQuizMode(mode);
     setPractice(true);
     setSelectedWord(null);
@@ -151,7 +166,67 @@ export function HardWordsView({ active }) {
     setQuizAnswer('');
     setSelectedOptions([]);
     setTypedValue('');
+    setPronunciationResult(null);
+    setPronunciationError('');
     setQuizIndex(nextIndex);
+  };
+
+  const checkPronunciation = async (audioBlob) => {
+    setCheckingPronunciation(true);
+    setPronunciationError('');
+    const form = new FormData();
+    form.append('audio', audioBlob, audioBlob.type.includes('mp4') ? 'pronunciation.m4a' : 'pronunciation.webm');
+    form.append('target', currentQuestion.item.word);
+    try {
+      const result = await apiJson('/api/pronunciation/check', { method: 'POST', body: form });
+      setPronunciationResult(result);
+      setQuizAnswer(result.transcript || 'checked');
+      if (result.passed) setScore((current) => current + 1);
+    }
+    catch (error) {
+      setPronunciationError(error.message || 'Could not check this recording. Please try again.');
+    }
+    finally {
+      setCheckingPronunciation(false);
+    }
+  };
+
+  const startPronunciationRecording = async () => {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      setPronunciationError('Audio recording is not supported in this browser. Try the latest version of Chrome.');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      recordingStreamRef.current = stream;
+      recordingChunksRef.current = [];
+      recorderRef.current = recorder;
+      recorder.ondataavailable = (event) => {
+        if (event.data.size) recordingChunksRef.current.push(event.data);
+      };
+      recorder.onstop = () => {
+        setIsRecording(false);
+        stream.getTracks().forEach((track) => track.stop());
+        recordingStreamRef.current = null;
+        const recording = new Blob(recordingChunksRef.current, { type: recorder.mimeType || 'audio/webm' });
+        if (recording.size) void checkPronunciation(recording);
+        else setPronunciationError('No audio was captured. Please try recording again.');
+      };
+      setPronunciationError('');
+      setPronunciationResult(null);
+      recorder.start();
+      setIsRecording(true);
+    }
+    catch (error) {
+      setPronunciationError(error.name === 'NotAllowedError'
+        ? 'Allow microphone access in your browser, then try again.'
+        : 'Could not start the microphone. Check that it is connected and try again.');
+    }
+  };
+
+  const stopPronunciationRecording = () => {
+    if (recorderRef.current?.state === 'recording') recorderRef.current.stop();
   };
 
   const answerQuestion = (answer) => {
@@ -184,11 +259,15 @@ export function HardWordsView({ active }) {
     setQuizMode(null);
     setQuizAnswer('');
     setSelectedOptions([]);
+    setPronunciationResult(null);
+    setPronunciationError('');
   };
 
   const currentQuestion = quizDeck[quizIndex];
   const questionCorrect = currentQuestion && (quizMode === 'spelling'
     ? currentQuestion.item.word.split('/').some((value) => value.trim().toLocaleLowerCase() === quizAnswer.trim().toLocaleLowerCase())
+    : quizMode === 'pronunciation'
+      ? pronunciationResult?.passed
     : quizMode === 'relations'
       ? sameAnswerSet(quizAnswer, currentQuestion.answer)
       : quizAnswer === currentQuestion.answer);
@@ -284,6 +363,7 @@ export function HardWordsView({ active }) {
             <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('meaning')}><strong>Meaning</strong><span>Choose the English word that matches the Vietnamese meaning.</span></button>
             <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('fill')} disabled={!filtered.some((item) => fillCandidate(item))}><strong>Fill in the blank</strong><span>Complete a real sentence with the right word.</span></button>
             <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('spelling')}><strong>Listen and spell</strong><span>Listen to the pronunciation, then type the word.</span></button>
+            <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('pronunciation')}><strong>Pronunciation coach</strong><span>Say each word into your microphone and get feedback from GPT-5.4 mini.</span></button>
             <button type="button" className={cx(styles, 'practice-mode-card c-button')} onClick={() => startPractice('relations')} disabled={!filtered.some((item) => item.synonyms?.length || item.antonyms?.length)}><strong>Synonyms and antonyms</strong><span>Select all matching synonyms or antonyms.</span></button>
           </div>
         </div> : quizFinished ? <div className={cx(styles, 'practice-card c-surface')}>
@@ -296,9 +376,24 @@ export function HardWordsView({ active }) {
           <div className={cx(styles, 'practice-topline')}><span>Question {quizIndex + 1} of {quizDeck.length}</span><span>Score {score}</span></div>
           <div className={cx(styles, 'practice-progress')}><span style={{ width: `${((quizIndex + (quizAnswer ? 1 : 0)) / quizDeck.length) * 100}%` }} /></div>
           <p className={cx(styles, 'eyebrow')}>{quizMode === 'meaning' ? 'CHOOSE THE WORD' : quizMode === 'fill' ? 'COMPLETE THE SENTENCE' : quizMode === 'spelling' ? 'LISTEN AND SPELL' : 'WORD RELATIONSHIPS'}</p>
-          <h2>{quizMode === 'meaning' ? currentQuestion.prompt : quizMode === 'relations' ? currentQuestion.prompt : quizMode === 'fill' ? currentQuestion.prompt : currentQuestion.item.meaning}</h2>
+          <h2>{quizMode === 'meaning' ? currentQuestion.prompt : quizMode === 'relations' ? currentQuestion.prompt : quizMode === 'fill' ? currentQuestion.prompt : quizMode === 'pronunciation' ? currentQuestion.item.word : currentQuestion.item.meaning}</h2>
           {quizMode === 'meaning' && <p lang="vi" className={cx(styles, 'practice-group')}>{currentQuestion.item.group}</p>}
           {quizMode === 'relations' && <p className={cx(styles, 'practice-group')}>Select every correct answer.</p>}
+          {quizMode === 'pronunciation' && <div className={cx(styles, 'pronunciation-controls')}>
+            <p>Listen once, then say the word clearly. Keep your recording short.</p>
+            <button className={cx(styles, 'secondary-button c-button')} type="button" onClick={() => speak(currentQuestion.item.word)} disabled={isRecording || checkingPronunciation}><Volume2 size={17} aria-hidden="true" /> Listen to the word</button>
+            {isRecording
+              ? <button className={cx(styles, 'practice-button c-button')} type="button" onClick={stopPronunciationRecording}><Square size={16} aria-hidden="true" /> Stop and check</button>
+              : <button className={cx(styles, 'practice-button c-button')} type="button" onClick={startPronunciationRecording} disabled={Boolean(quizAnswer) || checkingPronunciation}><Mic size={17} aria-hidden="true" /> {checkingPronunciation ? 'Checking pronunciation…' : 'Record my pronunciation'}</button>}
+            {pronunciationError && <p className={cx(styles, 'pronunciation-error')} role="alert">{pronunciationError}</p>}
+            {pronunciationResult && <div className={cx(styles, `pronunciation-result${pronunciationResult.passed ? ' is-correct' : ' is-wrong'}`)} role="status">
+              <strong>{pronunciationResult.score}/100 · {pronunciationResult.passed ? 'Recognized' : 'Try again'}</strong>
+              <span>Heard: “{pronunciationResult.transcript}”</span>
+              <span>{pronunciationResult.feedback}</span>
+              <span>{pronunciationResult.tip}</span>
+              <small>Score is based on speech recognition of the word, not a detailed analysis of accent or individual sounds.</small>
+            </div>}
+          </div>}
           {quizMode === 'spelling' && <div className={cx(styles, 'spelling-controls')}>
             <button className={cx(styles, 'secondary-button c-button')} type="button" onClick={() => speak(currentQuestion.item.word)}><Volume2 size={17} aria-hidden="true" /> Play pronunciation</button>
             <form onSubmit={(event) => { event.preventDefault(); if (typedValue.trim()) answerQuestion(typedValue); }}>

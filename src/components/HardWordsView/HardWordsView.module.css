@@ -424,6 +424,47 @@
   cursor: not-allowed;
   opacity: 0.55;
 }
+.pronunciationControls {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-top: 20px;
+}
+.pronunciationControls > p {
+  margin: 0 0 3px;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+.pronunciationControls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.pronunciationError {
+  color: var(--coral) !important;
+}
+.pronunciationResult {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--paper);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+.pronunciationResult.isCorrect strong {
+  color: var(--color-success);
+}
+.pronunciationResult.isWrong strong {
+  color: var(--coral);
+}
+.pronunciationResult small {
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
 .practiceTopline {
   display: flex;
   justify-content: space-between;
