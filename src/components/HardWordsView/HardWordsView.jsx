@@ -294,7 +294,8 @@ export function HardWordsView({ active }) {
   return <div className={cx(styles, `view hard-words-view${active ? ' is-visible' : ''}`)} id="view-hardwords">
     <div className={cx(styles, 'hard-words-shell')}>
       {!practice ? <>
-        <header className={cx(styles, 'hard-words-heading')}>
+        {!selectedWord && <>
+          <header className={cx(styles, 'hard-words-heading')}>
           <div>
             <p className={cx(styles, 'eyebrow')}>PRACTICAL VOCABULARY</p>
             <h1>Words that are hard to picture</h1>
@@ -304,9 +305,9 @@ export function HardWordsView({ active }) {
             <span><strong>{words.length.toLocaleString('en-US')}</strong> words</span>
             <span><strong>{learned.length.toLocaleString('en-US')}</strong> learned</span>
           </div>
-        </header>
+          </header>
 
-        <div className={cx(styles, 'hard-words-controls')}>
+          <div className={cx(styles, 'hard-words-controls')}>
           <label className={cx(styles, 'hard-words-search')}>
             <span className={cx(styles, 'sr-only')}>Search words and meanings</span>
             <Search size={18} aria-hidden="true" />
@@ -343,7 +344,8 @@ export function HardWordsView({ active }) {
           <Button className={cx(styles, 'practice-button c-button')} type="button" onClick={() => startPractice()} disabled={!filtered.length}>
             <BookOpenCheck size={17} aria-hidden="true" /> Practice
           </Button>
-        </div>
+          </div>
+        </>}
 
         {selectedWord ? <section className={cx(styles, 'hard-word-detail')} aria-live="polite">
           <Button className={cx(styles, 'back-to-list c-button')} type="button" onClick={() => setSelectedWord(null)}><ArrowLeft size={16} aria-hidden="true" /> Back to words</Button>
