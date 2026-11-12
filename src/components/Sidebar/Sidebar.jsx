@@ -1,11 +1,11 @@
 import styles from './Sidebar.module.css';
 import { cx } from '../../lib/cx.js';
-import { BookOpenText, Languages, MessageSquareText, SquarePlus } from 'lucide-react';
+import { BookOpenText, Languages, Brain, SquarePlus } from 'lucide-react';
 const navItems = [
   ['library', 'Library', BookOpenText],
   ['translate', 'Translate', Languages],
   ['add', 'Add word', SquarePlus],
-  ['ask', 'Chat AI', MessageSquareText],
+  ['hardwords', 'Hard words', Brain],
 ];
 
 export function Sidebar({ view, onNavigate }) {

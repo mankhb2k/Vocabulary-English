@@ -5,12 +5,13 @@ import { Sidebar } from '../Sidebar/Sidebar.jsx';
 import { LibraryView } from '../LibraryView/LibraryView.jsx';
 import { TranslationView } from '../TranslationView/TranslationView.jsx';
 import { AddView } from '../AddView/AddView.jsx';
-import { AskView } from '../AskView/AskView.jsx';
+import { HardWordsView } from '../HardWordsView/HardWordsView.jsx';
 
 function readRoute() {
   const hash = decodeURIComponent(window.location.hash.slice(1));
   if (hash.startsWith('library/')) return { view: 'library', card: hash.slice('library/'.length) };
-  return { view: ['library', 'translate', 'add', 'ask'].includes(hash) ? hash : 'library', card: '' };
+  const view = hash === 'ask' ? 'hardwords' : hash;
+  return { view: ['library', 'translate', 'add', 'hardwords'].includes(view) ? view : 'library', card: '' };
 }
 
 export function App() {
@@ -54,7 +55,7 @@ export function App() {
       <LibraryView active={route.view === 'library'} cardWord={route.card} refreshKey={refreshKey} onNavigate={navigate} onEdit={editCard} onToast={notify}/>
       <TranslationView active={route.view === 'translate'} onToast={notify}/>
       <AddView active={route.view === 'add'} editingCard={editingCard} onVocabularyChanged={() => setRefreshKey((value) => value + 1)} onSaved={() => { setEditingCard(null); setRefreshKey((value) => value + 1); navigate('library'); }} onToast={notify}/>
-      <AskView active={route.view === 'ask'} onToast={notify}/>
+      <HardWordsView active={route.view === 'hardwords'}/>
     </main>
     <div className={cx(styles, `toast${toast ? ' is-visible' : ''}`)} role="status" aria-live="polite">{toast}</div>
   </div>;
