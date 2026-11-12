@@ -88,7 +88,7 @@ export function HardWordsView({ active }) {
     return words.filter((item) => (group === 'all' || item.group === group)
       && (part === 'all' || item.partOfSpeech === part)
       && (!needle || `${item.word} ${item.meaning} ${item.group} ${item.partOfSpeech}`.toLocaleLowerCase().includes(needle)));
-  }, [group, part, query]);
+  }, [words, group, part, query]);
 
   const startPractice = (mode = null) => {
     if (!mode) {
