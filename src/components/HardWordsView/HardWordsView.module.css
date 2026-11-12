@@ -104,6 +104,36 @@
   pointer-events: none;
   color: var(--muted);
 }
+.hardWordsSortTools {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+.hardWordsSortLabel {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+.hardWordsSortWrap {
+  flex: 0 0 124px;
+  min-width: 124px;
+}
+.hardWordsShuffle {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--navy);
+  background: var(--white);
+}
+.hardWordsShuffle:hover {
+  border-color: var(--mint-strong);
+  background: var(--mint);
+}
 .practiceButton,
 .secondaryButton {
   display: inline-flex;
@@ -618,6 +648,12 @@
   .hardWordsSelectWrap {
     flex: 1 1 220px;
   }
+  .hardWordsSortTools {
+    flex: 1 1 220px;
+  }
+  .hardWordsSortWrap {
+    flex: 1 1 auto;
+  }
 }
 @media (max-width: 590px) {
   .hardWordsView {
@@ -642,6 +678,9 @@
   }
   .hardWordsSearch,
   .hardWordsSelectWrap {
+    flex-basis: 100%;
+  }
+  .hardWordsSortTools {
     flex-basis: 100%;
   }
   .practiceButton {

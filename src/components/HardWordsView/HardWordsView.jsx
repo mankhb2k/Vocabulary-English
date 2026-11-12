@@ -1,7 +1,7 @@
 import styles from './HardWordsView.module.css';
 import { cx } from '../../lib/cx.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, BookOpenCheck, Check, ChevronDown, Mic, RotateCcw, Search, Square, Volume2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpenCheck, Check, ChevronDown, Mic, RotateCcw, Search, Shuffle, Square, Volume2 } from 'lucide-react';
 import { apiJson } from '../../lib/vocabulary.js';
 
 const learnedStorageKey = 'englishCardsHardWordsLearned';
@@ -48,6 +48,8 @@ export function HardWordsView({ active }) {
   const [loadingWords, setLoadingWords] = useState(true);
   const [wordsError, setWordsError] = useState('');
   const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('random');
+  const [randomOrder, setRandomOrder] = useState([]);
   const [group, setGroup] = useState('all');
   const [part, setPart] = useState('all');
   const [selectedWord, setSelectedWord] = useState(null);
@@ -78,7 +80,11 @@ export function HardWordsView({ active }) {
     let cancelled = false;
     apiJson('/api/hard-words')
       .then((payload) => {
-        if (!cancelled) setWords(Array.isArray(payload.items) ? payload.items : []);
+        if (!cancelled) {
+          const items = Array.isArray(payload.items) ? payload.items : [];
+          setWords(items);
+          setRandomOrder(shuffle(items.map((item) => item.word.toLocaleLowerCase())));
+        }
       })
       .catch((error) => {
         if (!cancelled) setWordsError(error.message || 'Could not load the hard words from D1.');
@@ -97,10 +103,20 @@ export function HardWordsView({ active }) {
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
-    return words.filter((item) => (group === 'all' || item.group === group)
+    const result = words.filter((item) => (group === 'all' || item.group === group)
       && (part === 'all' || item.partOfSpeech === part)
       && (!needle || `${item.word} ${item.meaning} ${item.group} ${item.partOfSpeech}`.toLocaleLowerCase().includes(needle)));
-  }, [words, group, part, query]);
+    if (sort === 'az') return result.sort((a, b) => a.word.localeCompare(b.word, undefined, { sensitivity: 'base' }));
+    const lookup = new Map(result.map((item) => [item.word.toLocaleLowerCase(), item]));
+    const ordered = randomOrder.map((word) => lookup.get(word)).filter(Boolean);
+    const included = new Set(ordered.map((item) => item.word.toLocaleLowerCase()));
+    return ordered.concat(result.filter((item) => !included.has(item.word.toLocaleLowerCase())));
+  }, [words, group, part, query, sort, randomOrder]);
+
+  const shuffleWords = () => {
+    setRandomOrder(shuffle(words.map((item) => item.word.toLocaleLowerCase())));
+    setSort('random');
+  };
 
   const startPractice = (mode = null) => {
     if (!mode) {
@@ -311,6 +327,18 @@ export function HardWordsView({ active }) {
             </select>
             <ChevronDown size={16} aria-hidden="true" />
           </label>
+          <div className={cx(styles, 'hard-words-sort-tools')}>
+            <label className={cx(styles, 'hard-words-sort-label')} htmlFor="hard-words-sort">Sort by</label>
+            <label className={cx(styles, 'hard-words-select-wrap hard-words-sort-wrap')}>
+              <span className={cx(styles, 'sr-only')}>Sort hard words</span>
+              <select id="hard-words-sort" value={sort} onChange={(event) => setSort(event.target.value)}>
+                <option value="random">Random</option>
+                <option value="az">A–Z</option>
+              </select>
+              <ChevronDown size={16} aria-hidden="true" />
+            </label>
+            <button className={cx(styles, 'hard-words-shuffle c-button')} type="button" onClick={shuffleWords} aria-label="Shuffle words" title="Shuffle words"><Shuffle size={16} aria-hidden="true" /></button>
+          </div>
           <button className={cx(styles, 'practice-button c-button')} type="button" onClick={() => startPractice()} disabled={!filtered.length}>
             <BookOpenCheck size={17} aria-hidden="true" /> Practice
           </button>
