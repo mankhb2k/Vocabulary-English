@@ -144,7 +144,10 @@ export function TranslationView({ active, onToast }) {
     const textarea = textareaRef.current;
     if (!textarea) return;
     textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
+    const maxHeight = Number.parseFloat(window.getComputedStyle(textarea).maxHeight) || 150;
+    const height = Math.min(textarea.scrollHeight, maxHeight);
+    textarea.style.height = `${height}px`;
+    textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
   }, [source]);
 
   useEffect(() => {
