@@ -281,6 +281,9 @@ export function HardWordsView({ active }) {
   };
 
   const currentQuestion = quizDeck[quizIndex];
+  const meaningExample = quizMode === 'meaning'
+    ? currentQuestion?.item.examples?.find((example) => typeof example.english === 'string' && example.english.trim())
+    : null;
   const questionCorrect = currentQuestion && (quizMode === 'spelling'
     ? currentQuestion.item.word.split('/').some((value) => value.trim().toLocaleLowerCase() === quizAnswer.trim().toLocaleLowerCase())
     : quizMode === 'pronunciation'
@@ -452,8 +455,11 @@ export function HardWordsView({ active }) {
           {quizAnswer && <div className={cx(styles, `answer-feedback${questionCorrect ? ' is-correct' : ' is-wrong'}`)} role="status">
             <strong>{questionCorrect ? 'Correct!' : `Correct answers: ${answerText}.`}</strong>
             {quizMode === 'fill' && <span lang="vi">{currentQuestion.item.meaning}</span>}
-            {quizMode === 'meaning' && currentQuestion.item.examples[0]?.english && <span lang="en">{currentQuestion.item.examples[0].english}</span>}
-            {currentQuestion.item.examples[0]?.vietnamese && <span lang="vi">{currentQuestion.item.examples[0].vietnamese}</span>}
+            {meaningExample && <div className={cx(styles, 'answer-example')}>
+              <span className={cx(styles, 'answer-example-label')}>Example</span>
+              <span lang="en">{meaningExample.english}</span>
+              {meaningExample.vietnamese && <span lang="vi">{meaningExample.vietnamese}</span>}
+            </div>}
           </div>}
           {quizAnswer && <Button className={cx(styles, 'practice-button continue-button c-button')} type="button" onClick={nextQuestion}>{quizIndex + 1 === quizDeck.length ? 'See your score' : 'Next question'} <ArrowRight size={16} aria-hidden="true" /></Button>}
         </div>}

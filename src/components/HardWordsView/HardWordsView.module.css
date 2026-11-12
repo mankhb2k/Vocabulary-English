@@ -604,6 +604,19 @@
 .answerFeedback.isWrong strong {
   color: var(--coral);
 }
+.answerExample {
+  display: grid;
+  gap: 4px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+}
+.answerExampleLabel {
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 .continueButton {
   margin-top: 15px;
 }
