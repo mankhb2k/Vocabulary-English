@@ -106,6 +106,7 @@ export function Select({
       id={id}
       type="button"
       role="combobox"
+      data-select-trigger=""
       aria-haspopup="listbox"
       aria-expanded={open}
       aria-controls={listboxId}

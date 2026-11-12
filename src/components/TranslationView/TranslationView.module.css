@@ -99,7 +99,7 @@
 .translationVoicePanel [role='combobox'] {
   width: 100%;
   min-height: 42px;
-  padding: 0 10px;
+  padding: 0 36px 0 10px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   color: var(--ink);
@@ -270,7 +270,7 @@
   min-height: 34px;
   border: 0;
   border-radius: 7px;
-  padding: 0 4px;
+  padding: 0 32px 0 4px;
   color: var(--ink);
   background: var(--white);
   font: inherit;

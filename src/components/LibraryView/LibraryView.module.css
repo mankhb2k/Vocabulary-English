@@ -87,7 +87,7 @@
 .librarySort [role='combobox'] {
   width: auto;
   min-height: 32px;
-  padding: 0 28px 0 10px;
+  padding: 0 34px 0 10px;
   border: 1px solid var(--line);
   border-radius: 7px;
   color: var(--ink);

@@ -245,11 +245,11 @@
   font-size: var(--font-size-md);
   resize: vertical;
 }
-.formField [role='combobox'] {
+.formField [data-select-trigger] {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  padding: 11px 12px;
+  padding: 11px 36px 11px 12px;
   outline: 0;
   color: var(--ink);
   background: var(--paper);
@@ -299,7 +299,7 @@
   border-color: var(--mint-strong);
   background: var(--white);
 }
-.formField [role='combobox']:focus-visible {
+.formField [data-select-trigger]:focus-visible {
   border-color: var(--mint-strong);
   background: var(--white);
 }
@@ -470,7 +470,7 @@
   .formField input {
     font-size: var(--font-size-lg);
   }
-  .formField [role='combobox'] {
+  .formField [data-select-trigger] {
     font-size: var(--font-size-lg);
   }
   .formField textarea {
