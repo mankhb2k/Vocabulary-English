@@ -452,6 +452,7 @@ export function HardWordsView({ active }) {
           {quizAnswer && <div className={cx(styles, `answer-feedback${questionCorrect ? ' is-correct' : ' is-wrong'}`)} role="status">
             <strong>{questionCorrect ? 'Correct!' : `Correct answers: ${answerText}.`}</strong>
             {quizMode === 'fill' && <span lang="vi">{currentQuestion.item.meaning}</span>}
+            {quizMode === 'meaning' && currentQuestion.item.examples[0]?.english && <span lang="en">{currentQuestion.item.examples[0].english}</span>}
             {currentQuestion.item.examples[0]?.vietnamese && <span lang="vi">{currentQuestion.item.examples[0].vietnamese}</span>}
           </div>}
           {quizAnswer && <Button className={cx(styles, 'practice-button continue-button c-button')} type="button" onClick={nextQuestion}>{quizIndex + 1 === quizDeck.length ? 'See your score' : 'Next question'} <ArrowRight size={16} aria-hidden="true" /></Button>}
